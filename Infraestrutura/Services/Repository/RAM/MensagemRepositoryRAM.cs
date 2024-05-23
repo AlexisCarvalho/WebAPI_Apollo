@@ -40,7 +40,8 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 
         public List<ChatDto> GetAll()
         {
-            return VolatileContext.Mensagens.Select(mensagem =>
+            return VolatileContext.Mensagens
+                .Select(mensagem =>
                 new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp))
                 .ToList();
         }
@@ -52,25 +53,31 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 
         public List<ChatDto> EnviadasPor(Guid id)
         {
-            return VolatileContext.Mensagens.Where(mensagem => mensagem.Remetente == id)
+            return VolatileContext.Mensagens
+                .OrderByDescending(msg => msg.Id)
                 .Select(mensagem =>
                     new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp))
+                .Where(mensagem => mensagem.Remetente == id)
                 .ToList();
         }
 
         public List<ChatDto> RecebidasPor(Guid id)
         {
-            return VolatileContext.Mensagens.Where(mensagem => mensagem.Destinatario == id)
+            return VolatileContext.Mensagens
+                .OrderByDescending(msg => msg.Id)
                 .Select(mensagem =>
                     new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp))
+                .Where(mensagem => mensagem.Destinatario == id)
                 .ToList();
         }
 
         public List<ChatDto> EnviadasEntre(Guid remetente, Guid destinatario)
         {
-            return VolatileContext.Mensagens.Where(mensagem => mensagem.Remetente == remetente && mensagem.Destinatario == destinatario)
+            return VolatileContext.Mensagens
+                .OrderByDescending(msg => msg.Id)
                 .Select(mensagem =>
                     new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp))
+                .Where(mensagem => mensagem.Remetente == remetente && mensagem.Destinatario == destinatario)
                 .ToList();
         }
 

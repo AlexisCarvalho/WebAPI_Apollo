@@ -19,21 +19,21 @@ var builder = WebApplication.CreateBuilder(args);
 
   _____________________________________________
  |***************** Possivel ******************| 
- | TODO: Solicitações de amizade               |  (EM PROGRESSO) 
- | TODO: Aceitar Solicitações de amizade       |  (EM PROGRESSO)
- | TODO: Modo de diferenciar lidas e não lidas |
+ | TODO: Solicitações de amizade               |  (CONCLUIDO) 
+ | TODO: Aceitar Solicitações de amizade       |  (CONCLUIDO)
+ | TODO: Modo de diferenciar lidas e não lidas |  (CONCLUIDO)
  | TODO: Pesquisar por posts (pelos títulos)   |
- | TODO: Delete deve apagar todas as referen-  |
+ | TODO: Delete deve apagar todas as referen-  |  (EM PROGRESSO)
  |       cias do usuario incluindo amizades,   |
  |       posts, enfim... Tudo que seu id esta  |
  |       relacionado                           |
  |                                             |
   _____________________________________________
  |*********** Possivel mas difícil ************| 
- | TODO: Notificações                          |  (EM PROGRESSO) 
+ | TODO: Notificações                          |  (EM PROGRESSO) Revisão 
  | TODO: Feed gerado com pessoas ou perfis     |  (EM PROGRESSO) 
  |       que o usuario segue (Amigos)          |  
- | TODO: Posts estão sendo retornados e orden  |  (COMPLETO)
+ | TODO: Posts estão sendo retornados e orden  |  (CONCLUIDO)
  |       ados pelo id, por ser Guid a ordem    |
  |       fica bagunçada, como posts não tem    |
  |       timeStamp seria sabio adicionar e     |
@@ -45,9 +45,9 @@ var builder = WebApplication.CreateBuilder(args);
   _____________________________________________
  |******* Mexer Quando Tiver Pouco Tempo ******| 
  | TODO: Mudar todos os retornos Get para Dto, |
- |      pra evitar conversão na rota           |
+ |       pra evitar conversão na rota          |
  | TODO: Catalogar as respostas das rotas,     |
- |      possíveis retornos e código            |
+ |       possíveis retornos e código           |
 
 */
 

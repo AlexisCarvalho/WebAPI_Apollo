@@ -41,24 +41,27 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         public List<ChatDto> EnviadasPor(Guid id)
         {
             return _context.Mensagens
-                           .Where(mensagem => mensagem.Remetente == id)
+                           .OrderByDescending(msg => msg.Id)
                            .Select(mensagem => new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp))
+                           .Where(mensagem => mensagem.Remetente == id)
                            .ToList();
         }
 
         public List<ChatDto> RecebidasPor(Guid id)
         {
             return _context.Mensagens
-                           .Where(mensagem => mensagem.Destinatario == id)
+                           .OrderByDescending(msg => msg.Id)
                            .Select(mensagem => new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp))
+                           .Where(mensagem => mensagem.Destinatario == id)
                            .ToList();
         }
 
         public List<ChatDto> EnviadasEntre(Guid remetente, Guid destinatario)
         {
             return _context.Mensagens
-                    .Where(mensagem => mensagem.Remetente == remetente && mensagem.Destinatario == destinatario)
+                    .OrderByDescending(msg => msg.Id)
                     .Select(mensagem => new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp))
+                    .Where(mensagem => mensagem.Remetente == remetente && mensagem.Destinatario == destinatario)
                     .ToList();
         }
 

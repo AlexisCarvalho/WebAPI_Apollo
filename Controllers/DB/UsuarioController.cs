@@ -23,7 +23,7 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // Adicionar um Usuario
         //[Authorize]
-        //[Obsolete("Esta rota está obsoleta. Atualizar baseado no RAM.")]
+        [Obsolete("Esta rota está obsoleta. Atualizar baseado no RAM.")]
         [HttpPost]
         [Route("{nome}/{email}/{senha}/{userName}/{palavraRecuperacao}/{dataNascimento}")]
         public IActionResult AddUsr(string nome, string email, string senha, string userName, string palavraRecuperacao, string dataNascimento)

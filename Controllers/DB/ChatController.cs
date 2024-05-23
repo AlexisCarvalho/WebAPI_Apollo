@@ -23,7 +23,7 @@ namespace WebAPI_Apollo.Controllers.DB
         //  Email: Alexis@gmail.com Senha: 123456)
 
         //[Authorize]
-        //[Obsolete("Alterar conforme o RAM")]
+        [Obsolete("Alterar conforme o RAM")]
         [HttpPost]
         [Route("{remetente}/{destinatario}/{conteudo}")]
         public IActionResult AddMsg(Guid remetente, Guid destinatario, string conteudo)

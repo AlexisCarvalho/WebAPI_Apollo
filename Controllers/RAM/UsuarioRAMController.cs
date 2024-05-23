@@ -58,11 +58,17 @@ namespace WebAPI_Apollo.Controllers.DB
 
             var novoUsuario = new Usuario(nome, email, senha, userName, palavraRecuperacao, dataConvertida);
 
-            var existente = _usrRepository.verificarSeExisteEmailUsername(novoUsuario);
+            var existenteEmail = _usrRepository.GetSemelhanteEmail(novoUsuario.Email);
+            var existenteUserName = _usrRepository.GetSemelhanteUserName(novoUsuario.UserName);
 
-            if (existente)
+            if (existenteEmail != null)
             {
-                return BadRequest("Usuario com mesmo username ou email existente");
+                return BadRequest("Usuario com mesmo email existente");
+            }
+
+            if (existenteUserName != null)
+            {
+                return BadRequest("Usuario com mesmo username existente");
             }
 
             InformHome informHome = new InformHome(novoUsuario.Id);
@@ -274,15 +280,15 @@ namespace WebAPI_Apollo.Controllers.DB
         // Carregar a Home 
         //[Authorize]
         [HttpGet]
-        [Route("Amizades/{idUsuario}")]
-        public IActionResult GetAmigosUsr(Guid idUsuario)
+        [Route("Amizades/{id}")]
+        public IActionResult GetAmigosUsr(Guid id)
         {
-            var amizades = _amzdRepository.GetAllUsr(idUsuario);
+            var amizades = _amzdRepository.GetAllUsr(id);
             List<AmizadeListaAmigos> listaAmigos = new List<AmizadeListaAmigos>();
 
             foreach (var amizade in amizades)
             {
-                if (amizade.Remetente == idUsuario)
+                if (amizade.Remetente == id)
                 {
                     var amigo = _usrRepository.Get(amizade.Destinatario);
 
@@ -360,13 +366,20 @@ namespace WebAPI_Apollo.Controllers.DB
             string mensagem = $"Olá {quemEleQuerPedir.Nome.Split(" ")[0]}, gostaria de ser meu amigo aqui na {ConfSistema.NomeRedeSocial}. Seria ótimo trocar ideias e experiências.";
 
             Notificacao solicitacaoAmizade = new Notificacao(idUsuario, idAmigo, 1 , mensagem);
+            Notificacao solicitacaoDoAmigo = new Notificacao(idAmigo, idUsuario, 1, mensagem);
             // Tipo 1, solicitação de amizade
 
             var jaExisteSolicitacao = _ntfRepository.JaFoiNotificado(solicitacaoAmizade);
+            var jaExisteSolicitacaoDoAmigo = _ntfRepository.JaFoiNotificado(solicitacaoDoAmigo);
 
             if (jaExisteSolicitacao != null)
             {
-                return BadRequest("Solicitação de amizade já enviada");
+                return BadRequest("Solicitação de Amizade já Enviada");
+            }
+
+            if(jaExisteSolicitacaoDoAmigo != null)
+            {
+                return BadRequest("Solicitação do Amigo em Questão Pendente");
             }
 
             _ntfRepository.Add(solicitacaoAmizade);
@@ -524,6 +537,8 @@ namespace WebAPI_Apollo.Controllers.DB
                 return BadRequest("O Usuario requisitado já esta na sua lista de amigos");
             }
 
+            _ntfRepository.Delete(pedidoExistente);
+
             return Ok(resposta);
         }
 
@@ -550,11 +565,19 @@ namespace WebAPI_Apollo.Controllers.DB
         public IActionResult GetNotiUsr(Guid idUsuario)
         {
             var notiUsuario = _ntfRepository.GetAllUsr(idUsuario);
+            var homeUsr = _infHomeRepository.GetViaUsr(idUsuario);
 
             if (notiUsuario is null || notiUsuario.Count == 0)
             {
                 return NotFound();
             }
+
+            if(homeUsr is null)
+            {
+                return Problem("Informações da Home não Encontradas");
+            }
+
+            homeUsr.NumNotificacoesNaoLidas = 0;
 
             return Ok(notiUsuario);
         }
