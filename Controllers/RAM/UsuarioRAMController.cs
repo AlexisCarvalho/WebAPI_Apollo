@@ -19,6 +19,8 @@ namespace WebAPI_Apollo.Controllers.DB
         private readonly InformHomeRepositoryRAM _infHomeRepository = new();
         private readonly AmizadeRepositoryRAM _amzdRepository = new();
 
+
+
         /*
 
             * ------------------------------------ *
@@ -272,8 +274,28 @@ namespace WebAPI_Apollo.Controllers.DB
                 return NotFound();
             }
 
-            _usrRepository.Delete(usuario);
+            var estUsuario = _estRepository.Get(usuario.IdEstatisticas);
 
+            if(estUsuario is null)
+            {
+                return Problem();
+            }
+
+            var infHomeUsr = _infHomeRepository.GetViaUsr(usuario.Id);
+
+            if(infHomeUsr is null)
+            {
+                return Problem();
+            }
+
+            // Limpa todas as informações e referências do usuario
+            // no sistema incluindo suas amizades.
+            _infHomeRepository.Delete(infHomeUsr);
+            _estRepository.Delete(estUsuario);
+            _usrRepository.Delete(usuario);
+            _ntfRepository.DeletarReferencias(usuario.Id);
+            _amzdRepository.DeletarReferencias(usuario.Id);
+            
             return NoContent();
         }
 

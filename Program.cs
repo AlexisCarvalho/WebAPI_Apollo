@@ -23,14 +23,14 @@ var builder = WebApplication.CreateBuilder(args);
  | TODO: Aceitar Solicitações de amizade       |  (CONCLUIDO)
  | TODO: Modo de diferenciar lidas e não lidas |  (CONCLUIDO)
  | TODO: Pesquisar por posts (pelos títulos)   |
- | TODO: Delete deve apagar todas as referen-  |  (EM PROGRESSO)
+ | TODO: Delete deve apagar todas as referen-  |  (PRECISA DE REVISÃO)
  |       cias do usuario incluindo amizades,   |
  |       posts, enfim... Tudo que seu id esta  |
  |       relacionado                           |
  |                                             |
   _____________________________________________
  |*********** Possivel mas difícil ************| 
- | TODO: Notificações                          |  (EM PROGRESSO) Revisão 
+ | TODO: Notificações                          |  (PRECISA DE REVISÃO) 
  | TODO: Feed gerado com pessoas ou perfis     |  (EM PROGRESSO) 
  |       que o usuario segue (Amigos)          |  
  | TODO: Posts estão sendo retornados e orden  |  (CONCLUIDO)

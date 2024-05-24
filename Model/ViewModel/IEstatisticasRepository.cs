@@ -6,5 +6,6 @@
         Estatisticas? Get(int id);
         Estatisticas? GetLast();
         void Update(Estatisticas estatisticas);
+        void Delete(Estatisticas id);
     }
 }

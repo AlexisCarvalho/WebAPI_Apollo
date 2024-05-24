@@ -73,5 +73,18 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         {
             VolatileContext.Notificacoes.Remove(notificacao);
         }
+
+        public void DeletarReferencias(Guid idUsuario)
+        {
+            var notificacoesDoUsr = VolatileContext.Notificacoes
+                .Select(ntf => new Notificacao(ntf.Id,ntf.Remetente,ntf.Destinatario,ntf.TipoDeNotificacao,ntf.MensagemDaNotificacao))
+                .Where(ntf => ntf.Destinatario == idUsuario || ntf.Remetente == idUsuario)
+                .ToList();
+
+            foreach (var notificacoes in notificacoesDoUsr)
+            {
+                VolatileContext.Notificacoes.Remove(notificacoes);
+            }
+        }
     }
 }

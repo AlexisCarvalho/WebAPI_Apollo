@@ -17,6 +17,13 @@
             _tipoDeNotificacao = tipoDeNotificacao;
         }
 
+        public Notificacao(int id, Guid remetente, Guid destinatario, int tipoDeNotificacao, string mensagemDaNotificacao) :
+            base(id, remetente, destinatario)
+        {
+            _mensagemDaNotificacao = mensagemDaNotificacao;
+            _tipoDeNotificacao = tipoDeNotificacao;
+        }
+
         public int TipoDeNotificacao
         {
             get { return _tipoDeNotificacao; }

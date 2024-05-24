@@ -20,6 +20,13 @@
             _aguaDiaria = aguaDiaria;
         }
 
+        public Estatisticas(int id, double imc, double aguaDiaria)
+        {
+            _id = id;
+            _imc = imc;
+            _aguaDiaria = aguaDiaria;
+        }
+
         public int Id
         {
             get { return _id; }

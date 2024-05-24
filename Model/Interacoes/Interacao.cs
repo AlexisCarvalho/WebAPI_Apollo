@@ -12,6 +12,13 @@
             Destinatario = destinatario;
         }
 
+        public Interacao(int id, Guid remetente, Guid destinatario) 
+        {
+            Id = id;
+            Remetente = remetente;
+            Destinatario = destinatario;
+        }
+
         public int Id
         {
             get { return _id; }

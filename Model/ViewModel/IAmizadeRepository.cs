@@ -10,5 +10,6 @@ namespace WebAPI_Apollo.Model.ViewModel
         void Update(Amizade amizade);
         Amizade? JaEAmigo(Amizade amizade);
         void Delete(Amizade amizade);
+        void DeletarReferencias(Guid idUsuario);
     }
 }

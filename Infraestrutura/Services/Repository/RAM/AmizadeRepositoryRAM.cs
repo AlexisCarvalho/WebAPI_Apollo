@@ -64,5 +64,18 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         {
             VolatileContext.Amizades.Remove(amizade);
         }
+
+        public void DeletarReferencias(Guid idUsuario)
+        {
+            var amizadesDoUsr = VolatileContext.Amizades
+                .Select(amz => new Amizade(amz.Id, amz.Remetente, amz.Destinatario))
+                .Where(amz => amz.Destinatario == idUsuario || amz.Remetente == idUsuario)
+                .ToList();
+
+            foreach(var amizade in amizadesDoUsr) 
+            {
+                VolatileContext.Amizades.Remove(amizade);
+            }
+        }
     }
 }
