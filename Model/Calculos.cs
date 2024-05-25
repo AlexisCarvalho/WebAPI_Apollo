@@ -14,7 +14,6 @@ namespace WebAPI_Apollo.Model
             return Math.Round(usuario.Peso / Math.Pow(usuario.Altura, 2), 2);
         }
 
-        // TODO: Otimizar uso dos ifs
         // Jovens até os 17 anos	40 ml por cada kg
         // De 18 a 55 anos	35 ml por cada kg
         // De 55 a 65 anos	30 ml por cada kg
@@ -67,11 +66,15 @@ namespace WebAPI_Apollo.Model
                     idade--;
                 }
             }
+
+            if (idade < 0)
+            {
+                return 0;
+            }
+
             return idade;
         }
 
-        //TODO: Fazer metodo para calcular o nivel de disciplina do usuario, determinar a formula e 
-        //quantia de experiencia adquirida a cada task para o calculo;
         public void GanharXP(int quantidadeExp, ref Usuario usuario)
         {
             usuario.XP += quantidadeExp;

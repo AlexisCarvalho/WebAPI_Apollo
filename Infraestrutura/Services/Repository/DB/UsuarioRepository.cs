@@ -6,15 +6,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 {
     public class UsuarioRepository : IUsuarioRepository
     {
-        private readonly AppDbContext _context = new AppDbContext();
-
-        public bool verificarSeExisteEmailUsername(Usuario usuarioInformado)
-        {
-            var existente = _context.Usuarios.Any(usuario => usuario.UserName == usuarioInformado.UserName);
-            existente = existente || _context.Usuarios.Any(usuario => usuario.Email == usuarioInformado.Email);
-            return existente;
-        }
-        //System.Threading.Task<boll>
+        private readonly AppDbContext _context = new();
 
         public void Add(Usuario usuario)
         {
@@ -24,12 +16,17 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public Usuario? Get(Guid id)
         {
-            return _context.Usuarios.Find(id);
+            return _context.Usuarios.FirstOrDefault(usuario => usuario.Id == id);
         }
 
         public Usuario? GetSemelhanteUserName(string userName)
         {
             return _context.Usuarios.FirstOrDefault(usuario => usuario.UserName == userName);
+        }
+
+        public Usuario? GetSemelhanteEmail(string email)
+        {
+            return _context.Usuarios.FirstOrDefault(usuario => usuario.Email == email);
         }
 
         public void Update(Usuario usuario)
@@ -40,23 +37,17 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public bool VerificaSeCadastrado(string email)
         {
-            if (_context.Usuarios.Any(usuario => usuario.Email == email))
-            {
-                return true;
-            }
-            return false;
+            return _context.Usuarios.Any(usuario => usuario.Email == email);
         }
 
         public List<UsuarioDto> GetAll()
         {
-            return _context.Usuarios
-                    .Select(usuario => new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura))
-                    .ToList();
+            return _context.Usuarios.Select(usuario => new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura)).ToList();
         }
 
         public Usuario? GetViaLogin(string email, string senha)
         {
-            return _context.Usuarios.ToList().Find(usuario => usuario.Email == email && usuario.Senha == senha);
+            return _context.Usuarios.FirstOrDefault(usuario => usuario.Email == email && usuario.Senha == senha);
         }
 
         public void Delete(Usuario usuario)
@@ -70,9 +61,9 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
             return _context.Usuarios.FirstOrDefault(usuario => usuario.PalavraRecuperacao == palavraRecuperacao && usuario.Email == email);
         }
 
-        public Usuario? GetSemelhanteEmail(string email)
+        public bool VerificarSeExisteEmailUsername(Usuario usuarioInformado)
         {
-            return _context.Usuarios.FirstOrDefault(usuario => usuario.Email == email);
+            return _context.Usuarios.Any(usuario => usuario.UserName == usuarioInformado.UserName || usuario.Email == usuarioInformado.Email);
         }
     }
 }

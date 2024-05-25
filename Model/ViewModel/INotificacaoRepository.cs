@@ -1,14 +1,18 @@
-﻿using WebAPI_Apollo.Model.Interacoes;
+﻿using WebAPI_Apollo.Model.DTOs;
+using WebAPI_Apollo.Model.Interacoes;
 
 namespace WebAPI_Apollo.Model.ViewModel
 {
     public interface INotificacaoRepository
     {
         void Add(Notificacao notificacao);
-        Notificacao? Get(int id);
-        Notificacao? GetLast();
-        void Update(Notificacao notificacao);
-        Notificacao? JaFoiNotificado(Notificacao notificacao);
+        void DeletarReferencias(Guid idUsuario);
         void Delete(Notificacao notificacao);
+        Notificacao? Get(int id);
+        List<NotificacoesDaRedeDto> GetAll();
+        List<NotificacoesDaRedeDto> GetAllUsr(Guid idUsuario);
+        Notificacao? GetLast();
+        Notificacao? JaFoiNotificado(Notificacao notificacao);
+        void Update(Notificacao notificacao);
     }
 }

@@ -16,11 +16,7 @@ namespace WebAPI_Apollo.Controllers.RAM
         private readonly UsuarioRepositoryRAM _usrRepository = new();
         private readonly CurtidaRepositoryRAM _intRepository = new();
 
-        // O Authorize daqui faz com que ele precise da verificação do token pra rodar
-        // Ta desativado pra tu testar sem ter que logar toda vez, ele bloqueia todas as rotas
-        // Até alguém cadastrado fazer login
-        // (Deixei um usuario padrão lá causo queira testar a rota Auth)
-        //  Email: Alexis@gmail.com Senha: 123456)
+        // RAM/Posts:
 
         // Adicionar um Post Padrão da Rede, sem imagem
         //[Authorize]
@@ -115,6 +111,8 @@ namespace WebAPI_Apollo.Controllers.RAM
             return NoContent();
         }
 
+        // RAM/Posts/Comentarios:
+
         // Adicionar um comentario a um Post
         //[Authorize]
         [HttpPost]
@@ -163,10 +161,11 @@ namespace WebAPI_Apollo.Controllers.RAM
             return Ok(comentarios);
         }
 
+        // RAM/Posts/Interagir:
         // Adicionar uma curtida a um post
         //[Authorize]
         [HttpPost]
-        [Route("Curtir/{idPost}/{idUsuario}")]
+        [Route("Interagir/Curtir/{idPost}/{idUsuario}")]
         public IActionResult AddCurtidaPost(Guid idPost, Guid idUsuario)
         {
             var postCurtido = _pstRepository.Get(idPost);
@@ -204,7 +203,7 @@ namespace WebAPI_Apollo.Controllers.RAM
         // Adicionar uma curtida a um post
         //[Authorize]
         [HttpPost]
-        [Route("Descurtir/{idPost}/{idUsuario}")]
+        [Route("Interagir/Descurtir/{idPost}/{idUsuario}")]
         public IActionResult RemoverCurtidaPost(Guid idPost, Guid idUsuario)
         {
             var postDescurtido = _pstRepository.Get(idPost);
@@ -237,10 +236,28 @@ namespace WebAPI_Apollo.Controllers.RAM
             return Ok(resposta);
         }
 
+        // RAM/Posts/Pesquisa
+        // Retornar somente posts que correspondem a determinada pesquisa
+        //[Authorize]
+        [HttpGet]
+        [Route("Pesquisa/{termo}")]
+        public IActionResult GetPostsDoUsuario(string termo)
+        {
+            var postsCorrespondentes = _pstRepository.GetPostsPesquisa(termo);
+
+            if (postsCorrespondentes is null)
+            {
+                return NotFound("Nenhum Post Correspondente Encontrado");
+            }
+
+            return Ok(postsCorrespondentes);
+        }
+
+        // RAM/Posts/Usuario:
         // Retornar somente posts feitos por aquele usuario
         //[Authorize]
         [HttpGet]
-        [Route("DoUsuario/{id}")]
+        [Route("Usuario/{id}")]
         public IActionResult GetPostsDoUsuario(Guid id)
         {
             var usuario = _usrRepository.Get(id);
@@ -260,6 +277,7 @@ namespace WebAPI_Apollo.Controllers.RAM
             return Ok(posts);
         }
 
+        // RAM/Posts/Destroy:
         // Deletar Tudo da Memória
         //[Authorize]
         [HttpDelete]

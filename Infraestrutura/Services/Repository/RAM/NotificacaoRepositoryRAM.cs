@@ -30,7 +30,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                 .FirstOrDefault(notificacoesNoBanco =>
                 notificacoesNoBanco.Remetente == notificacao.Remetente &&
                 notificacoesNoBanco.Destinatario == notificacao.Destinatario &&
-                notificacoesNoBanco.TipoDeNotificacao == notificacao.TipoDeNotificacao); 
+                notificacoesNoBanco.TipoDeNotificacao == notificacao.TipoDeNotificacao);
         }
 
         public Notificacao? Get(int id)
@@ -77,7 +77,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         public void DeletarReferencias(Guid idUsuario)
         {
             var notificacoesDoUsr = VolatileContext.Notificacoes
-                .Select(ntf => new Notificacao(ntf.Id,ntf.Remetente,ntf.Destinatario,ntf.TipoDeNotificacao,ntf.MensagemDaNotificacao))
+                .Select(ntf => new Notificacao(ntf.Id, ntf.Remetente, ntf.Destinatario, ntf.TipoDeNotificacao, ntf.MensagemDaNotificacao))
                 .Where(ntf => ntf.Destinatario == idUsuario || ntf.Remetente == idUsuario)
                 .ToList();
 

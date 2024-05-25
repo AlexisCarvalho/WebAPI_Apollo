@@ -6,7 +6,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 {
     public class CurtidaRepository : ICurtidaRepository
     {
-        private readonly AppDbContext _context = new AppDbContext();
+        private readonly AppDbContext _context = new();
 
         public void Add(Curtida curtida, ref Post postCurtido)
         {
@@ -17,20 +17,18 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public Curtida? JaCurtiu(Curtida curtida)
         {
-            return _context.Curtidas
-                .FirstOrDefault(jaCurtiuAntes =>
-                jaCurtiuAntes.Remetente == curtida.Remetente &&
-                jaCurtiuAntes.Destinatario == curtida.Destinatario);
+            return _context.Curtidas.FirstOrDefault(c =>
+                c.Remetente == curtida.Remetente && c.Destinatario == curtida.Destinatario);
         }
 
         public Curtida? Get(int id)
         {
-            return _context.Curtidas.FirstOrDefault(e => e.Id == id);
+            return _context.Curtidas.FirstOrDefault(c => c.Id == id);
         }
 
         public Curtida? GetLast()
         {
-            return _context.Curtidas.OrderByDescending(e => e.Id).FirstOrDefault();
+            return _context.Curtidas.OrderByDescending(c => c.Id).FirstOrDefault();
         }
 
         public void Update(Curtida curtida)

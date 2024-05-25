@@ -12,7 +12,7 @@
             Destinatario = destinatario;
         }
 
-        public Interacao(int id, Guid remetente, Guid destinatario) 
+        public Interacao(int id, Guid remetente, Guid destinatario)
         {
             Id = id;
             Remetente = remetente;

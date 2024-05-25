@@ -6,20 +6,6 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 {
     public class UsuarioRepositoryRAM : IUsuarioRepository
     {
-        public UsuarioRepositoryRAM() { }
-
-        /*
-          
-        |//////////////////////////////////////////////|
-        | Metodos relacionados com a memoria principal |
-        |______________________________________________|
-        
-         */
-
-        public bool verificarSeExisteEmailUsername(Usuario usuarioInformado)
-        {
-            return VolatileContext.Usuarios.Any(usuario => usuario.UserName == usuarioInformado.UserName || usuario.Email == usuarioInformado.Email);
-        }
 
         public void Add(Usuario usuario)
         {
@@ -73,6 +59,11 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         public Usuario? RecuperarSenha(string email, string palavraRecuperacao)
         {
             return VolatileContext.Usuarios.FirstOrDefault(usuario => usuario.PalavraRecuperacao == palavraRecuperacao && usuario.Email == email);
+        }
+
+        public bool VerificarSeExisteEmailUsername(Usuario usuarioInformado)
+        {
+            return VolatileContext.Usuarios.Any(usuario => usuario.UserName == usuarioInformado.UserName || usuario.Email == usuarioInformado.Email);
         }
     }
 }

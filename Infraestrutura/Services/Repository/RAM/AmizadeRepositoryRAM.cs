@@ -1,5 +1,4 @@
-﻿using WebAPI_Apollo.Model.DTOs;
-using WebAPI_Apollo.Model.Interacoes;
+﻿using WebAPI_Apollo.Model.Interacoes;
 using WebAPI_Apollo.Model.ViewModel;
 
 namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
@@ -24,12 +23,14 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
             VolatileContext.Amizades.Add(amizade);
         }
 
-        public Amizade? JaEAmigo(Amizade amizade)
+        public Amizade? VerificarAmizade(Amizade amizade)
         {
             return VolatileContext.Amizades
                 .FirstOrDefault(amizadesNoBanco =>
                 amizadesNoBanco.Remetente == amizade.Remetente &&
-                amizadesNoBanco.Destinatario == amizade.Destinatario);
+                amizadesNoBanco.Destinatario == amizade.Destinatario ||
+                amizadesNoBanco.Destinatario == amizade.Remetente &&
+                amizadesNoBanco.Remetente == amizade.Destinatario);
         }
 
         public Amizade? Get(int id)
@@ -72,7 +73,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                 .Where(amz => amz.Destinatario == idUsuario || amz.Remetente == idUsuario)
                 .ToList();
 
-            foreach(var amizade in amizadesDoUsr) 
+            foreach (var amizade in amizadesDoUsr)
             {
                 VolatileContext.Amizades.Remove(amizade);
             }

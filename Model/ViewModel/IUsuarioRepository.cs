@@ -5,15 +5,15 @@ namespace WebAPI_Apollo.Model.ViewModel
     public interface IUsuarioRepository
     {
         void Add(Usuario usuario);
-        List<UsuarioDto> GetAll();
+        void Delete(Usuario usuario);
         Usuario? Get(Guid id);
-        public bool verificarSeExisteEmailUsername(Usuario usuarioInformado);
-        bool VerificaSeCadastrado(string email);
+        List<UsuarioDto> GetAll();
+        Usuario? GetSemelhanteEmail(string email);
+        Usuario? GetSemelhanteUserName(string userName);
         Usuario? GetViaLogin(string email, string senha);
         Usuario? RecuperarSenha(string email, string palavraRecuperacao);
-        Usuario? GetSemelhanteUserName(string userName);
-        Usuario? GetSemelhanteEmail(string email);
         void Update(Usuario usuario);
-        void Delete(Usuario usuario);
+        bool VerificarSeExisteEmailUsername(Usuario usuarioInformado);
+        bool VerificaSeCadastrado(string email);
     }
 }

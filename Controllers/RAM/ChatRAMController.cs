@@ -13,24 +13,28 @@ namespace WebAPI_Apollo.Controllers.RAM
         private readonly MensagemRepositoryRAM _msgRepository = new();
         private readonly InformHomeRepositoryRAM _infHomeRepository = new();
         private readonly UsuarioRepositoryRAM _usrRepository = new();
+        private readonly AmizadeRepositoryRAM _amzdRepository = new();
 
-        // O Authorize daqui faz com que ele precise da verificação do token pra rodar
-        // Ta desativado pra tu testar sem ter que logar toda vez, ele bloqueia todas as rotas
-        // Até alguém cadastrado fazer login
-        // (Deixei um usuario padrão lá causo queira testar a rota Auth)
-        //  Email: Alexis@gmail.com Senha: 123456)
+        // RAM/Chat:
 
-        // Falta adicionar a parte de mandar apenas para amigos
         //[Authorize]
         [HttpPost]
         [Route("{remetente}/{destinatario}/{conteudo}")]
-        public IActionResult AddMsg(Guid remetente, Guid destinatario, string conteudo) 
-        { 
+        public IActionResult AddMsg(Guid remetente, Guid destinatario, string conteudo)
+        {
+            var amigos = _amzdRepository.VerificarAmizade(new Amizade(remetente, destinatario));
+
+            if (amigos is null)
+            {
+                return BadRequest("Usuarios não são amigos");
+            }
+
             var novaMensagem = new Mensagem(remetente, destinatario, conteudo);
 
             var usuario = _usrRepository.Get(remetente);
             var amigo = _usrRepository.Get(destinatario);
             var home = _infHomeRepository.GetViaUsr(destinatario);
+
 
             if (usuario is null)
             {
@@ -143,11 +147,13 @@ namespace WebAPI_Apollo.Controllers.RAM
             return NoContent();
         }
 
+        // RAM/Chat/Usuario:
+
         // Obter informações por ID
         // Mensagens Enviadas para aquele ID e Recebidas por aquele ID
         //[Authorize]
         [HttpGet]
-        [Route("Enviadas/{id}")]
+        [Route("Usuario/Enviadas/{id}")]
         public IActionResult GetEnviadas(Guid id)
         {
             var mensagens = _msgRepository.EnviadasPor(id);
@@ -162,7 +168,7 @@ namespace WebAPI_Apollo.Controllers.RAM
 
         //[Authorize]
         [HttpGet]
-        [Route("Recebidas/{id}")]
+        [Route("Usuario/Recebidas/{id}")]
         public IActionResult GetRecebidas(Guid id)
         {
             var mensagens = _msgRepository.RecebidasPor(id);
@@ -175,6 +181,7 @@ namespace WebAPI_Apollo.Controllers.RAM
             return Ok(mensagens);
         }
 
+        // RAM/Chat/Destroy:
         // Deletar Tudo da Memória
         //[Authorize]
         [HttpDelete]

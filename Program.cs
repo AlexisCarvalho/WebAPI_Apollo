@@ -7,22 +7,25 @@ var builder = WebApplication.CreateBuilder(args);
 
 /*
  * Passado: UsuarioRAMController (Mudança da lógica "InformHome")
- *        Atualizar a Home nas rotas que envolvem ela           (FAZER REVISÃO)
- * Atual: Impedir solicitação de amizade cruzada entre usuarios, se um já
+ *        Atualizar a Home nas rotas que envolvem ela                        (FAZER REVISÃO)
+ * Passado: Impedir solicitação de amizade cruzada entre usuarios, se um já  (FAZER REVISÃO)
  *        tiver enviado o outro não pode.
  *        Garantir que o número de amigos esta aumentando onde devia
  *        Fazer o desfazer amizade
+ *        
+ * Atual: Finalizar os detalhes da lista de Amigos
+
   _____________________________________________
  |******************* Facil *******************| //
  | TODO: Lista de amigos                       |  (EM PROGRESSO) 
- | TODO: Desfazer Amizade                      |  (EM PROGRESSO)
-
+ | TODO: Desfazer Amizade                      |  (CONCLUIDO)
+ | TODO: Mandar mensagem apenas para amigos    |  (CONCLUIDO)
   _____________________________________________
  |***************** Possivel ******************| 
  | TODO: Solicitações de amizade               |  (CONCLUIDO) 
  | TODO: Aceitar Solicitações de amizade       |  (CONCLUIDO)
  | TODO: Modo de diferenciar lidas e não lidas |  (CONCLUIDO)
- | TODO: Pesquisar por posts (pelos títulos)   |
+ | TODO: Pesquisar por posts (pelos títulos)   |  (CONCLUIDO)
  | TODO: Delete deve apagar todas as referen-  |  (PRECISA DE REVISÃO)
  |       cias do usuario incluindo amizades,   |
  |       posts, enfim... Tudo que seu id esta  |
@@ -31,7 +34,7 @@ var builder = WebApplication.CreateBuilder(args);
   _____________________________________________
  |*********** Possivel mas difícil ************| 
  | TODO: Notificações                          |  (PRECISA DE REVISÃO) 
- | TODO: Feed gerado com pessoas ou perfis     |  (EM PROGRESSO) 
+ | TODO: Feed gerado com pessoas ou perfis     |  (CONCLUIDO) 
  |       que o usuario segue (Amigos)          |  
  | TODO: Posts estão sendo retornados e orden  |  (CONCLUIDO)
  |       ados pelo id, por ser Guid a ordem    |
@@ -58,22 +61,24 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
-builder.Services.AddTransient<IEstatisticasRepository, EstatisticasRepository>();
-builder.Services.AddTransient<IMensagemRepository, MensagemRepository>();
-builder.Services.AddTransient<IPostsRepository, PostRepository>();
+builder.Services.AddTransient<IAmizadeRepository, AmizadeRepository>();
 builder.Services.AddTransient<ICurtidaRepository, CurtidaRepository>();
+builder.Services.AddTransient<IEstatisticasRepository, EstatisticasRepository>();
+builder.Services.AddTransient<IInformHomeRepository, InformHomeRepository>();
+builder.Services.AddTransient<IMensagemRepository, MensagemRepository>();
+builder.Services.AddTransient<INotificacaoRepository, NotificacaoRepository>();
+builder.Services.AddTransient<IPostRepository, PostRepository>();
+builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
 
 // Esse primeiro aqui limita por porta "endereço",
 // se descobrir como setar uma porta especifica no Electron
 // muda pra essa aqui, o que esta usando é a debaixo
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "RestringirAcesso",
         policy =>
         {
-            policy.WithOrigins("http://localhost:3000") // Muda isso aqui
+            policy.WithOrigins("http://localhost:3000") // Muda isso aqui pro do Electron João
             .AllowAnyHeader()
             .AllowAnyMethod();
         });
@@ -81,7 +86,7 @@ builder.Services.AddCors(options =>
 
 // Essa aqui libera pra qualquer endereço ou porta,
 // independente de quem tentar,
-// se estiver rodando mesma maquina vai executar
+// se estiver rodando na mesma maquina vai executar
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Liberado",

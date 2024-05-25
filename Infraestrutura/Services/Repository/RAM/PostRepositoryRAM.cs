@@ -1,15 +1,12 @@
-﻿using System.Collections.Generic;
-using WebAPI_Apollo.Model;
+﻿using WebAPI_Apollo.Model;
 using WebAPI_Apollo.Model.DTOs;
 using WebAPI_Apollo.Model.Interacoes;
 using WebAPI_Apollo.Model.ViewModel;
 
 namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 {
-    public class PostRepositoryRAM : IPostsRepository
+    public class PostRepositoryRAM : IPostRepository
     {
-        private readonly AmizadeRepositoryRAM _amzdRepository = new();
-
         public void Add(Post post)
         {
             VolatileContext.Posts.Add(post);
@@ -39,7 +36,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 
         public List<PostCompletoDto> GetFeedUsr(Guid idUsuario)
         {
-            var amizades = _amzdRepository.GetAllUsr(idUsuario);
+            var amizades = GetAllAmz(idUsuario);
             List<Guid> idAmigos = new();
             List<PostCompletoDto> feed = new();
 
@@ -65,6 +62,16 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
             return feed;
         }
 
+        public List<PostCompletoDto> GetPostsPesquisa(string pesquisa)
+        {
+            return VolatileContext.Posts.Select(post => new PostCompletoDto
+            (post.Id, post.IdUsuario, post.Titulo, post.Descricao,
+             post.CaminhoImagem, post.NumCurtidas, post.NumComentarios, post.TimeStamp))
+            .Where(post => AlgoritmosDePesquisa.SimilaridadeDeJaccard(post.titulo, pesquisa) > 0.4
+                        || AlgoritmosDePesquisa.SimilaridadeDeJaccard(post.descricao, pesquisa) > 0.7)
+            .ToList();
+        }
+
         public void Delete(Post post)
         {
             VolatileContext.Posts.Remove(post);
@@ -81,6 +88,15 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                                         .Select(post =>
             new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.CaminhoImagem, post.NumCurtidas, post.NumComentarios, post.TimeStamp))
                                         .ToList();
+        }
+
+        public List<Amizade> GetAllAmz(Guid idUsuario)
+        {
+            return VolatileContext.Amizades
+                .OrderByDescending(amz => amz.Id)
+                .Select(amz => new Amizade(amz.Remetente, amz.Destinatario))
+                .Where(amz => amz.Destinatario == idUsuario || amz.Remetente == idUsuario)
+                .ToList();
         }
     }
 }

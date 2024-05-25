@@ -1,5 +1,4 @@
 ﻿using WebAPI_Apollo.Model;
-using WebAPI_Apollo.Model.Interacoes;
 using WebAPI_Apollo.Model.ViewModel;
 
 namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM

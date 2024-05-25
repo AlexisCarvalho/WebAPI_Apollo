@@ -10,26 +10,57 @@ namespace WebAPI_Apollo.Controllers.DB
     public class ChatController : ControllerBase
     {
         private readonly IMensagemRepository _msgRepository;
+        private readonly IInformHomeRepository _infHomeRepository;
+        private readonly IUsuarioRepository _usrRepository;
+        private readonly IAmizadeRepository _amzdRepository;
 
-        public ChatController(IMensagemRepository msgRepository)
+        public ChatController(IMensagemRepository msgRepository, IInformHomeRepository infHomeRepository, IUsuarioRepository usrRepository, IAmizadeRepository amzdRepository)
         {
             _msgRepository = msgRepository ?? throw new ArgumentNullException();
+            _infHomeRepository = infHomeRepository ?? throw new ArgumentNullException();
+            _usrRepository = usrRepository ?? throw new ArgumentNullException();
+            _amzdRepository = amzdRepository ?? throw new ArgumentNullException();
         }
 
-        // O Authorize daqui faz com que ele precise da verificação do token pra rodar
-        // Ta desativado pra tu testar sem ter que logar toda vez, ele bloqueia todas as rotas
-        // Até alguém cadastrado fazer login
-        // (Deixei um usuario padrão lá causo queira testar a rota Auth)
-        //  Email: Alexis@gmail.com Senha: 123456)
+        // Chat:
 
         //[Authorize]
-        [Obsolete("Alterar conforme o RAM")]
         [HttpPost]
         [Route("{remetente}/{destinatario}/{conteudo}")]
         public IActionResult AddMsg(Guid remetente, Guid destinatario, string conteudo)
         {
+            var amigos = _amzdRepository.VerificarAmizade(new Amizade(remetente, destinatario));
+
+            if (amigos is null)
+            {
+                return BadRequest("Usuarios não são amigos");
+            }
+
             var novaMensagem = new Mensagem(remetente, destinatario, conteudo);
 
+            var usuario = _usrRepository.Get(remetente);
+            var amigo = _usrRepository.Get(destinatario);
+            var home = _infHomeRepository.GetViaUsr(destinatario);
+
+
+            if (usuario is null)
+            {
+                return NotFound("Usuario não encontrado");
+            }
+
+            if (amigo is null)
+            {
+                return NotFound("Usuario solicitado não encontrado");
+            }
+
+            if (home is null)
+            {
+                return Problem("Home do Usuario não Encontrada");
+            }
+
+            home.NumMensagensNaoLidas++;
+
+            _infHomeRepository.Update(home);
             _msgRepository.Add(novaMensagem);
 
             var resposta = new ChatDto(novaMensagem.Id, novaMensagem.Remetente, novaMensagem.Destinatario, novaMensagem.Conteudo, novaMensagem.TimeStamp);
@@ -123,11 +154,13 @@ namespace WebAPI_Apollo.Controllers.DB
             return NoContent();
         }
 
+        // Chat/Usuario:
+
         // Obter informações por ID
         // Mensagens Enviadas para aquele ID e Recebidas por aquele ID
         //[Authorize]
         [HttpGet]
-        [Route("Enviadas/{id}")]
+        [Route("Usuario/Enviadas/{id}")]
         public IActionResult GetEnviadas(Guid id)
         {
             var mensagens = _msgRepository.EnviadasPor(id);
@@ -142,7 +175,7 @@ namespace WebAPI_Apollo.Controllers.DB
 
         //[Authorize]
         [HttpGet]
-        [Route("Recebidas/{id}")]
+        [Route("Usuario/Recebidas/{id}")]
         public IActionResult GetRecebidas(Guid id)
         {
             var mensagens = _msgRepository.RecebidasPor(id);

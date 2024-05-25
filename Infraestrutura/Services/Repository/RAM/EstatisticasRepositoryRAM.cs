@@ -1,5 +1,4 @@
 ﻿using WebAPI_Apollo.Model;
-using WebAPI_Apollo.Model.Interacoes;
 using WebAPI_Apollo.Model.ViewModel;
 
 namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
@@ -8,6 +7,18 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
     {
         public void Add(Estatisticas estatisticas)
         {
+            // Código pra substituir o autoIncrement do Banco
+            var ultimaEstatistica = GetLast();
+
+            if (ultimaEstatistica != null)
+            {
+                estatisticas.Id = ultimaEstatistica.Id + 1;
+            }
+            else
+            {
+                estatisticas.Id = 1;
+            }
+            // Visa manter o uso de id int ao invés de trocar pra Guid
             VolatileContext.Estatisticas.Add(estatisticas);
         }
 
