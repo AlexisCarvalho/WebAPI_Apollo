@@ -43,12 +43,25 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 
         public List<UsuarioDto> GetAll()
         {
-            return VolatileContext.Usuarios.Select(usuario => new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura)).ToList();
+            return VolatileContext.Usuarios
+                .Select(usuario => new UsuarioDto
+                (
+                    usuario.Id, usuario.Idade,
+                    usuario.XP, usuario.Level,
+                    usuario.XP_ProximoNivel, usuario.Nome,
+                    usuario.Email, usuario.Senha,
+                    usuario.Esporte, usuario.Genero,
+                    usuario.UserName, usuario.PalavraRecuperacao,
+                    usuario.DataNascimento, usuario.Peso,
+                    usuario.Altura, usuario.ImagemPerfil
+                ))
+                .ToList();
         }
 
         public Usuario? GetViaLogin(string email, string senha)
         {
-            return VolatileContext.Usuarios.FirstOrDefault(usuario => usuario.Email == email && usuario.Senha == senha);
+            return VolatileContext.Usuarios
+                .FirstOrDefault(usuario => usuario.Email == email && usuario.Senha == senha);
         }
 
         public void Delete(Usuario usuario)
@@ -58,12 +71,16 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 
         public Usuario? RecuperarSenha(string email, string palavraRecuperacao)
         {
-            return VolatileContext.Usuarios.FirstOrDefault(usuario => usuario.PalavraRecuperacao == palavraRecuperacao && usuario.Email == email);
+            return VolatileContext.Usuarios
+                .FirstOrDefault(usuario => usuario.PalavraRecuperacao == palavraRecuperacao 
+                                           && usuario.Email == email);
         }
 
         public bool VerificarSeExisteEmailUsername(Usuario usuarioInformado)
         {
-            return VolatileContext.Usuarios.Any(usuario => usuario.UserName == usuarioInformado.UserName || usuario.Email == usuarioInformado.Email);
+            return VolatileContext.Usuarios
+                .Any(usuario => usuario.UserName == usuarioInformado.UserName 
+                                || usuario.Email == usuarioInformado.Email);
         }
     }
 }

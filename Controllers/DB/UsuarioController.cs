@@ -32,7 +32,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // Usuario:
         // Adicionar um Usuario
-        //[Authorize]
         [HttpPost]
         [Route("{nome}/{email}/{senha}/{userName}/{palavraRecuperacao}/{dataNascimento}")]
         public IActionResult AddUsr(string nome, string email, string senha, string userName, string palavraRecuperacao, string dataNascimento)
@@ -48,10 +47,10 @@ namespace WebAPI_Apollo.Controllers.DB
                 return BadRequest("Data no Padrão Errado");
             }
 
-            var novoUsuario = new Usuario(nome, email, senha, userName, palavraRecuperacao, dataConvertida);
+            var usuario = new Usuario(nome, email, senha, userName, palavraRecuperacao, dataConvertida);
 
-            var existenteEmail = _usrRepository.GetSemelhanteEmail(novoUsuario.Email);
-            var existenteUserName = _usrRepository.GetSemelhanteUserName(novoUsuario.UserName);
+            var existenteEmail = _usrRepository.GetSemelhanteEmail(usuario.Email);
+            var existenteUserName = _usrRepository.GetSemelhanteUserName(usuario.UserName);
 
             if (existenteEmail != null)
             {
@@ -63,17 +62,22 @@ namespace WebAPI_Apollo.Controllers.DB
                 return BadRequest("Usuario com mesmo username existente");
             }
 
-            InformHome informHome = new InformHome(novoUsuario.Id);
+            InformHome informHome = new InformHome(usuario.Id);
 
-            _usrRepository.Add(novoUsuario);
+            _usrRepository.Add(usuario);
             _infHomeRepository.Add(informHome);
 
-            var resposta = new UsuarioDto(novoUsuario.Id, novoUsuario.Idade, novoUsuario.XP, novoUsuario.Level, novoUsuario.XP_ProximoNivel, novoUsuario.Nome, novoUsuario.Email, novoUsuario.Senha, novoUsuario.Esporte, novoUsuario.Genero, novoUsuario.UserName, novoUsuario.PalavraRecuperacao, novoUsuario.DataNascimento, novoUsuario.Peso, novoUsuario.Altura);
+            var resposta = new UsuarioDto
+                (usuario.Id, usuario.Idade, usuario.XP, 
+                usuario.Level, usuario.XP_ProximoNivel, 
+                usuario.Nome, usuario.Email, usuario.Senha, 
+                usuario.Esporte, usuario.Genero, usuario.UserName, 
+                usuario.PalavraRecuperacao, usuario.DataNascimento, 
+                usuario.Peso, usuario.Altura, usuario.ImagemPerfil);
             return Ok(resposta);
         }
 
         // Adicionar XP em Usuarios especificos por um ID 
-        //[Authorize]
         [HttpPost]
         [Route("{id}/{XP}")]
         public IActionResult AdcXPUsr(Guid id, int XP)
@@ -92,12 +96,17 @@ namespace WebAPI_Apollo.Controllers.DB
 
             _usrRepository.Update(usuario);
 
-            var resposta = new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura);
+            var resposta = new UsuarioDto
+                (usuario.Id, usuario.Idade, usuario.XP,
+                usuario.Level, usuario.XP_ProximoNivel,
+                usuario.Nome, usuario.Email, usuario.Senha,
+                usuario.Esporte, usuario.Genero, usuario.UserName,
+                usuario.PalavraRecuperacao, usuario.DataNascimento,
+                usuario.Peso, usuario.Altura, usuario.ImagemPerfil);
             return Ok(resposta);
         }
 
         // Retornar todos os Usuarios 
-        //[Authorize]
         [HttpGet]
         public IActionResult GetAllUsr()
         {
@@ -112,7 +121,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Obter informações por id 
-        //[Authorize]
         [HttpGet]
         [Route("{id}")]
         public IActionResult GetUsr(Guid id)
@@ -124,12 +132,11 @@ namespace WebAPI_Apollo.Controllers.DB
                 return NotFound();
             }
 
-            var resposta = new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura);
+            var resposta = new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura, usuario.ImagemPerfil);
             return Ok(resposta);
         }
 
         // Atualizar informações por id 
-        //[Authorize]
         [HttpPut]
         [Route("{id}/{nome}/{esporte}/{genero}/{userName}/{palavraRecuperacao}/{dataNascimento}/{peso}/{altura}")]
         public IActionResult AtualizarUsr(Guid id, string nome, string esporte, string genero, string userName, string palavraRecuperacao, string dataNascimento, float peso, float altura)
@@ -165,7 +172,7 @@ namespace WebAPI_Apollo.Controllers.DB
                 return BadRequest("Data no Padrão Errado");
             }
 
-            // [Futura] Conversão e testes do padrão do Email
+            // TODO: Conversão e testes do padrão do Email
 
             if (usuario.Altura != altura || usuario.Peso != peso)
             {
@@ -249,11 +256,17 @@ namespace WebAPI_Apollo.Controllers.DB
 
             _usrRepository.Update(usuario);
 
-            return Ok(new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura));
+            var resposta = new UsuarioDto
+                (usuario.Id, usuario.Idade, usuario.XP,
+                usuario.Level, usuario.XP_ProximoNivel,
+                usuario.Nome, usuario.Email, usuario.Senha,
+                usuario.Esporte, usuario.Genero, usuario.UserName,
+                usuario.PalavraRecuperacao, usuario.DataNascimento,
+                usuario.Peso, usuario.Altura, usuario.ImagemPerfil);
+            return Ok(resposta);
         }
 
         // Deletar Usuario por ID
-        //[Authorize]
         [HttpDelete]
         [Route("{id}")]
         public IActionResult DeleteUsr(Guid id)
@@ -292,7 +305,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // Usuario/Amizades:
         // Carregar a Home 
-        //[Authorize]
         [HttpGet]
         [Route("Amizades/{id}")]
         public IActionResult GetAmigosUsr(Guid id)
@@ -308,7 +320,7 @@ namespace WebAPI_Apollo.Controllers.DB
 
                     if (amigo != null)
                     {
-                        listaAmigos.Add(new AmizadeListaAmigos(amigo.Id, amigo.Nome, "")); // Aqui que entrara a foto
+                        listaAmigos.Add(new AmizadeListaAmigos(amigo.Id, amigo.Nome, amigo.ImagemPerfil)); // Aqui que entrara a foto
                     }
                     else
                     {
@@ -341,7 +353,6 @@ namespace WebAPI_Apollo.Controllers.DB
         // Adicionar Solicitacoes de Amizade 
         // Entre o conjunto de Solicitar Aceitar e Recusar atualmente existe
         // a chance de ambos mandarem um pro outro uma solicitaão antes de algum aceitar
-        //[Authorize]
         [HttpPost]
         [Route("Amizades/Solicitar/{idUsuario}/{idAmigo}")]
         public IActionResult AdcSoliAmiza(Guid idUsuario, Guid idAmigo)
@@ -406,7 +417,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Aceitar solicitação de amizade
-        //[Authorize]
         [HttpPost]
         [Route("Amizades/Aceitar/{idUsuario}/{idDeQuemPediu}")]
         public IActionResult AceitarSoliAmiza(Guid idUsuario, Guid idDeQuemPediu)
@@ -465,6 +475,7 @@ namespace WebAPI_Apollo.Controllers.DB
             _infHomeRepository.Update(home);
 
             homeAmigo.NumNotificacoesNaoLidas++;
+            homeAmigo.NumAmigos++;
             _infHomeRepository.Update(homeAmigo);
 
             Amizade amizade = new(quemPediu.Id, usuario.Id);
@@ -482,7 +493,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Aceitar solicitação de amizade
-        //[Authorize]
         [HttpPost]
         [Route("Amizades/Recusar/{idUsuario}/{idDeQuemPediu}")]
         public IActionResult RecusarSoliAmiza(Guid idUsuario, Guid idDeQuemPediu)
@@ -557,7 +567,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Desfazer amizades
-        //[Authorize]
         [HttpDelete]
         [Route("Amizades/Desfazer/{idUsuario}/{idAmigo}")]
         public IActionResult DesfazerAmiza(Guid idUsuario, Guid idAmigo)
@@ -594,7 +603,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // Usuario/Home:
         // Carregar a Home 
-        //[Authorize]
         [HttpGet]
         [Route("Home/{idUsuario}")]
         public IActionResult GetHomeUsr(Guid idUsuario)
@@ -611,7 +619,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // Usuario/Login:
         // Efetuar Login 
-        //[Authorize]
         [HttpGet]
         [Route("Login/{email}/{senha}")]
         public IActionResult Login(string email, string senha)
@@ -627,7 +634,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Rota para alterar as informações do Login
-        //[Authorize]
         [HttpPut]
         [Route("Login/{id}/{email}/{senha}")]
         public IActionResult LoginUpdate(Guid id, string email, string senha)
@@ -667,7 +673,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // Usuario/Notificacoes:
         // Carregar as Notificacoes 
-        //[Authorize]
         [HttpGet]
         [Route("Notificacoes/{idUsuario}")]
         public IActionResult GetNotiUsr(Guid idUsuario)
@@ -686,13 +691,13 @@ namespace WebAPI_Apollo.Controllers.DB
             }
 
             homeUsr.NumNotificacoesNaoLidas = 0;
+            _infHomeRepository.Update(homeUsr);
 
             return Ok(notiUsuario);
         }
 
         // Usuario/Perfil:
         // Rota para carregar o perfil do usuario *
-        //[Authorize]
         [HttpGet]
         [Route("Perfil/{id}")]
         public IActionResult PerfilUsr(Guid id)
@@ -712,21 +717,21 @@ namespace WebAPI_Apollo.Controllers.DB
             {
                 if (usuario.Peso != 0 && usuario.Altura != 0)
                 {
-                    Estatisticas est = new Estatisticas(c.CalcularIMC(usuario), c.CalcularAguaDiaria(true, usuario));
+                    Estatisticas novasEst = new Estatisticas(c.CalcularIMC(usuario), c.CalcularAguaDiaria(true, usuario));
                     var ultimaEstatistica = _estRepository.GetLast();
 
                     // Código pra substituir o autoIncrement do Banco
                     if (ultimaEstatistica != null)
                     {
-                        est.Id = ultimaEstatistica.Id + 1;
+                        novasEst.Id = ultimaEstatistica.Id + 1;
                     }
                     else
                     {
-                        est.Id = 1;
+                        novasEst.Id = 1;
                     }
                     // Visa manter o uso de id int ao invés de trocar pra Guid
 
-                    _estRepository.Add(est);
+                    _estRepository.Add(novasEst);
 
                     ultimaEstatistica = _estRepository.GetLast();
                     if (ultimaEstatistica != null)
@@ -734,7 +739,10 @@ namespace WebAPI_Apollo.Controllers.DB
                         usuario.IdEstatisticas = ultimaEstatistica.Id;
                         _usrRepository.Update(usuario);
                     }
-                    var resposta = new PerfilUsuarioDto(usuario.Nome, usuario.Altura, usuario.Peso, est.IMC, est.AguaDiaria, usuario.Level, usuario.XP);
+                    var resposta = new PerfilUsuarioDto
+                        (usuario.Nome, usuario.Altura, usuario.Peso, 
+                        novasEst.IMC, novasEst.AguaDiaria, usuario.Level, 
+                        usuario.XP, usuario.ImagemPerfil);
                     return Ok(resposta);
                 }
                 else
@@ -744,15 +752,48 @@ namespace WebAPI_Apollo.Controllers.DB
             }
             else
             {
-                var resposta = new PerfilUsuarioDto(usuario.Nome, usuario.Altura, usuario.Peso, estatisticas.IMC, estatisticas.AguaDiaria, usuario.Level, usuario.XP);
+                var resposta = new PerfilUsuarioDto
+                    (usuario.Nome, usuario.Altura, usuario.Peso,
+                    estatisticas.IMC, estatisticas.AguaDiaria, usuario.Level,
+                    usuario.XP, usuario.ImagemPerfil);
                 return Ok(resposta);
             }
         }
 
+        // Rota pra atualizar a foto do Perfil
+        [HttpPost]
+        [Route("Perfil/Foto/{id}/{imagemBase64}")]
+        public IActionResult PerfilUsrImagem(Guid id, string imagemBase64)
+        {
+            var usuario = _usrRepository.Get(id);
+
+            if (usuario is null)
+            {
+                return NotFound();
+            }
+
+            usuario.ImagemPerfil = imagemBase64;
+
+            return Ok();
+        }
+
+        // Rota pra pegar apenas a foto do Perfil
+        [HttpGet]
+        [Route("Perfil/Foto/{id}")]
+        public IActionResult GetPerfilUsrImagem(Guid id)
+        {
+            var usuario = _usrRepository.Get(id);
+
+            if (usuario is null)
+            {
+                return NotFound();
+            }
+
+            return Ok(usuario.ImagemPerfil);
+        }
 
         // Usuario/Recuperacao:
         // Recuperar senha simples
-        //[Authorize]
         [HttpGet]
         [Route("Recuperacao/{email}/{palavraRecuperacao}")]
         public IActionResult RecuperarSenha(string email, string palavraRecuperacao)

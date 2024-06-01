@@ -26,12 +26,14 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 
         public Mensagem? Get(int id)
         {
-            return VolatileContext.Mensagens.FirstOrDefault(mensagem => mensagem.Id == id);
+            return VolatileContext.Mensagens
+                .FirstOrDefault(mensagem => mensagem.Id == id);
         }
 
         public void Update(Mensagem mensagem)
         {
-            var index = VolatileContext.Mensagens.FindIndex(m => m.Id == mensagem.Id);
+            var index = VolatileContext.Mensagens
+                .FindIndex(m => m.Id == mensagem.Id);
             if (index != -1)
             {
                 VolatileContext.Mensagens[index] = mensagem;
@@ -41,8 +43,14 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         public List<ChatDto> GetAll()
         {
             return VolatileContext.Mensagens
-                .Select(mensagem =>
-                new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp))
+                .Select(mensagem => new ChatDto
+                (
+                    mensagem.Id, 
+                    mensagem.Remetente, 
+                    mensagem.Destinatario, 
+                    mensagem.Conteudo, 
+                    mensagem.TimeStamp
+                ))
                 .ToList();
         }
 
@@ -55,8 +63,14 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         {
             return VolatileContext.Mensagens
                 .OrderByDescending(msg => msg.Id)
-                .Select(mensagem =>
-                    new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp))
+                .Select(mensagem => new ChatDto
+                (
+                    mensagem.Id, 
+                    mensagem.Remetente, 
+                    mensagem.Destinatario, 
+                    mensagem.Conteudo, 
+                    mensagem.TimeStamp
+                ))
                 .Where(mensagem => mensagem.Remetente == id)
                 .ToList();
         }
@@ -65,8 +79,14 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         {
             return VolatileContext.Mensagens
                 .OrderByDescending(msg => msg.Id)
-                .Select(mensagem =>
-                    new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp))
+                .Select(mensagem => new ChatDto
+                (
+                    mensagem.Id, 
+                    mensagem.Remetente, 
+                    mensagem.Destinatario, 
+                    mensagem.Conteudo, 
+                    mensagem.TimeStamp
+                ))
                 .Where(mensagem => mensagem.Destinatario == id)
                 .ToList();
         }
@@ -75,15 +95,24 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         {
             return VolatileContext.Mensagens
                 .OrderByDescending(msg => msg.Id)
-                .Select(mensagem =>
-                    new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp))
-                .Where(mensagem => mensagem.Remetente == remetente && mensagem.Destinatario == destinatario)
+                .Select(mensagem => new ChatDto
+                (
+                    mensagem.Id, 
+                    mensagem.Remetente, 
+                    mensagem.Destinatario, 
+                    mensagem.Conteudo, 
+                    mensagem.TimeStamp
+                ))
+                .Where(mensagem => mensagem.Remetente == remetente 
+                                   && mensagem.Destinatario == destinatario)
                 .ToList();
         }
 
         public Mensagem? GetLast()
         {
-            return VolatileContext.Mensagens.OrderByDescending(e => e.Id).FirstOrDefault();
+            return VolatileContext.Mensagens
+                .OrderByDescending(e => e.Id)
+                .FirstOrDefault();
         }
     }
 }

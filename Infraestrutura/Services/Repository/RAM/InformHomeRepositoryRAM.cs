@@ -27,27 +27,32 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         {
             return VolatileContext.InformHome
                 .FirstOrDefault(informHomesNoBanco =>
-                informHomesNoBanco.IdUsuario == informHome.IdUsuario);
+                    informHomesNoBanco.IdUsuario == informHome.IdUsuario);
         }
 
         public InformHome? Get(int id)
         {
-            return VolatileContext.InformHome.FirstOrDefault(e => e.Id == id);
+            return VolatileContext.InformHome
+                .FirstOrDefault(e => e.Id == id);
         }
 
         public InformHome? GetViaUsr(Guid idUsuario)
         {
-            return VolatileContext.InformHome.FirstOrDefault(e => e.IdUsuario == idUsuario);
+            return VolatileContext.InformHome
+                .FirstOrDefault(e => e.IdUsuario == idUsuario);
         }
 
         public InformHome? GetLast()
         {
-            return VolatileContext.InformHome.OrderByDescending(e => e.Id).FirstOrDefault();
+            return VolatileContext.InformHome
+                .OrderByDescending(e => e.Id)
+                .FirstOrDefault();
         }
 
         public void Update(InformHome informHome)
         {
-            var index = VolatileContext.InformHome.FindIndex(e => e.Id == informHome.Id);
+            var index = VolatileContext.InformHome
+                .FindIndex(e => e.Id == informHome.Id);
             if (index != -1)
             {
                 VolatileContext.InformHome[index] = informHome;

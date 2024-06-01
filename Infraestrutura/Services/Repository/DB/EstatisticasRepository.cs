@@ -36,7 +36,9 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public Estatisticas? GetLast()
         {
-            return _context.Estatisticas.OrderByDescending(e => e.Id).FirstOrDefault();
+            return _context.Estatisticas
+                .OrderByDescending(e => e.Id)
+                .FirstOrDefault();
         }
 
         public void Update(Estatisticas estatisticas)

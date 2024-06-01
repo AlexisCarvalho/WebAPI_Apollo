@@ -19,29 +19,8 @@ namespace WebAPI_Apollo.Controllers.DB
         private readonly InformHomeRepositoryRAM _infHomeRepository = new();
         private readonly AmizadeRepositoryRAM _amzdRepository = new();
 
-        /*
-
-            * ------------------------------------ *
-            *               PAREI AQUI             *
-            * ------------------------------------ *
-
-            E procurar o resto do que falta pq não lembro
-            Se vira ai men... acabei de lembrar
-            Tem que adicionar nas notificacoes como não lida
-            Vulgo aumentar o numero de notificacoes
-            Pensar na lógica pra isso depois
-
-            Coisa nova, anterior adiantado, preciso atualizar a 
-            Home nas rotas que envolvem ela, como essa de adicionar 
-            usuario, criar rota pra aceitar a solicitação e adicionar
-            a futura lista de amigos (Já existe repositorio pra isso)
-            falta implementar.
-
-        */
-
         // RAM/Usuario:
         // Adicionar um Usuario
-        //[Authorize]
         [HttpPost]
         [Route("{nome}/{email}/{senha}/{userName}/{palavraRecuperacao}/{dataNascimento}")]
         public IActionResult AddUsr(string nome, string email, string senha, string userName, string palavraRecuperacao, string dataNascimento)
@@ -57,10 +36,10 @@ namespace WebAPI_Apollo.Controllers.DB
                 return BadRequest("Data no Padrão Errado");
             }
 
-            var novoUsuario = new Usuario(nome, email, senha, userName, palavraRecuperacao, dataConvertida);
+            var novoUsr = new Usuario(nome, email, senha, userName, palavraRecuperacao, dataConvertida);
 
-            var existenteEmail = _usrRepository.GetSemelhanteEmail(novoUsuario.Email);
-            var existenteUserName = _usrRepository.GetSemelhanteUserName(novoUsuario.UserName);
+            var existenteEmail = _usrRepository.GetSemelhanteEmail(novoUsr.Email);
+            var existenteUserName = _usrRepository.GetSemelhanteUserName(novoUsr.UserName);
 
             if (existenteEmail != null)
             {
@@ -72,17 +51,22 @@ namespace WebAPI_Apollo.Controllers.DB
                 return BadRequest("Usuario com mesmo username existente");
             }
 
-            InformHome informHome = new InformHome(novoUsuario.Id);
+            InformHome informHome = new InformHome(novoUsr.Id);
 
-            _usrRepository.Add(novoUsuario);
+            _usrRepository.Add(novoUsr);
             _infHomeRepository.Add(informHome);
 
-            var resposta = new UsuarioDto(novoUsuario.Id, novoUsuario.Idade, novoUsuario.XP, novoUsuario.Level, novoUsuario.XP_ProximoNivel, novoUsuario.Nome, novoUsuario.Email, novoUsuario.Senha, novoUsuario.Esporte, novoUsuario.Genero, novoUsuario.UserName, novoUsuario.PalavraRecuperacao, novoUsuario.DataNascimento, novoUsuario.Peso, novoUsuario.Altura);
+            var resposta = new UsuarioDto
+                (novoUsr.Id, novoUsr.Idade, novoUsr.XP, 
+                novoUsr.Level, novoUsr.XP_ProximoNivel, novoUsr.Nome, 
+                novoUsr.Email, novoUsr.Senha, novoUsr.Esporte, 
+                novoUsr.Genero, novoUsr.UserName, novoUsr.PalavraRecuperacao, 
+                novoUsr.DataNascimento, novoUsr.Peso, novoUsr.Altura, 
+                novoUsr.ImagemPerfil);
             return Ok(resposta);
         }
 
         // Adicionar XP em Usuarios especificos por um ID 
-        //[Authorize]
         [HttpPost]
         [Route("{id}/{XP}")]
         public IActionResult AdcXPUsr(Guid id, int XP)
@@ -101,12 +85,17 @@ namespace WebAPI_Apollo.Controllers.DB
 
             _usrRepository.Update(usuario);
 
-            var resposta = new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura);
+            var resposta = new UsuarioDto
+                (usuario.Id, usuario.Idade, usuario.XP,
+                usuario.Level, usuario.XP_ProximoNivel, usuario.Nome,
+                usuario.Email, usuario.Senha, usuario.Esporte,
+                usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao,
+                usuario.DataNascimento, usuario.Peso, usuario.Altura,
+                usuario.ImagemPerfil);
             return Ok(resposta);
         }
 
         // Retornar todos os Usuarios 
-        //[Authorize]
         [HttpGet]
         public IActionResult GetAllUsr()
         {
@@ -121,7 +110,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Obter informações por id 
-        //[Authorize]
         [HttpGet]
         [Route("{id}")]
         public IActionResult GetUsr(Guid id)
@@ -133,12 +121,17 @@ namespace WebAPI_Apollo.Controllers.DB
                 return NotFound();
             }
 
-            var resposta = new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura);
+            var resposta = new UsuarioDto
+                (usuario.Id, usuario.Idade, usuario.XP,
+                usuario.Level, usuario.XP_ProximoNivel, usuario.Nome,
+                usuario.Email, usuario.Senha, usuario.Esporte,
+                usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao,
+                usuario.DataNascimento, usuario.Peso, usuario.Altura,
+                usuario.ImagemPerfil);
             return Ok(resposta);
         }
 
         // Atualizar informações por id 
-        //[Authorize]
         [HttpPut]
         [Route("{id}/{nome}/{esporte}/{genero}/{userName}/{palavraRecuperacao}/{dataNascimento}/{peso}/{altura}")]
         public IActionResult AtualizarUsr(Guid id, string nome, string esporte, string genero, string userName, string palavraRecuperacao, string dataNascimento, float peso, float altura)
@@ -245,11 +238,17 @@ namespace WebAPI_Apollo.Controllers.DB
 
             _usrRepository.Update(usuario);
 
-            return Ok(new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura));
+            var resposta = new UsuarioDto
+                (usuario.Id, usuario.Idade, usuario.XP,
+                usuario.Level, usuario.XP_ProximoNivel, usuario.Nome,
+                usuario.Email, usuario.Senha, usuario.Esporte,
+                usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao,
+                usuario.DataNascimento, usuario.Peso, usuario.Altura,
+                usuario.ImagemPerfil);
+            return Ok(resposta);
         }
 
         // Deletar Usuario por ID
-        //[Authorize]
         [HttpDelete]
         [Route("{id}")]
         public IActionResult DeleteUsr(Guid id)
@@ -277,6 +276,16 @@ namespace WebAPI_Apollo.Controllers.DB
 
             // Limpa todas as informações e referências do usuario
             // no sistema incluindo suas amizades.
+
+            // TODO: Quando se trata das notificações a lógica atual
+            // não permite tirar as notificações não vistas do usuario
+            // da lista de não vistas quando são apagadas aqui, o que faz
+            // uma notificação não vista fantasma que some quando a
+            // caixa é aberta, isto porque não é possível saber qual foi
+            // vista ou não atualmente, a caixa é separada e atualizada
+            // quando recebe algo novo e não contando quantas tem
+            // atualmente que não foram vistas, sendo limpa quando aberta
+
             _infHomeRepository.Delete(infHomeUsr);
             _estRepository.Delete(estUsuario);
             _usrRepository.Delete(usuario);
@@ -288,7 +297,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // RAM/Usuario/Amizades:
         // Carregar a Home 
-        //[Authorize]
         [HttpGet]
         [Route("Amizades/{id}")]
         public IActionResult GetAmigosUsr(Guid id)
@@ -304,7 +312,7 @@ namespace WebAPI_Apollo.Controllers.DB
 
                     if (amigo != null)
                     {
-                        listaAmigos.Add(new AmizadeListaAmigos(amigo.Id, amigo.Nome, "")); // Aqui que entrara a foto
+                        listaAmigos.Add(new AmizadeListaAmigos(amigo.Id, amigo.Nome, amigo.ImagemPerfil)); // Aqui que entrara a foto
                     }
                     else
                     {
@@ -317,7 +325,7 @@ namespace WebAPI_Apollo.Controllers.DB
 
                     if (amigo != null)
                     {
-                        listaAmigos.Add(new AmizadeListaAmigos(amigo.Id, amigo.Nome, "")); // Aqui que entrara a foto
+                        listaAmigos.Add(new AmizadeListaAmigos(amigo.Id, amigo.Nome, amigo.ImagemPerfil)); // Aqui que entrara a foto
                     }
                     else
                     {
@@ -337,7 +345,6 @@ namespace WebAPI_Apollo.Controllers.DB
         // Adicionar Solicitacoes de Amizade 
         // Entre o conjunto de Solicitar Aceitar e Recusar atualmente existe
         // a chance de ambos mandarem um pro outro uma solicitaão antes de algum aceitar
-        //[Authorize]
         [HttpPost]
         [Route("Amizades/Solicitar/{idUsuario}/{idAmigo}")]
         public IActionResult AdcSoliAmiza(Guid idUsuario, Guid idAmigo)
@@ -402,7 +409,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Aceitar solicitação de amizade
-        //[Authorize]
         [HttpPost]
         [Route("Amizades/Aceitar/{idUsuario}/{idDeQuemPediu}")]
         public IActionResult AceitarSoliAmiza(Guid idUsuario, Guid idDeQuemPediu)
@@ -461,6 +467,7 @@ namespace WebAPI_Apollo.Controllers.DB
             _infHomeRepository.Update(home);
 
             homeAmigo.NumNotificacoesNaoLidas++;
+            homeAmigo.NumAmigos++;
             _infHomeRepository.Update(homeAmigo);
 
             Amizade amizade = new(quemPediu.Id, usuario.Id);
@@ -478,7 +485,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Aceitar solicitação de amizade
-        //[Authorize]
         [HttpPost]
         [Route("Amizades/Recusar/{idUsuario}/{idDeQuemPediu}")]
         public IActionResult RecusarSoliAmiza(Guid idUsuario, Guid idDeQuemPediu)
@@ -553,7 +559,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Desfazer amizades
-        //[Authorize]
         [HttpDelete]
         [Route("Amizades/Desfazer/{idUsuario}/{idAmigo}")]
         public IActionResult DesfazerAmiza(Guid idUsuario, Guid idAmigo)
@@ -590,7 +595,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // RAM/Usuario/Home:
         // Carregar a Home 
-        //[Authorize]
         [HttpGet]
         [Route("Home/{idUsuario}")]
         public IActionResult GetHomeUsr(Guid idUsuario)
@@ -607,7 +611,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // RAM/Usuario/Login:
         // Efetuar Login 
-        //[Authorize]
         [HttpGet]
         [Route("Login/{email}/{senha}")]
         public IActionResult Login(string email, string senha)
@@ -623,7 +626,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Rota para alterar as informações do Login
-        //[Authorize]
         [HttpPut]
         [Route("Login/{id}/{email}/{senha}")]
         public IActionResult LoginUpdate(Guid id, string email, string senha)
@@ -663,7 +665,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // RAM/Usuario/Notificacoes:
         // Carregar as Notificacoes 
-        //[Authorize]
         [HttpGet]
         [Route("Notificacoes/{idUsuario}")]
         public IActionResult GetNotiUsr(Guid idUsuario)
@@ -682,13 +683,13 @@ namespace WebAPI_Apollo.Controllers.DB
             }
 
             homeUsr.NumNotificacoesNaoLidas = 0;
+            _infHomeRepository.Update(homeUsr);
 
             return Ok(notiUsuario);
         }
 
         // RAM/Usuario/Perfil:
         // Rota para carregar o perfil do usuario *
-        //[Authorize]
         [HttpGet]
         [Route("Perfil/{id}")]
         public IActionResult PerfilUsr(Guid id)
@@ -708,9 +709,9 @@ namespace WebAPI_Apollo.Controllers.DB
             {
                 if (usuario.Peso != 0 && usuario.Altura != 0)
                 {
-                    Estatisticas est = new Estatisticas(c.CalcularIMC(usuario), c.CalcularAguaDiaria(true, usuario));
+                    Estatisticas novasEst = new Estatisticas(c.CalcularIMC(usuario), c.CalcularAguaDiaria(true, usuario));
 
-                    _estRepository.Add(est);
+                    _estRepository.Add(novasEst);
 
                     var ultimaEstatistica = _estRepository.GetLast();
                     if (ultimaEstatistica != null)
@@ -718,7 +719,10 @@ namespace WebAPI_Apollo.Controllers.DB
                         usuario.IdEstatisticas = ultimaEstatistica.Id;
                         _usrRepository.Update(usuario);
                     }
-                    var resposta = new PerfilUsuarioDto(usuario.Nome, usuario.Altura, usuario.Peso, est.IMC, est.AguaDiaria, usuario.Level, usuario.XP);
+                    var resposta = new PerfilUsuarioDto
+                        (usuario.Nome, usuario.Altura, usuario.Peso,
+                        novasEst.IMC, novasEst.AguaDiaria, usuario.Level,
+                        usuario.XP, usuario.ImagemPerfil);
                     return Ok(resposta);
                 }
                 else
@@ -728,7 +732,10 @@ namespace WebAPI_Apollo.Controllers.DB
             }
             else
             {
-                var resposta = new PerfilUsuarioDto(usuario.Nome, usuario.Altura, usuario.Peso, estatisticas.IMC, estatisticas.AguaDiaria, usuario.Level, usuario.XP);
+                var resposta = new PerfilUsuarioDto
+                    (usuario.Nome, usuario.Altura, usuario.Peso,
+                    estatisticas.IMC, estatisticas.AguaDiaria, usuario.Level,
+                    usuario.XP, usuario.ImagemPerfil);
                 return Ok(resposta);
             }
         }
@@ -736,7 +743,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // RAM/Usuario/Recuperacao:
         // Recuperar senha simples
-        //[Authorize]
         [HttpGet]
         [Route("Recuperacao/{email}/{palavraRecuperacao}")]
         public IActionResult RecuperarSenha(string email, string palavraRecuperacao)
@@ -771,7 +777,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // RAM/Usuario/Destroy:
         // Deletar Tudo da Memória
-        //[Authorize]
         [HttpDelete]
         [Route("Destroy")]
         public IActionResult DeleteAllDataRAM()
@@ -786,7 +791,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Deletar Tudo da Memória
-        //[Authorize]
         [HttpDelete]
         [Route("Destroy/Estatisticas")]
         public IActionResult DeleteAllDataRAMEstatisticas()

@@ -28,7 +28,12 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         public void DeletarReferencias(int idEstatisticas)
         {
             var estatisticasDoUsuario = VolatileContext.Estatisticas
-                .Select(est => new Estatisticas(est.Id, est.IMC, est.AguaDiaria))
+                .Select(est => new Estatisticas
+                (
+                    est.Id, 
+                    est.IMC, 
+                    est.AguaDiaria
+                ))
                 .Where(amz => amz.Id == idEstatisticas)
                 .ToList();
 
@@ -50,12 +55,15 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 
         public Estatisticas? GetLast()
         {
-            return VolatileContext.Estatisticas.OrderByDescending(e => e.Id).FirstOrDefault();
+            return VolatileContext.Estatisticas
+                .OrderByDescending(e => e.Id)
+                .FirstOrDefault();
         }
 
         public void Update(Estatisticas estatisticas)
         {
-            var index = VolatileContext.Estatisticas.FindIndex(e => e.Id == estatisticas.Id);
+            var index = VolatileContext.Estatisticas
+                .FindIndex(e => e.Id == estatisticas.Id);
             if (index != -1)
             {
                 VolatileContext.Estatisticas[index] = estatisticas;

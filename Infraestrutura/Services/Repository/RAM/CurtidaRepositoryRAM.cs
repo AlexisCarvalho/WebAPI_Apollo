@@ -40,12 +40,15 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 
         public Curtida? GetLast()
         {
-            return VolatileContext.Curtidas.OrderByDescending(e => e.Id).FirstOrDefault();
+            return VolatileContext.Curtidas
+                .OrderByDescending(e => e.Id)
+                .FirstOrDefault();
         }
 
         public void Update(Curtida curtida)
         {
-            var index = VolatileContext.Curtidas.FindIndex(e => e.Id == curtida.Id);
+            var index = VolatileContext.Curtidas
+                .FindIndex(e => e.Id == curtida.Id);
             if (index != -1)
             {
                 VolatileContext.Curtidas[index] = curtida;

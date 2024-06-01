@@ -42,7 +42,13 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         {
             return VolatileContext.Notificacoes
                 .OrderByDescending(noti => noti.Id)
-                .Select(noti => new NotificacoesDaRedeDto(noti.Remetente, noti.Destinatario, noti.TipoDeNotificacao, noti.MensagemDaNotificacao))
+                .Select(noti => new NotificacoesDaRedeDto
+                (
+                    noti.Remetente, 
+                    noti.Destinatario, 
+                    noti.TipoDeNotificacao, 
+                    noti.MensagemDaNotificacao
+                ))
                 .ToList();
         }
 
@@ -50,19 +56,28 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         {
             return VolatileContext.Notificacoes
                 .OrderByDescending(noti => noti.Id)
-                .Select(noti => new NotificacoesDaRedeDto(noti.Remetente, noti.Destinatario, noti.TipoDeNotificacao, noti.MensagemDaNotificacao))
+                .Select(noti => new NotificacoesDaRedeDto
+                (
+                    noti.Remetente, 
+                    noti.Destinatario, 
+                    noti.TipoDeNotificacao, 
+                    noti.MensagemDaNotificacao
+                ))
                 .Where(noti => noti.destinatario == idUsuario)
                 .ToList();
         }
 
         public Notificacao? GetLast()
         {
-            return VolatileContext.Notificacoes.OrderByDescending(e => e.Id).FirstOrDefault();
+            return VolatileContext.Notificacoes
+                .OrderByDescending(e => e.Id)
+                .FirstOrDefault();
         }
 
         public void Update(Notificacao notificacao)
         {
-            var index = VolatileContext.Notificacoes.FindIndex(e => e.Id == notificacao.Id);
+            var index = VolatileContext.Notificacoes
+                .FindIndex(e => e.Id == notificacao.Id);
             if (index != -1)
             {
                 VolatileContext.Notificacoes[index] = notificacao;
@@ -77,8 +92,16 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         public void DeletarReferencias(Guid idUsuario)
         {
             var notificacoesDoUsr = VolatileContext.Notificacoes
-                .Select(ntf => new Notificacao(ntf.Id, ntf.Remetente, ntf.Destinatario, ntf.TipoDeNotificacao, ntf.MensagemDaNotificacao))
-                .Where(ntf => ntf.Destinatario == idUsuario || ntf.Remetente == idUsuario)
+                .Select(ntf => new Notificacao
+                (
+                    ntf.Id, 
+                    ntf.Remetente, 
+                    ntf.Destinatario, 
+                    ntf.TipoDeNotificacao, 
+                    ntf.MensagemDaNotificacao
+                ))
+                .Where(ntf => ntf.Destinatario == idUsuario 
+                              || ntf.Remetente == idUsuario)
                 .ToList();
 
             foreach (var notificacoes in notificacoesDoUsr)
