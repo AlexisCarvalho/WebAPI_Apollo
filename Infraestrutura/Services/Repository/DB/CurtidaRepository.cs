@@ -17,8 +17,9 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public Curtida? JaCurtiu(Curtida curtida)
         {
-            return _context.Curtidas.FirstOrDefault(c =>
-                c.Remetente == curtida.Remetente && c.Destinatario == curtida.Destinatario);
+            return _context.Curtidas
+                .FirstOrDefault(c => c.Remetente == curtida.Remetente 
+                                     && c.Destinatario == curtida.Destinatario);
         }
 
         public Curtida? Get(int id)
@@ -28,7 +29,9 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public Curtida? GetLast()
         {
-            return _context.Curtidas.OrderByDescending(c => c.Id).FirstOrDefault();
+            return _context.Curtidas
+                .OrderByDescending(c => c.Id)
+                .FirstOrDefault();
         }
 
         public void Update(Curtida curtida)

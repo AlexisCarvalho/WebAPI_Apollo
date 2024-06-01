@@ -16,8 +16,6 @@ namespace WebAPI_Apollo.Controllers.RAM
         private readonly AmizadeRepositoryRAM _amzdRepository = new();
 
         // RAM/Chat:
-
-        //[Authorize]
         [HttpPost]
         [Route("{remetente}/{destinatario}/{conteudo}")]
         public IActionResult AddMsg(Guid remetente, Guid destinatario, string conteudo)
@@ -61,7 +59,6 @@ namespace WebAPI_Apollo.Controllers.RAM
         }
 
         // Retornar todas as Mensagens
-        //[Authorize]
         [HttpGet]
         public IActionResult GetAllMsg()
         {
@@ -76,7 +73,6 @@ namespace WebAPI_Apollo.Controllers.RAM
         }
 
         // Retornar mensagem
-        //[Authorize]
         [HttpGet]
         [Route("{id}")]
         public IActionResult GetMsg(int id)
@@ -92,7 +88,6 @@ namespace WebAPI_Apollo.Controllers.RAM
         }
 
         // Mensagens trocadas entre dois ids
-        //[Authorize]
         [HttpGet]
         [Route("{remetente}/{destinatario}")]
         public IActionResult GetEnviadasEntreIDs(Guid remetente, Guid destinatario)
@@ -109,7 +104,6 @@ namespace WebAPI_Apollo.Controllers.RAM
 
         // Atualizar informações por id
         // Isso pra editar a mensagem já enviada (deixar pra mexer no final)
-        //[Authorize]
         [HttpPut]
         [Route("{id}/{conteudo}")]
         public IActionResult AtualizarMsg(int id, string conteudo)
@@ -130,7 +124,6 @@ namespace WebAPI_Apollo.Controllers.RAM
         }
 
         // Deletar Mensagem por ID
-        //[Authorize]
         [HttpDelete]
         [Route("{id}")]
         public IActionResult Delete(int id)
@@ -151,7 +144,6 @@ namespace WebAPI_Apollo.Controllers.RAM
 
         // Obter informações por ID
         // Mensagens Enviadas para aquele ID e Recebidas por aquele ID
-        //[Authorize]
         [HttpGet]
         [Route("Usuario/Enviadas/{id}")]
         public IActionResult GetEnviadas(Guid id)
@@ -166,7 +158,6 @@ namespace WebAPI_Apollo.Controllers.RAM
             return Ok(mensagens);
         }
 
-        //[Authorize]
         [HttpGet]
         [Route("Usuario/Recebidas/{id}")]
         public IActionResult GetRecebidas(Guid id)
@@ -183,7 +174,6 @@ namespace WebAPI_Apollo.Controllers.RAM
 
         // RAM/Chat/Destroy:
         // Deletar Tudo da Memória
-        //[Authorize]
         [HttpDelete]
         [Route("Destroy")]
         public IActionResult DeleteAllDataRAM()

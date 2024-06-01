@@ -28,7 +28,14 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         public List<ChatDto> GetAll()
         {
             return _context.Mensagens
-                .Select(m => new ChatDto(m.Id, m.Remetente, m.Destinatario, m.Conteudo, m.TimeStamp))
+                .Select(m => new ChatDto
+                (
+                    m.Id,
+                    m.Remetente, 
+                    m.Destinatario, 
+                    m.Conteudo, 
+                    m.TimeStamp
+                ))
                 .ToList();
         }
 
@@ -43,7 +50,14 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
             return _context.Mensagens
                 .Where(m => m.Remetente == id)
                 .OrderByDescending(m => m.Id)
-                .Select(m => new ChatDto(m.Id, m.Remetente, m.Destinatario, m.Conteudo, m.TimeStamp))
+                .Select(m => new ChatDto
+                (
+                    m.Id, 
+                    m.Remetente, 
+                    m.Destinatario, 
+                    m.Conteudo, 
+                    m.TimeStamp
+                ))
                 .ToList();
         }
 
@@ -52,22 +66,39 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
             return _context.Mensagens
                 .Where(m => m.Destinatario == id)
                 .OrderByDescending(m => m.Id)
-                .Select(m => new ChatDto(m.Id, m.Remetente, m.Destinatario, m.Conteudo, m.TimeStamp))
+                .Select(m => new ChatDto
+                (
+                    m.Id, 
+                    m.Remetente, 
+                    m.Destinatario, 
+                    m.Conteudo, 
+                    m.TimeStamp
+                ))
                 .ToList();
         }
 
         public List<ChatDto> EnviadasEntre(Guid remetente, Guid destinatario)
         {
             return _context.Mensagens
-                .Where(m => m.Remetente == remetente && m.Destinatario == destinatario)
+                .Where(m => m.Remetente == remetente 
+                            && m.Destinatario == destinatario)
                 .OrderByDescending(m => m.Id)
-                .Select(m => new ChatDto(m.Id, m.Remetente, m.Destinatario, m.Conteudo, m.TimeStamp))
+                .Select(m => new ChatDto
+                (
+                    m.Id, 
+                    m.Remetente, 
+                    m.Destinatario, 
+                    m.Conteudo, 
+                    m.TimeStamp
+                ))
                 .ToList();
         }
 
         public Mensagem? GetLast()
         {
-            return _context.Mensagens.OrderByDescending(m => m.Id).FirstOrDefault();
+            return _context.Mensagens
+                .OrderByDescending(m => m.Id)
+                .FirstOrDefault();
         }
     }
 }

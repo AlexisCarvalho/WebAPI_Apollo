@@ -27,10 +27,10 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public Notificacao? JaFoiNotificado(Notificacao notificacao)
         {
-            return _context.Notificacoes.FirstOrDefault(n =>
-                n.Remetente == notificacao.Remetente &&
-                n.Destinatario == notificacao.Destinatario &&
-                n.TipoDeNotificacao == notificacao.TipoDeNotificacao);
+            return _context.Notificacoes
+                .FirstOrDefault(n => n.Remetente == notificacao.Remetente 
+                                    && n.Destinatario == notificacao.Destinatario 
+                                    && n.TipoDeNotificacao == notificacao.TipoDeNotificacao);
         }
 
         public Notificacao? Get(int id)
@@ -42,7 +42,13 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         {
             return _context.Notificacoes
                 .OrderByDescending(n => n.Id)
-                .Select(n => new NotificacoesDaRedeDto(n.Remetente, n.Destinatario, n.TipoDeNotificacao, n.MensagemDaNotificacao))
+                .Select(n => new NotificacoesDaRedeDto
+                (
+                    n.Remetente, 
+                    n.Destinatario, 
+                    n.TipoDeNotificacao, 
+                    n.MensagemDaNotificacao
+                ))
                 .ToList();
         }
 
@@ -51,13 +57,21 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
             return _context.Notificacoes
                 .Where(n => n.Destinatario == idUsuario)
                 .OrderByDescending(n => n.Id)
-                .Select(n => new NotificacoesDaRedeDto(n.Remetente, n.Destinatario, n.TipoDeNotificacao, n.MensagemDaNotificacao))
+                .Select(n => new NotificacoesDaRedeDto
+                (
+                    n.Remetente, 
+                    n.Destinatario, 
+                    n.TipoDeNotificacao, 
+                    n.MensagemDaNotificacao
+                ))
                 .ToList();
         }
 
         public Notificacao? GetLast()
         {
-            return _context.Notificacoes.OrderByDescending(n => n.Id).FirstOrDefault();
+            return _context.Notificacoes
+                .OrderByDescending(n => n.Id)
+                .FirstOrDefault();
         }
 
         public void Update(Notificacao notificacao)
@@ -75,7 +89,8 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         public void DeletarReferencias(Guid idUsuario)
         {
             var notificacoesDoUsr = _context.Notificacoes
-                .Where(n => n.Destinatario == idUsuario || n.Remetente == idUsuario)
+                .Where(n => n.Destinatario == idUsuario 
+                            || n.Remetente == idUsuario)
                 .ToList();
 
             _context.Notificacoes.RemoveRange(notificacoesDoUsr);

@@ -30,7 +30,17 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         {
             return VolatileContext.Posts
                 .OrderByDescending(post => post.TimeStamp)
-                .Select(post => new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.CaminhoImagem, post.NumCurtidas, post.NumComentarios, post.TimeStamp))
+                .Select(post => new PostCompletoDto
+                (
+                    post.Id, 
+                    post.IdUsuario, 
+                    post.Titulo, 
+                    post.Descricao, 
+                    post.CaminhoImagem, 
+                    post.NumCurtidas, 
+                    post.NumComentarios, 
+                    post.TimeStamp
+                ))
                 .ToList();
         }
 
@@ -57,19 +67,30 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                 feed.AddRange(PostadosPor(id));
             }
 
-            feed.Sort((postUm, postDois) => postDois.timeStamp.CompareTo(postUm.timeStamp)); // Ordem inversa para ser decrescente, trocar causo queira crescente
+            feed.Sort((postUm, postDois) => 
+            postDois.timeStamp.CompareTo(postUm.timeStamp)); 
+            // Ordem inversa para ser decrescente, trocar causo queira crescente
 
             return feed;
         }
 
         public List<PostCompletoDto> GetPostsPesquisa(string pesquisa)
         {
-            return VolatileContext.Posts.Select(post => new PostCompletoDto
-            (post.Id, post.IdUsuario, post.Titulo, post.Descricao,
-             post.CaminhoImagem, post.NumCurtidas, post.NumComentarios, post.TimeStamp))
-            .Where(post => AlgoritmosDePesquisa.SimilaridadeDeJaccard(post.titulo, pesquisa) > 0.4
-                        || AlgoritmosDePesquisa.SimilaridadeDeJaccard(post.descricao, pesquisa) > 0.7)
-            .ToList();
+            return VolatileContext.Posts
+                .Select(post => new PostCompletoDto
+                (
+                    post.Id, 
+                    post.IdUsuario, 
+                    post.Titulo, 
+                    post.Descricao,
+                    post.CaminhoImagem, 
+                    post.NumCurtidas, 
+                    post.NumComentarios, 
+                    post.TimeStamp
+                ))
+                .Where(post => AlgoritmosDePesquisa.SimilaridadeDeJaccard(post.titulo, pesquisa) > 0.4
+                               || AlgoritmosDePesquisa.SimilaridadeDeJaccard(post.descricao, pesquisa) > 0.2)
+                .ToList();
         }
 
         public void Delete(Post post)
@@ -84,10 +105,20 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 
         public List<PostCompletoDto> PostadosPor(Guid idUsuario)
         {
-            return VolatileContext.Posts.Where(post => post.IdUsuario == idUsuario)
-                                        .Select(post =>
-            new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.CaminhoImagem, post.NumCurtidas, post.NumComentarios, post.TimeStamp))
-                                        .ToList();
+            return VolatileContext.Posts
+                .Where(post => post.IdUsuario == idUsuario)
+                .Select(post => new PostCompletoDto
+                (
+                    post.Id, 
+                    post.IdUsuario,
+                    post.Titulo, 
+                    post.Descricao,
+                    post.CaminhoImagem, 
+                    post.NumCurtidas, 
+                    post.NumComentarios, 
+                    post.TimeStamp
+                ))
+                .ToList();
         }
 
         public List<Amizade> GetAllAmz(Guid idUsuario)

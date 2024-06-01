@@ -46,11 +46,15 @@ var builder = WebApplication.CreateBuilder(args);
  |************* Nearly Impossible *************| 
  | TODO: Compartilhar Post com Amigo           |
   _____________________________________________
- |******* Mexer Quando Tiver Pouco Tempo ******| 
+ |******* Mexer Quando Tiver Muito Tempo ******| 
  | TODO: Mudar todos os retornos Get para Dto, |
  |       pra evitar conversão na rota          |
  | TODO: Catalogar as respostas das rotas,     |
  |       possíveis retornos e código           |
+ | TODO: Ao capturar dados do banco usar a     |
+ |      model e converter para Dto depois      |
+ |      usando mapper ao invés de capturar     |
+ |       diretamente em Dto                    |
 
 */
 

@@ -42,12 +42,26 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public List<UsuarioDto> GetAll()
         {
-            return _context.Usuarios.Select(usuario => new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura)).ToList();
+            return _context.Usuarios
+                .Select(usuario => new UsuarioDto
+                (
+                    usuario.Id, usuario.Idade, 
+                    usuario.XP, usuario.Level, 
+                    usuario.XP_ProximoNivel, usuario.Nome, 
+                    usuario.Email, usuario.Senha, 
+                    usuario.Esporte, usuario.Genero, 
+                    usuario.UserName, usuario.PalavraRecuperacao, 
+                    usuario.DataNascimento, usuario.Peso, 
+                    usuario.Altura, usuario.ImagemPerfil
+                ))
+                .ToList();
         }
 
         public Usuario? GetViaLogin(string email, string senha)
         {
-            return _context.Usuarios.FirstOrDefault(usuario => usuario.Email == email && usuario.Senha == senha);
+            return _context.Usuarios
+                .FirstOrDefault(usuario => usuario.Email == email 
+                                           && usuario.Senha == senha);
         }
 
         public void Delete(Usuario usuario)
@@ -58,12 +72,16 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public Usuario? RecuperarSenha(string email, string palavraRecuperacao)
         {
-            return _context.Usuarios.FirstOrDefault(usuario => usuario.PalavraRecuperacao == palavraRecuperacao && usuario.Email == email);
+            return _context.Usuarios
+                .FirstOrDefault(usuario => usuario.PalavraRecuperacao == palavraRecuperacao 
+                                           && usuario.Email == email);
         }
 
         public bool VerificarSeExisteEmailUsername(Usuario usuarioInformado)
         {
-            return _context.Usuarios.Any(usuario => usuario.UserName == usuarioInformado.UserName || usuario.Email == usuarioInformado.Email);
+            return _context.Usuarios
+                .Any(usuario => usuario.UserName == usuarioInformado.UserName 
+                                || usuario.Email == usuarioInformado.Email);
         }
     }
 }

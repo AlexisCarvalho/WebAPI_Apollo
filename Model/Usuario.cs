@@ -18,6 +18,7 @@ namespace WebAPI_Apollo.Model
         private float _peso;
         private float _altura;
         private int _idEstatisticas;
+        private string _imagemPerfil;
 
         public Usuario()
         {
@@ -58,6 +59,7 @@ namespace WebAPI_Apollo.Model
             _peso = 0;
             _altura = 0;
             _idEstatisticas = 0;
+            _imagemPerfil = String.Empty;
         }
 
         public Guid Id
@@ -154,6 +156,12 @@ namespace WebAPI_Apollo.Model
         {
             get { return _idEstatisticas; }
             set { _idEstatisticas = value; }
+        }
+
+        public string ImagemPerfil
+        {
+            get { return _imagemPerfil; }
+            set { _imagemPerfil = value; }
         }
     }
 }

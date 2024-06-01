@@ -26,7 +26,6 @@ namespace WebAPI_Apollo.Controllers.DB
         // Posts:
 
         // Adicionar um Post Padrão da Rede, sem imagem
-        //[Authorize]
         [HttpPost]
         [Route("{idUsuario}/{titulo}/{descricao}")]
         public IActionResult AddPostPadrao(Guid idUsuario, string titulo, string descricao)
@@ -47,7 +46,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Retornar todos os Posts
-        //[Authorize]
         [HttpGet]
         public IActionResult GetAllPost()
         {
@@ -62,7 +60,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Retornar Post
-        //[Authorize]
         [HttpGet]
         [Route("{id}")]
         public IActionResult GetPost(Guid id)
@@ -79,7 +76,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // Atualizar informações por id
         // Isso pra editar o post já publicado (deixar pra mexer no final)
-        //[Authorize]
         [HttpPut]
         [Route("{id}/{titulo}/{descricao}/{caminhoImagem}")]
         public IActionResult AtualizaPost(Guid id, string titulo, string descricao, string caminhoImagem)
@@ -101,7 +97,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Deletar Post por ID
-        //[Authorize]
         [HttpDelete]
         [Route("{id}")]
         public IActionResult Delete(Guid id)
@@ -121,7 +116,6 @@ namespace WebAPI_Apollo.Controllers.DB
         // Posts/Comentarios:
 
         // Adicionar um comentario a um Post
-        //[Authorize]
         [HttpPost]
         [Route("Comentarios/{id}/{usuarioQueComentou}/{comentario}")]
         public IActionResult AddComentarioPost(Guid id, Guid usuarioQueComentou, string comentario)
@@ -153,24 +147,57 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Retornar Comentarios do Post
-        //[Authorize]
         [HttpGet]
         [Route("Comentarios/{id}")]
         public IActionResult GetComentariosPost(Guid id)
         {
             var comentarios = _msgRepository.RecebidasPor(id);
+            var comentariosFormatados = new List<ComentariosDto>();
 
             if (comentarios is null || comentarios.Count == 0)
             {
-                return NotFound();
+                return NotFound("Não foi Encontrado Nenhum Comentario");
             }
 
-            return Ok(comentarios);
+            foreach(var comentario in comentarios)
+            {
+                Usuario usr = _usrRepository.Get(comentario.Remetente);
+                
+                if(usr is null)
+                {
+                    return Problem("Algo Inesperado Ocorreu, Usuario que Comentou não Encontrado");
+                }
+
+                comentariosFormatados.Add(new ComentariosDto(comentario.Remetente, comentario.Destinatario, usr.ImagemPerfil, usr.Nome, comentario.Conteudo, comentario.timeStamp));
+            }
+
+            return Ok(comentariosFormatados);
+        }
+
+        // Posts/Feed:
+        [HttpGet]
+        [Route("Feed/{idUsuario}")]
+        public IActionResult GetFeedUsr(Guid idUsuario)
+        {
+            var usuario = _usrRepository.Get(idUsuario);
+
+            if (usuario is null)
+            {
+                return NotFound("Usuario não encontrado");
+            }
+
+            var posts = _pstRepository.GetFeedUsr(idUsuario);
+
+            if (posts is null || posts.Count == 0)
+            {
+                return NotFound("Nenhum Post Criado por Amigos Encontrado");
+            }
+
+            return Ok(posts);
         }
 
         // Posts/Interagir:
         // Adicionar uma curtida a um post
-        //[Authorize]
         [HttpPost]
         [Route("Interagir/Curtir/{idPost}/{idUsuario}")]
         public IActionResult AddCurtidaPost(Guid idPost, Guid idUsuario)
@@ -208,7 +235,6 @@ namespace WebAPI_Apollo.Controllers.DB
         }
 
         // Adicionar uma curtida a um post
-        //[Authorize]
         [HttpPost]
         [Route("Interagir/Descurtir/{idPost}/{idUsuario}")]
         public IActionResult RemoverCurtidaPost(Guid idPost, Guid idUsuario)
@@ -245,14 +271,13 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // Posts/Pesquisa
         // Retornar somente posts que correspondem a determinada pesquisa
-        //[Authorize]
         [HttpGet]
         [Route("Pesquisa/{termo}")]
         public IActionResult GetPostsDoUsuario(string termo)
         {
             var postsCorrespondentes = _pstRepository.GetPostsPesquisa(termo);
 
-            if (postsCorrespondentes is null)
+            if (postsCorrespondentes is null || postsCorrespondentes.Count == 0)
             {
                 return NotFound("Nenhum Post Correspondente Encontrado");
             }
@@ -262,7 +287,6 @@ namespace WebAPI_Apollo.Controllers.DB
 
         // Posts/Usuario:
         // Retornar somente posts feitos por aquele usuario
-        //[Authorize]
         [HttpGet]
         [Route("Usuario/{id}")]
         public IActionResult GetPostsDoUsuario(Guid id)

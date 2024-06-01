@@ -30,7 +30,17 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         {
             return _context.Posts
                 .OrderByDescending(post => post.TimeStamp)
-                .Select(post => new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.CaminhoImagem, post.NumCurtidas, post.NumComentarios, post.TimeStamp))
+                .Select(post => new PostCompletoDto
+                (
+                    post.Id, 
+                    post.IdUsuario, 
+                    post.Titulo, 
+                    post.Descricao, 
+                    post.CaminhoImagem, 
+                    post.NumCurtidas, 
+                    post.NumComentarios,
+                    post.TimeStamp
+                ))
                 .ToList();
         }
 
@@ -38,12 +48,24 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         {
             var amizades = GetAllAmz(idUsuario);
 
-            var idAmigos = amizades.Select(amz => amz.Destinatario == idUsuario ? amz.Remetente : amz.Destinatario).ToList();
+            var idAmigos = amizades
+                .Select(amz => amz.Destinatario == idUsuario ? amz.Remetente : amz.Destinatario)
+                .ToList();
 
             var feed = _context.Posts
                 .Where(post => idAmigos.Contains(post.IdUsuario))
                 .OrderByDescending(post => post.TimeStamp)
-                .Select(post => new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.CaminhoImagem, post.NumCurtidas, post.NumComentarios, post.TimeStamp))
+                .Select(post => new PostCompletoDto
+                (
+                    post.Id, 
+                    post.IdUsuario, 
+                    post.Titulo, 
+                    post.Descricao, 
+                    post.CaminhoImagem, 
+                    post.NumCurtidas, 
+                    post.NumComentarios, 
+                    post.TimeStamp
+                ))
                 .ToList();
 
             return feed;
@@ -52,9 +74,20 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         public List<PostCompletoDto> GetPostsPesquisa(string pesquisa)
         {
             return _context.Posts
-                .Where(post => AlgoritmosDePesquisa.SimilaridadeDeJaccard(post.Titulo, pesquisa) > 0.4
-                            || AlgoritmosDePesquisa.SimilaridadeDeJaccard(post.Descricao, pesquisa) > 0.7)
-                .Select(post => new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.CaminhoImagem, post.NumCurtidas, post.NumComentarios, post.TimeStamp))
+                .Select(post => new PostCompletoDto
+                (
+                    post.Id,
+                    post.IdUsuario,
+                    post.Titulo,
+                    post.Descricao,
+                    post.CaminhoImagem,
+                    post.NumCurtidas,
+                    post.NumComentarios,
+                    post.TimeStamp
+                ))
+                .AsEnumerable() // TODO: (Modificar Pra Uso Real) Traz os dados para a memória, Isso pode gerar um problema futuro causo seja implementado na vida real
+                .Where(post => AlgoritmosDePesquisa.SimilaridadeDeJaccard(post.titulo, pesquisa) > 0.4
+                               || AlgoritmosDePesquisa.SimilaridadeDeJaccard(post.descricao, pesquisa) > 0.2)
                 .ToList();
         }
 
@@ -66,7 +99,9 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public Post? GetLast()
         {
-            return _context.Posts.OrderByDescending(post => post.Id).FirstOrDefault();
+            return _context.Posts
+                .OrderByDescending(post => post.Id)
+                .FirstOrDefault();
         }
 
         public List<PostCompletoDto> PostadosPor(Guid idUsuario)
@@ -74,14 +109,25 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
             return _context.Posts
                 .Where(post => post.IdUsuario == idUsuario)
                 .OrderByDescending(post => post.TimeStamp)
-                .Select(post => new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.CaminhoImagem, post.NumCurtidas, post.NumComentarios, post.TimeStamp))
+                .Select(post => new PostCompletoDto
+                (
+                    post.Id, 
+                    post.IdUsuario, 
+                    post.Titulo, 
+                    post.Descricao, 
+                    post.CaminhoImagem, 
+                    post.NumCurtidas, 
+                    post.NumComentarios,
+                    post.TimeStamp
+                ))
                 .ToList();
         }
 
         public List<Amizade> GetAllAmz(Guid idUsuario)
         {
             return _context.Amizades
-               .Where(amz => amz.Destinatario == idUsuario || amz.Remetente == idUsuario)
+               .Where(amz => amz.Destinatario == idUsuario 
+                             || amz.Remetente == idUsuario)
                .ToList();
         }
     }

@@ -15,7 +15,8 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public InformHome? JaExiste(InformHome informHome)
         {
-            return _context.InformHome.FirstOrDefault(h => h.IdUsuario == informHome.IdUsuario);
+            return _context.InformHome
+                .FirstOrDefault(h => h.IdUsuario == informHome.IdUsuario);
         }
 
         public InformHome? Get(int id)
@@ -25,12 +26,15 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public InformHome? GetViaUsr(Guid idUsuario)
         {
-            return _context.InformHome.FirstOrDefault(h => h.IdUsuario == idUsuario);
+            return _context.InformHome
+                .FirstOrDefault(h => h.IdUsuario == idUsuario);
         }
 
         public InformHome? GetLast()
         {
-            return _context.InformHome.OrderByDescending(h => h.Id).FirstOrDefault();
+            return _context.InformHome
+                .OrderByDescending(h => h.Id)
+                .FirstOrDefault();
         }
 
         public void Update(InformHome informHome)
