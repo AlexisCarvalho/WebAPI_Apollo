@@ -1,5 +1,4 @@
-﻿using WebAPI_Apollo.Model.DTOs;
-using WebAPI_Apollo.Model.Interacoes;
+﻿using WebAPI_Apollo.Model.Interacoes;
 using WebAPI_Apollo.Model.ViewModel;
 
 namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
@@ -30,9 +29,9 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         {
             return VolatileContext.Amizades
                 .FirstOrDefault(amizadesNoBanco =>
-                amizadesNoBanco.Remetente == amizade.Remetente 
-                && amizadesNoBanco.Destinatario == amizade.Destinatario 
-                || amizadesNoBanco.Destinatario == amizade.Remetente 
+                amizadesNoBanco.Remetente == amizade.Remetente
+                && amizadesNoBanco.Destinatario == amizade.Destinatario
+                || amizadesNoBanco.Destinatario == amizade.Remetente
                 && amizadesNoBanco.Remetente == amizade.Destinatario);
         }
 
@@ -47,10 +46,10 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                 .OrderByDescending(amz => amz.Id)
                 .Select(amz => new Amizade
                 (
-                    amz.Remetente, 
+                    amz.Remetente,
                     amz.Destinatario
                 ))
-                .Where(amz => amz.Destinatario == idUsuario 
+                .Where(amz => amz.Destinatario == idUsuario
                               || amz.Remetente == idUsuario)
                 .ToList();
         }
@@ -82,11 +81,11 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
             var amizadesDoUsr = VolatileContext.Amizades
                 .Select(amz => new Amizade
                 (
-                    amz.Id, 
-                    amz.Remetente, 
+                    amz.Id,
+                    amz.Remetente,
                     amz.Destinatario
                  ))
-                .Where(amz => amz.Destinatario == idUsuario 
+                .Where(amz => amz.Destinatario == idUsuario
                               || amz.Remetente == idUsuario)
                 .ToList();
 

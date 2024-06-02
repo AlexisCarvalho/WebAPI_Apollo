@@ -62,7 +62,15 @@ namespace WebAPI_Apollo.Controllers.DB
             _infHomeRepository.Update(home);
             _msgRepository.Add(novaMensagem);
 
-            var resposta = new ChatDto(novaMensagem.Id, novaMensagem.Remetente, novaMensagem.Destinatario, novaMensagem.Conteudo, novaMensagem.TimeStamp);
+            var resposta = new ChatDto
+                (
+                    novaMensagem.Id, 
+                    novaMensagem.Remetente,
+                    novaMensagem.Destinatario,
+                    novaMensagem.Conteudo,
+                    novaMensagem.TimeStamp
+                );
+
             return Ok(resposta);
         }
 
@@ -92,7 +100,16 @@ namespace WebAPI_Apollo.Controllers.DB
                 return NotFound();
             }
 
-            return Ok(new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp));
+            var resposta = new ChatDto
+                (
+                    mensagem.Id,
+                    mensagem.Remetente,
+                    mensagem.Destinatario,
+                    mensagem.Conteudo,
+                    mensagem.TimeStamp
+                );
+
+            return Ok(resposta);
         }
 
         // Mensagens trocadas entre dois ids
@@ -128,7 +145,16 @@ namespace WebAPI_Apollo.Controllers.DB
 
             _msgRepository.Update(mensagem);
 
-            return Ok(new ChatDto(mensagem.Id, mensagem.Remetente, mensagem.Destinatario, mensagem.Conteudo, mensagem.TimeStamp));
+            var resposta = new ChatDto
+                (
+                    mensagem.Id,
+                    mensagem.Remetente,
+                    mensagem.Destinatario,
+                    mensagem.Conteudo,
+                    mensagem.TimeStamp
+                );
+
+            return Ok(resposta);
         }
 
         // Deletar Mensagem por ID

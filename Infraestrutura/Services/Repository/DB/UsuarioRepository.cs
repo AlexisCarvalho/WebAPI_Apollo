@@ -45,13 +45,13 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
             return _context.Usuarios
                 .Select(usuario => new UsuarioDto
                 (
-                    usuario.Id, usuario.Idade, 
-                    usuario.XP, usuario.Level, 
-                    usuario.XP_ProximoNivel, usuario.Nome, 
-                    usuario.Email, usuario.Senha, 
-                    usuario.Esporte, usuario.Genero, 
-                    usuario.UserName, usuario.PalavraRecuperacao, 
-                    usuario.DataNascimento, usuario.Peso, 
+                    usuario.Id, usuario.Idade,
+                    usuario.XP, usuario.Level,
+                    usuario.XP_ProximoNivel, usuario.Nome,
+                    usuario.Email, usuario.Senha,
+                    usuario.Esporte, usuario.Genero,
+                    usuario.UserName, usuario.PalavraRecuperacao,
+                    usuario.DataNascimento, usuario.Peso,
                     usuario.Altura, usuario.ImagemPerfil
                 ))
                 .ToList();
@@ -60,7 +60,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         public Usuario? GetViaLogin(string email, string senha)
         {
             return _context.Usuarios
-                .FirstOrDefault(usuario => usuario.Email == email 
+                .FirstOrDefault(usuario => usuario.Email == email
                                            && usuario.Senha == senha);
         }
 
@@ -73,14 +73,14 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         public Usuario? RecuperarSenha(string email, string palavraRecuperacao)
         {
             return _context.Usuarios
-                .FirstOrDefault(usuario => usuario.PalavraRecuperacao == palavraRecuperacao 
+                .FirstOrDefault(usuario => usuario.PalavraRecuperacao == palavraRecuperacao
                                            && usuario.Email == email);
         }
 
         public bool VerificarSeExisteEmailUsername(Usuario usuarioInformado)
         {
             return _context.Usuarios
-                .Any(usuario => usuario.UserName == usuarioInformado.UserName 
+                .Any(usuario => usuario.UserName == usuarioInformado.UserName
                                 || usuario.Email == usuarioInformado.Email);
         }
     }

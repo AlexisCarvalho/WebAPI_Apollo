@@ -40,31 +40,145 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 
         public List<NotificacoesDaRedeDto> GetAll()
         {
-            return VolatileContext.Notificacoes
+            var notificacoesSaida = new List<NotificacoesDaRedeDto>();
+            var notificacoes = VolatileContext.Notificacoes
                 .OrderByDescending(noti => noti.Id)
-                .Select(noti => new NotificacoesDaRedeDto
+                .Select(noti => new Notificacao
                 (
-                    noti.Remetente, 
-                    noti.Destinatario, 
-                    noti.TipoDeNotificacao, 
+                    noti.Id,
+                    noti.Remetente,
+                    noti.Destinatario,
+                    noti.TipoDeNotificacao,
                     noti.MensagemDaNotificacao
                 ))
                 .ToList();
+
+            foreach (var noti in notificacoes)
+            {
+                var usuarioQueEnviou = VolatileContext.Usuarios
+                    .FirstOrDefault(usr => usr.Id == noti.Remetente);
+
+                var notiSaida = new NotificacoesDaRedeDto
+                    (
+                        noti.Remetente,
+                        noti.Destinatario,
+                        usuarioQueEnviou.ImagemPerfil,
+                        usuarioQueEnviou.Nome,
+                        noti.TipoDeNotificacao,
+                        noti.MensagemDaNotificacao
+                    );
+                notificacoesSaida.Add(notiSaida);
+            }
+
+            return notificacoesSaida;
         }
 
         public List<NotificacoesDaRedeDto> GetAllUsr(Guid idUsuario)
         {
-            return VolatileContext.Notificacoes
+            var notificacoesSaida = new List<NotificacoesDaRedeDto>();
+            var notificacoes = VolatileContext.Notificacoes
                 .OrderByDescending(noti => noti.Id)
-                .Select(noti => new NotificacoesDaRedeDto
+                .Select(noti => new Notificacao
                 (
-                    noti.Remetente, 
-                    noti.Destinatario, 
-                    noti.TipoDeNotificacao, 
+                    noti.Id,
+                    noti.Remetente,
+                    noti.Destinatario,
+                    noti.TipoDeNotificacao,
                     noti.MensagemDaNotificacao
                 ))
-                .Where(noti => noti.destinatario == idUsuario)
+                .Where(noti => noti.Destinatario == idUsuario && noti.TipoDeNotificacao != 1)
                 .ToList();
+
+            foreach (var noti in notificacoes)
+            {
+                var usuarioQueEnviou = VolatileContext.Usuarios
+                    .FirstOrDefault(usr => usr.Id == noti.Remetente);
+
+                var notiSaida = new NotificacoesDaRedeDto
+                    (
+                        noti.Remetente,
+                        noti.Destinatario,
+                        usuarioQueEnviou.ImagemPerfil,
+                        usuarioQueEnviou.Nome,
+                        noti.TipoDeNotificacao,
+                        noti.MensagemDaNotificacao
+                    );
+                notificacoesSaida.Add(notiSaida);
+            }
+
+            return notificacoesSaida;
+        }
+
+        public List<NotificacoesDaRedeDto> GetAllNotiAmizadeUsr(Guid idUsuario)
+        {
+            var notificacoesSaida = new List<NotificacoesDaRedeDto>();
+            var notificacoes = VolatileContext.Notificacoes
+                .OrderByDescending(noti => noti.Id)
+                .Select(noti => new Notificacao
+                (
+                    noti.Id,
+                    noti.Remetente,
+                    noti.Destinatario,
+                    noti.TipoDeNotificacao,
+                    noti.MensagemDaNotificacao
+                ))
+                .Where(noti => noti.Destinatario == idUsuario && noti.TipoDeNotificacao == 1)
+                .ToList();
+
+            foreach (var noti in notificacoes)
+            {
+                var usuarioQueEnviou = VolatileContext.Usuarios
+                    .FirstOrDefault(usr => usr.Id == noti.Remetente);
+
+                var notiSaida = new NotificacoesDaRedeDto
+                    (
+                        noti.Remetente,
+                        noti.Destinatario,
+                        usuarioQueEnviou.ImagemPerfil,
+                        usuarioQueEnviou.Nome,
+                        noti.TipoDeNotificacao,
+                        noti.MensagemDaNotificacao
+                    );
+                notificacoesSaida.Add(notiSaida);
+            }
+
+            return notificacoesSaida;
+        }
+
+        public List<NotificacoesDaRedeDto> GetAllEnviadasNotiAmizadeUsr(Guid idUsuario)
+        {
+            var notificacoesSaida = new List<NotificacoesDaRedeDto>();
+            var notificacoes = VolatileContext.Notificacoes
+                .OrderByDescending(noti => noti.Id)
+                .Select(noti => new Notificacao
+                (
+                    noti.Id,
+                    noti.Remetente,
+                    noti.Destinatario,
+                    noti.TipoDeNotificacao,
+                    noti.MensagemDaNotificacao
+                ))
+                .Where(noti => noti.Remetente == idUsuario && noti.TipoDeNotificacao == 1)
+                .ToList();
+
+            foreach (var noti in notificacoes)
+            {
+                var usuarioQueEnviou = VolatileContext.Usuarios
+                    .FirstOrDefault(usr => usr.Id == noti.Remetente);
+
+                var notiSaida = new NotificacoesDaRedeDto
+                    (
+                        noti.Remetente,
+                        noti.Destinatario,
+                        usuarioQueEnviou.ImagemPerfil,
+                        usuarioQueEnviou.Nome,
+                        noti.TipoDeNotificacao,
+                        noti.MensagemDaNotificacao
+                    );
+                notificacoesSaida.Add(notiSaida);
+            }
+
+            return notificacoesSaida;
         }
 
         public Notificacao? GetLast()
@@ -94,13 +208,13 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
             var notificacoesDoUsr = VolatileContext.Notificacoes
                 .Select(ntf => new Notificacao
                 (
-                    ntf.Id, 
-                    ntf.Remetente, 
-                    ntf.Destinatario, 
-                    ntf.TipoDeNotificacao, 
+                    ntf.Id,
+                    ntf.Remetente,
+                    ntf.Destinatario,
+                    ntf.TipoDeNotificacao,
                     ntf.MensagemDaNotificacao
                 ))
-                .Where(ntf => ntf.Destinatario == idUsuario 
+                .Where(ntf => ntf.Destinatario == idUsuario
                               || ntf.Remetente == idUsuario)
                 .ToList();
 

@@ -28,8 +28,8 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         public Notificacao? JaFoiNotificado(Notificacao notificacao)
         {
             return _context.Notificacoes
-                .FirstOrDefault(n => n.Remetente == notificacao.Remetente 
-                                    && n.Destinatario == notificacao.Destinatario 
+                .FirstOrDefault(n => n.Remetente == notificacao.Remetente
+                                    && n.Destinatario == notificacao.Destinatario
                                     && n.TipoDeNotificacao == notificacao.TipoDeNotificacao);
         }
 
@@ -40,31 +40,145 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
 
         public List<NotificacoesDaRedeDto> GetAll()
         {
-            return _context.Notificacoes
+            var notificacoesSaida = new List<NotificacoesDaRedeDto>();
+            var notificacoes = _context.Notificacoes
                 .OrderByDescending(n => n.Id)
-                .Select(n => new NotificacoesDaRedeDto
+                .Select(n => new Notificacao
                 (
-                    n.Remetente, 
-                    n.Destinatario, 
-                    n.TipoDeNotificacao, 
+                    n.Id,
+                    n.Remetente,
+                    n.Destinatario,
+                    n.TipoDeNotificacao,
                     n.MensagemDaNotificacao
                 ))
                 .ToList();
+
+            foreach (var noti in notificacoes)
+            {
+                var usuarioQueEnviou = _context.Usuarios
+                    .FirstOrDefault(usr => usr.Id == noti.Remetente);
+
+                var notiSaida = new NotificacoesDaRedeDto
+                    (
+                        noti.Remetente,
+                        noti.Destinatario,
+                        usuarioQueEnviou.ImagemPerfil,
+                        usuarioQueEnviou.Nome,
+                        noti.TipoDeNotificacao,
+                        noti.MensagemDaNotificacao
+                    );
+                notificacoesSaida.Add(notiSaida);
+            }
+
+            return notificacoesSaida;
         }
 
         public List<NotificacoesDaRedeDto> GetAllUsr(Guid idUsuario)
         {
-            return _context.Notificacoes
-                .Where(n => n.Destinatario == idUsuario)
+            var notificacoesSaida = new List<NotificacoesDaRedeDto>();
+            var notificacoes = _context.Notificacoes
+                .Where(n => n.Destinatario == idUsuario && n.TipoDeNotificacao != 1)
                 .OrderByDescending(n => n.Id)
-                .Select(n => new NotificacoesDaRedeDto
+                .Select(n => new Notificacao
                 (
-                    n.Remetente, 
-                    n.Destinatario, 
-                    n.TipoDeNotificacao, 
+                    n.Id,
+                    n.Remetente,
+                    n.Destinatario,
+                    n.TipoDeNotificacao,
                     n.MensagemDaNotificacao
                 ))
                 .ToList();
+
+            foreach (var noti in notificacoes)
+            {
+                var usuarioQueEnviou = _context.Usuarios
+                    .FirstOrDefault(usr => usr.Id == noti.Remetente);
+
+                var notiSaida = new NotificacoesDaRedeDto
+                    (
+                        noti.Remetente,
+                        noti.Destinatario,
+                        usuarioQueEnviou.ImagemPerfil,
+                        usuarioQueEnviou.Nome,
+                        noti.TipoDeNotificacao,
+                        noti.MensagemDaNotificacao
+                    );
+                notificacoesSaida.Add(notiSaida);
+            }
+
+            return notificacoesSaida;
+        }
+
+        public List<NotificacoesDaRedeDto> GetAllNotiAmizadeUsr(Guid idUsuario)
+        {
+            var notificacoesSaida = new List<NotificacoesDaRedeDto>();
+            var notificacoes = _context.Notificacoes
+                .Where(n => n.Destinatario == idUsuario && n.TipoDeNotificacao == 1)
+                .OrderByDescending(n => n.Id)
+                .Select(n => new Notificacao
+                (
+                    n.Id,
+                    n.Remetente,
+                    n.Destinatario,
+                    n.TipoDeNotificacao,
+                    n.MensagemDaNotificacao
+                ))
+                .ToList();
+
+            foreach (var noti in notificacoes)
+            {
+                var usuarioQueEnviou = _context.Usuarios
+                    .FirstOrDefault(usr => usr.Id == noti.Remetente);
+
+                var notiSaida = new NotificacoesDaRedeDto
+                    (
+                        noti.Remetente,
+                        noti.Destinatario,
+                        usuarioQueEnviou.ImagemPerfil,
+                        usuarioQueEnviou.Nome,
+                        noti.TipoDeNotificacao,
+                        noti.MensagemDaNotificacao
+                    );
+                notificacoesSaida.Add(notiSaida);
+            }
+
+            return notificacoesSaida;
+        }
+
+        public List<NotificacoesDaRedeDto> GetAllEnviadasNotiAmizadeUsr(Guid idUsuario)
+        {
+            var notificacoesSaida = new List<NotificacoesDaRedeDto>();
+            var notificacoes = _context.Notificacoes
+                .Where(n => n.Remetente == idUsuario && n.TipoDeNotificacao == 1)
+                .OrderByDescending(n => n.Id)
+                .Select(n => new Notificacao
+                (
+                    n.Id,
+                    n.Remetente,
+                    n.Destinatario,
+                    n.TipoDeNotificacao,
+                    n.MensagemDaNotificacao
+                ))
+                .ToList();
+
+            foreach (var noti in notificacoes)
+            {
+                var usuarioQueEnviou = _context.Usuarios
+                    .FirstOrDefault(usr => usr.Id == noti.Remetente);
+
+                var notiSaida = new NotificacoesDaRedeDto
+                    (
+                        noti.Remetente,
+                        noti.Destinatario,
+                        usuarioQueEnviou.ImagemPerfil,
+                        usuarioQueEnviou.Nome,
+                        noti.TipoDeNotificacao,
+                        noti.MensagemDaNotificacao
+                    );
+                notificacoesSaida.Add(notiSaida);
+            }
+
+            return notificacoesSaida;
         }
 
         public Notificacao? GetLast()
@@ -89,7 +203,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         public void DeletarReferencias(Guid idUsuario)
         {
             var notificacoesDoUsr = _context.Notificacoes
-                .Where(n => n.Destinatario == idUsuario 
+                .Where(n => n.Destinatario == idUsuario
                             || n.Remetente == idUsuario)
                 .ToList();
 

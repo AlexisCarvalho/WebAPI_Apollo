@@ -31,9 +31,9 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                 .Select(m => new ChatDto
                 (
                     m.Id,
-                    m.Remetente, 
-                    m.Destinatario, 
-                    m.Conteudo, 
+                    m.Remetente,
+                    m.Destinatario,
+                    m.Conteudo,
                     m.TimeStamp
                 ))
                 .ToList();
@@ -52,10 +52,10 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                 .OrderByDescending(m => m.Id)
                 .Select(m => new ChatDto
                 (
-                    m.Id, 
-                    m.Remetente, 
-                    m.Destinatario, 
-                    m.Conteudo, 
+                    m.Id,
+                    m.Remetente,
+                    m.Destinatario,
+                    m.Conteudo,
                     m.TimeStamp
                 ))
                 .ToList();
@@ -68,10 +68,10 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                 .OrderByDescending(m => m.Id)
                 .Select(m => new ChatDto
                 (
-                    m.Id, 
-                    m.Remetente, 
-                    m.Destinatario, 
-                    m.Conteudo, 
+                    m.Id,
+                    m.Remetente,
+                    m.Destinatario,
+                    m.Conteudo,
                     m.TimeStamp
                 ))
                 .ToList();
@@ -80,15 +80,15 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         public List<ChatDto> EnviadasEntre(Guid remetente, Guid destinatario)
         {
             return _context.Mensagens
-                .Where(m => m.Remetente == remetente 
+                .Where(m => m.Remetente == remetente
                             && m.Destinatario == destinatario)
                 .OrderByDescending(m => m.Id)
                 .Select(m => new ChatDto
                 (
-                    m.Id, 
-                    m.Remetente, 
-                    m.Destinatario, 
-                    m.Conteudo, 
+                    m.Id,
+                    m.Remetente,
+                    m.Destinatario,
+                    m.Conteudo,
                     m.TimeStamp
                 ))
                 .ToList();

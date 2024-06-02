@@ -18,7 +18,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         public Curtida? JaCurtiu(Curtida curtida)
         {
             return _context.Curtidas
-                .FirstOrDefault(c => c.Remetente == curtida.Remetente 
+                .FirstOrDefault(c => c.Remetente == curtida.Remetente
                                      && c.Destinatario == curtida.Destinatario);
         }
 

@@ -72,14 +72,14 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         public Usuario? RecuperarSenha(string email, string palavraRecuperacao)
         {
             return VolatileContext.Usuarios
-                .FirstOrDefault(usuario => usuario.PalavraRecuperacao == palavraRecuperacao 
+                .FirstOrDefault(usuario => usuario.PalavraRecuperacao == palavraRecuperacao
                                            && usuario.Email == email);
         }
 
         public bool VerificarSeExisteEmailUsername(Usuario usuarioInformado)
         {
             return VolatileContext.Usuarios
-                .Any(usuario => usuario.UserName == usuarioInformado.UserName 
+                .Any(usuario => usuario.UserName == usuarioInformado.UserName
                                 || usuario.Email == usuarioInformado.Email);
         }
     }

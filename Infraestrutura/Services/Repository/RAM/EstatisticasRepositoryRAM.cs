@@ -30,8 +30,8 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
             var estatisticasDoUsuario = VolatileContext.Estatisticas
                 .Select(est => new Estatisticas
                 (
-                    est.Id, 
-                    est.IMC, 
+                    est.Id,
+                    est.IMC,
                     est.AguaDiaria
                 ))
                 .Where(amz => amz.Id == idEstatisticas)

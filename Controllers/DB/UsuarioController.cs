@@ -68,11 +68,11 @@ namespace WebAPI_Apollo.Controllers.DB
             _infHomeRepository.Add(informHome);
 
             var resposta = new UsuarioDto
-                (usuario.Id, usuario.Idade, usuario.XP, 
-                usuario.Level, usuario.XP_ProximoNivel, 
-                usuario.Nome, usuario.Email, usuario.Senha, 
-                usuario.Esporte, usuario.Genero, usuario.UserName, 
-                usuario.PalavraRecuperacao, usuario.DataNascimento, 
+                (usuario.Id, usuario.Idade, usuario.XP,
+                usuario.Level, usuario.XP_ProximoNivel,
+                usuario.Nome, usuario.Email, usuario.Senha,
+                usuario.Esporte, usuario.Genero, usuario.UserName,
+                usuario.PalavraRecuperacao, usuario.DataNascimento,
                 usuario.Peso, usuario.Altura, usuario.ImagemPerfil);
             return Ok(resposta);
         }
@@ -280,9 +280,9 @@ namespace WebAPI_Apollo.Controllers.DB
 
             var estUsuario = _estRepository.Get(usuario.IdEstatisticas);
 
-            if (estUsuario is null)
+            if (estUsuario != null)
             {
-                return Problem();
+                _estRepository.Delete(estUsuario);
             }
 
             var infHomeUsr = _infHomeRepository.GetViaUsr(usuario.Id);
@@ -295,10 +295,27 @@ namespace WebAPI_Apollo.Controllers.DB
             // Limpa todas as informações e referências do usuario
             // no sistema incluindo suas amizades.
             _infHomeRepository.Delete(infHomeUsr);
-            _estRepository.Delete(estUsuario);
-            _usrRepository.Delete(usuario);
-            _ntfRepository.DeletarReferencias(usuario.Id);
             _amzdRepository.DeletarReferencias(usuario.Id);
+
+            // Todas essa são solicitações de amizade enviadas pelo usuario
+            var notificacoesDoUsr = _ntfRepository.GetAllEnviadasNotiAmizadeUsr(usuario.Id);
+
+            foreach (var noti in notificacoesDoUsr)
+            {
+                var homeAmigo = _infHomeRepository.GetViaUsr(noti.destinatario);
+
+                if (homeAmigo is null)
+                {
+                    return Problem();
+                }
+
+                homeAmigo.NumSolicitacoesAmizade--;
+
+                _infHomeRepository.Update(homeAmigo);
+            }
+
+            _ntfRepository.DeletarReferencias(usuario.Id);
+            _usrRepository.Delete(usuario);
 
             return NoContent();
         }
@@ -324,7 +341,7 @@ namespace WebAPI_Apollo.Controllers.DB
                     }
                     else
                     {
-                        Problem("Algum usuario da lista de amigos parece não existir de forma inesperada");
+                        return Problem("Algum usuario da lista de amigos parece não existir de forma inesperada");
                     }
                 }
                 else
@@ -337,7 +354,7 @@ namespace WebAPI_Apollo.Controllers.DB
                     }
                     else
                     {
-                        Problem("Algum usuario da lista de amigos parece não existir de forma inesperada");
+                        return Problem("Algum usuario da lista de amigos parece não existir de forma inesperada");
                     }
                 }
             }
@@ -488,6 +505,7 @@ namespace WebAPI_Apollo.Controllers.DB
             }
 
             _amzdRepository.Add(amizade);
+            _ntfRepository.Delete(pedidoExistente);
 
             return Ok(resposta);
         }
@@ -607,14 +625,30 @@ namespace WebAPI_Apollo.Controllers.DB
         [Route("Home/{idUsuario}")]
         public IActionResult GetHomeUsr(Guid idUsuario)
         {
+            var usuario = _usrRepository.Get(idUsuario);
             var homeUsuario = _infHomeRepository.GetViaUsr(idUsuario);
+
+            if (usuario is null)
+            {
+                return NotFound("Usuario não encontrado");
+            }
 
             if (homeUsuario is null)
             {
-                return NotFound();
+                return NotFound("Home do Usuario Não Encontrada");
             }
 
-            return Ok(new InformHomeDto(homeUsuario.IdUsuario, homeUsuario.NumNotificacoesNaoLidas, homeUsuario.NumSolicitacoesAmizade, homeUsuario.NumAmigos, homeUsuario.NumMensagensNaoLidas));
+            var resposta = new InformHomeDto
+                (
+                    homeUsuario.IdUsuario,
+                    usuario.Nome,
+                    homeUsuario.NumNotificacoesNaoLidas,
+                    homeUsuario.NumSolicitacoesAmizade,
+                    homeUsuario.NumAmigos,
+                    homeUsuario.NumMensagensNaoLidas
+                 );
+
+            return Ok(resposta);
         }
 
         // Usuario/Login:
@@ -696,6 +730,21 @@ namespace WebAPI_Apollo.Controllers.DB
             return Ok(notiUsuario);
         }
 
+        // Carregar os Pedidos de Amizade 
+        [HttpGet]
+        [Route("Notificacoes/PedidoAmizade/{idUsuario}")]
+        public IActionResult GetNotiUsrAmizade(Guid idUsuario)
+        {
+            var notiUsuario = _ntfRepository.GetAllNotiAmizadeUsr(idUsuario);
+
+            if (notiUsuario is null || notiUsuario.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(notiUsuario);
+        }
+
         // Usuario/Perfil:
         // Rota para carregar o perfil do usuario *
         [HttpGet]
@@ -740,8 +789,8 @@ namespace WebAPI_Apollo.Controllers.DB
                         _usrRepository.Update(usuario);
                     }
                     var resposta = new PerfilUsuarioDto
-                        (usuario.Nome, usuario.Altura, usuario.Peso, 
-                        novasEst.IMC, novasEst.AguaDiaria, usuario.Level, 
+                        (usuario.Nome, usuario.Altura, usuario.Peso,
+                        novasEst.IMC, novasEst.AguaDiaria, usuario.Level,
                         usuario.XP, usuario.ImagemPerfil);
                     return Ok(resposta);
                 }

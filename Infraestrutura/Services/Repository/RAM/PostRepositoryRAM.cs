@@ -32,13 +32,13 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                 .OrderByDescending(post => post.TimeStamp)
                 .Select(post => new PostCompletoDto
                 (
-                    post.Id, 
-                    post.IdUsuario, 
-                    post.Titulo, 
-                    post.Descricao, 
-                    post.CaminhoImagem, 
-                    post.NumCurtidas, 
-                    post.NumComentarios, 
+                    post.Id,
+                    post.IdUsuario,
+                    post.Titulo,
+                    post.Descricao,
+                    post.CaminhoImagem,
+                    post.NumCurtidas,
+                    post.NumComentarios,
                     post.TimeStamp
                 ))
                 .ToList();
@@ -67,8 +67,8 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                 feed.AddRange(PostadosPor(id));
             }
 
-            feed.Sort((postUm, postDois) => 
-            postDois.timeStamp.CompareTo(postUm.timeStamp)); 
+            feed.Sort((postUm, postDois) =>
+            postDois.timeStamp.CompareTo(postUm.timeStamp));
             // Ordem inversa para ser decrescente, trocar causo queira crescente
 
             return feed;
@@ -79,13 +79,13 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
             return VolatileContext.Posts
                 .Select(post => new PostCompletoDto
                 (
-                    post.Id, 
-                    post.IdUsuario, 
-                    post.Titulo, 
+                    post.Id,
+                    post.IdUsuario,
+                    post.Titulo,
                     post.Descricao,
-                    post.CaminhoImagem, 
-                    post.NumCurtidas, 
-                    post.NumComentarios, 
+                    post.CaminhoImagem,
+                    post.NumCurtidas,
+                    post.NumComentarios,
                     post.TimeStamp
                 ))
                 .Where(post => AlgoritmosDePesquisa.SimilaridadeDeJaccard(post.titulo, pesquisa) > 0.4
@@ -109,13 +109,13 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                 .Where(post => post.IdUsuario == idUsuario)
                 .Select(post => new PostCompletoDto
                 (
-                    post.Id, 
+                    post.Id,
                     post.IdUsuario,
-                    post.Titulo, 
+                    post.Titulo,
                     post.Descricao,
-                    post.CaminhoImagem, 
-                    post.NumCurtidas, 
-                    post.NumComentarios, 
+                    post.CaminhoImagem,
+                    post.NumCurtidas,
+                    post.NumComentarios,
                     post.TimeStamp
                 ))
                 .ToList();

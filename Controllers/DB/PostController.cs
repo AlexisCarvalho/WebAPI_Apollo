@@ -13,14 +13,20 @@ namespace WebAPI_Apollo.Controllers.DB
         private readonly IUsuarioRepository _usrRepository;
         private readonly IPostRepository _pstRepository;
         private readonly IMensagemRepository _msgRepository;
-        private readonly ICurtidaRepository _intRepository;
+        private readonly ICurtidaRepository _crtRepository;
+        private readonly IAmizadeRepository _amzdRepository;
+        private readonly INotificacaoRepository _ntfRepository;
+        private readonly IInformHomeRepository _infHomeRepository;
 
-        public PostController(IUsuarioRepository usrRepository, IPostRepository pstRepository, IMensagemRepository msgRepository, ICurtidaRepository intRepository)
+        public PostController(IUsuarioRepository usrRepository, IPostRepository pstRepository, IMensagemRepository msgRepository, ICurtidaRepository crtRepository, IAmizadeRepository amzdRepository, INotificacaoRepository ntfRepository, IInformHomeRepository infHomeRepository)
         {
             _usrRepository = usrRepository ?? throw new ArgumentNullException();
             _pstRepository = pstRepository ?? throw new ArgumentNullException();
             _msgRepository = msgRepository ?? throw new ArgumentNullException();
-            _intRepository = intRepository ?? throw new ArgumentNullException();
+            _crtRepository = crtRepository ?? throw new ArgumentNullException();
+            _amzdRepository = amzdRepository ?? throw new ArgumentNullException();
+            _ntfRepository = ntfRepository ?? throw new ArgumentNullException();
+            _infHomeRepository = infHomeRepository ?? throw new ArgumentNullException();
         }
 
         // Posts:
@@ -40,6 +46,150 @@ namespace WebAPI_Apollo.Controllers.DB
             var novoPost = new Post(idUsuario, titulo, descricao);
 
             _pstRepository.Add(novoPost);
+
+            var amizades = _amzdRepository.GetAllUsr(idUsuario);
+
+            foreach (var amizade in amizades)
+            {
+                if (amizade.Remetente == idUsuario)
+                {
+                    var usuarioQuePostou = _usrRepository.Get(idUsuario);
+                    var amigo = _usrRepository.Get(amizade.Destinatario);
+                    var homeAmigo = _infHomeRepository.GetViaUsr(amizade.Destinatario);
+
+                    if (usuarioQuePostou is null)
+                    {
+                        return Problem("Seus dados não foram encontrados");
+                    }
+
+                    if (amigo is null)
+                    {
+                        return Problem("Um amigo da sua lista parece não existir por algum motivo");
+                    }
+
+                    if (homeAmigo is null)
+                    {
+                        return Problem("A Home do seu amigo parece não existir de modo inesperado");
+                    }
+
+                    Notificacao ntf = new Notificacao(idUsuario, amizade.Destinatario, 2, $"{amigo.Nome.Split(" ")[0]}! Eu acabei de postar: {novoPost.Titulo}, vem dar uma olhada");
+
+                    _ntfRepository.Add(ntf);
+
+                    homeAmigo.NumNotificacoesNaoLidas++;
+                    _infHomeRepository.Update(homeAmigo);
+                }
+                else
+                {
+                    var usuarioQuePostou = _usrRepository.Get(idUsuario);
+                    var amigo = _usrRepository.Get(amizade.Remetente);
+                    var homeAmigo = _infHomeRepository.GetViaUsr(amizade.Remetente);
+
+                    if (usuarioQuePostou is null)
+                    {
+                        return Problem("Seus dados não foram encontrados");
+                    }
+
+                    if (amigo is null)
+                    {
+                        return Problem("Um amigo da sua lista parece não existir por algum motivo");
+                    }
+
+                    if (homeAmigo is null)
+                    {
+                        return Problem("A Home do seu amigo parece não existir de modo inesperado");
+                    }
+
+                    Notificacao ntf = new Notificacao(idUsuario, amizade.Remetente, 2, $"{amigo.Nome.Split(" ")[0]}! Eu acabei de postar: {novoPost.Titulo}, vêm dar uma olhada");
+
+                    _ntfRepository.Add(ntf);
+
+                    homeAmigo.NumNotificacoesNaoLidas++;
+                    _infHomeRepository.Update(homeAmigo);
+                }
+            }
+
+            var resposta = new PostPadraoDto(novoPost.Id, novoPost.IdUsuario, novoPost.Titulo, novoPost.Descricao, novoPost.NumCurtidas, novoPost.NumComentarios, novoPost.TimeStamp);
+            return Ok(resposta);
+        }
+
+        // Adicionar um Post Padrão da Rede, com imagem
+        [HttpPost]
+        [Route("{idUsuario}/{titulo}/{descricao}/{imagemBase64}")]
+        public IActionResult AddPostImagem(Guid idUsuario, string titulo, string descricao, string imagemBase64)
+        {
+            var usuario = _usrRepository.Get(idUsuario);
+
+            if (usuario is null)
+            {
+                return NotFound("Usuario não Encontrado");
+            }
+
+            var novoPost = new Post(idUsuario, titulo, descricao, imagemBase64);
+
+            _pstRepository.Add(novoPost);
+
+            var amizades = _amzdRepository.GetAllUsr(idUsuario);
+
+            foreach (var amizade in amizades)
+            {
+                if (amizade.Remetente == idUsuario)
+                {
+                    var usuarioQuePostou = _usrRepository.Get(idUsuario);
+                    var amigo = _usrRepository.Get(amizade.Destinatario);
+                    var homeAmigo = _infHomeRepository.GetViaUsr(amizade.Destinatario);
+
+                    if (usuarioQuePostou is null)
+                    {
+                        return Problem("Seus dados não foram encontrados");
+                    }
+
+                    if (amigo is null)
+                    {
+                        return Problem("Um amigo da sua lista parece não existir por algum motivo");
+                    }
+
+                    if (homeAmigo is null)
+                    {
+                        return Problem("A Home do seu amigo parece não existir de modo inesperado");
+                    }
+
+                    Notificacao ntf = new Notificacao(idUsuario, amizade.Destinatario, 2, $"{amigo.Nome.Split(" ")[0]}! Eu acabei de postar: {novoPost.Titulo}, vem dar uma olhada");
+
+                    _ntfRepository.Add(ntf);
+
+                    homeAmigo.NumNotificacoesNaoLidas++;
+                    _infHomeRepository.Update(homeAmigo);
+                }
+                else
+                {
+                    var usuarioQuePostou = _usrRepository.Get(idUsuario);
+                    var amigo = _usrRepository.Get(amizade.Remetente);
+                    var homeAmigo = _infHomeRepository.GetViaUsr(amizade.Remetente);
+
+                    if (usuarioQuePostou is null)
+                    {
+                        return Problem("Seus dados não foram encontrados");
+                    }
+
+                    if (amigo is null)
+                    {
+                        return Problem("Um amigo da sua lista parece não existir por algum motivo");
+                    }
+
+                    if (homeAmigo is null)
+                    {
+                        return Problem("A Home do seu amigo parece não existir de modo inesperado");
+                    }
+
+                    Notificacao ntf = new Notificacao(idUsuario, amizade.Remetente, 2, $"{amigo.Nome.Split(" ")[0]}! Eu acabei de postar: {novoPost.Titulo}, vêm dar uma olhada");
+
+                    _ntfRepository.Add(ntf);
+
+                    homeAmigo.NumNotificacoesNaoLidas++;
+                    _infHomeRepository.Update(homeAmigo);
+                }
+            }
 
             var resposta = new PostPadraoDto(novoPost.Id, novoPost.IdUsuario, novoPost.Titulo, novoPost.Descricao, novoPost.NumCurtidas, novoPost.NumComentarios, novoPost.TimeStamp);
             return Ok(resposta);
@@ -159,11 +309,11 @@ namespace WebAPI_Apollo.Controllers.DB
                 return NotFound("Não foi Encontrado Nenhum Comentario");
             }
 
-            foreach(var comentario in comentarios)
+            foreach (var comentario in comentarios)
             {
                 Usuario usr = _usrRepository.Get(comentario.Remetente);
-                
-                if(usr is null)
+
+                if (usr is null)
                 {
                     return Problem("Algo Inesperado Ocorreu, Usuario que Comentou não Encontrado");
                 }
@@ -218,11 +368,11 @@ namespace WebAPI_Apollo.Controllers.DB
 
             Curtida curtida = new Curtida(idUsuario, idPost);
 
-            var jaCurtiu = _intRepository.JaCurtiu(curtida);
+            var jaCurtiu = _crtRepository.JaCurtiu(curtida);
 
             if (jaCurtiu is null)
             {
-                _intRepository.Add(curtida, ref postCurtido);
+                _crtRepository.Add(curtida, ref postCurtido);
                 _pstRepository.Update(postCurtido);
 
                 var resposta = new PostPadraoDto(postCurtido.Id, postCurtido.IdUsuario, postCurtido.Titulo, postCurtido.Descricao, postCurtido.NumCurtidas, postCurtido.NumComentarios, postCurtido.TimeStamp);
@@ -255,14 +405,14 @@ namespace WebAPI_Apollo.Controllers.DB
 
             Curtida descurtida = new Curtida(idUsuario, idPost);
 
-            var curtiuAntes = _intRepository.JaCurtiu(descurtida);
+            var curtiuAntes = _crtRepository.JaCurtiu(descurtida);
 
             if (curtiuAntes is null)
             {
                 return NotFound("Post Nunca foi Curtido Por Esse Usuario Antes");
             }
 
-            _intRepository.Delete(curtiuAntes, ref postDescurtido);
+            _crtRepository.Delete(curtiuAntes, ref postDescurtido);
             _pstRepository.Update(postDescurtido);
 
             var resposta = new PostPadraoDto(postDescurtido.Id, postDescurtido.IdUsuario, postDescurtido.Titulo, postDescurtido.Descricao, postDescurtido.NumCurtidas, postDescurtido.NumComentarios, postDescurtido.TimeStamp);

@@ -45,10 +45,10 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
             return VolatileContext.Mensagens
                 .Select(mensagem => new ChatDto
                 (
-                    mensagem.Id, 
-                    mensagem.Remetente, 
-                    mensagem.Destinatario, 
-                    mensagem.Conteudo, 
+                    mensagem.Id,
+                    mensagem.Remetente,
+                    mensagem.Destinatario,
+                    mensagem.Conteudo,
                     mensagem.TimeStamp
                 ))
                 .ToList();
@@ -65,10 +65,10 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                 .OrderByDescending(msg => msg.Id)
                 .Select(mensagem => new ChatDto
                 (
-                    mensagem.Id, 
-                    mensagem.Remetente, 
-                    mensagem.Destinatario, 
-                    mensagem.Conteudo, 
+                    mensagem.Id,
+                    mensagem.Remetente,
+                    mensagem.Destinatario,
+                    mensagem.Conteudo,
                     mensagem.TimeStamp
                 ))
                 .Where(mensagem => mensagem.Remetente == id)
@@ -81,10 +81,10 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                 .OrderByDescending(msg => msg.Id)
                 .Select(mensagem => new ChatDto
                 (
-                    mensagem.Id, 
-                    mensagem.Remetente, 
-                    mensagem.Destinatario, 
-                    mensagem.Conteudo, 
+                    mensagem.Id,
+                    mensagem.Remetente,
+                    mensagem.Destinatario,
+                    mensagem.Conteudo,
                     mensagem.TimeStamp
                 ))
                 .Where(mensagem => mensagem.Destinatario == id)
@@ -97,13 +97,13 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                 .OrderByDescending(msg => msg.Id)
                 .Select(mensagem => new ChatDto
                 (
-                    mensagem.Id, 
-                    mensagem.Remetente, 
-                    mensagem.Destinatario, 
-                    mensagem.Conteudo, 
+                    mensagem.Id,
+                    mensagem.Remetente,
+                    mensagem.Destinatario,
+                    mensagem.Conteudo,
                     mensagem.TimeStamp
                 ))
-                .Where(mensagem => mensagem.Remetente == remetente 
+                .Where(mensagem => mensagem.Remetente == remetente
                                    && mensagem.Destinatario == destinatario)
                 .ToList();
         }

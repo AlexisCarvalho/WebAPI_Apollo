@@ -32,12 +32,12 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                 .OrderByDescending(post => post.TimeStamp)
                 .Select(post => new PostCompletoDto
                 (
-                    post.Id, 
-                    post.IdUsuario, 
-                    post.Titulo, 
-                    post.Descricao, 
-                    post.CaminhoImagem, 
-                    post.NumCurtidas, 
+                    post.Id,
+                    post.IdUsuario,
+                    post.Titulo,
+                    post.Descricao,
+                    post.CaminhoImagem,
+                    post.NumCurtidas,
                     post.NumComentarios,
                     post.TimeStamp
                 ))
@@ -57,13 +57,13 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                 .OrderByDescending(post => post.TimeStamp)
                 .Select(post => new PostCompletoDto
                 (
-                    post.Id, 
-                    post.IdUsuario, 
-                    post.Titulo, 
-                    post.Descricao, 
-                    post.CaminhoImagem, 
-                    post.NumCurtidas, 
-                    post.NumComentarios, 
+                    post.Id,
+                    post.IdUsuario,
+                    post.Titulo,
+                    post.Descricao,
+                    post.CaminhoImagem,
+                    post.NumCurtidas,
+                    post.NumComentarios,
                     post.TimeStamp
                 ))
                 .ToList();
@@ -111,12 +111,12 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                 .OrderByDescending(post => post.TimeStamp)
                 .Select(post => new PostCompletoDto
                 (
-                    post.Id, 
-                    post.IdUsuario, 
-                    post.Titulo, 
-                    post.Descricao, 
-                    post.CaminhoImagem, 
-                    post.NumCurtidas, 
+                    post.Id,
+                    post.IdUsuario,
+                    post.Titulo,
+                    post.Descricao,
+                    post.CaminhoImagem,
+                    post.NumCurtidas,
                     post.NumComentarios,
                     post.TimeStamp
                 ))
@@ -126,7 +126,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
         public List<Amizade> GetAllAmz(Guid idUsuario)
         {
             return _context.Amizades
-               .Where(amz => amz.Destinatario == idUsuario 
+               .Where(amz => amz.Destinatario == idUsuario
                              || amz.Remetente == idUsuario)
                .ToList();
         }
