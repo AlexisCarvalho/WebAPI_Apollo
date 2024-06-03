@@ -27,7 +27,7 @@
 
     public class ConfSistema
     {
-        static bool _BDAtivado = false;
+        static bool _BDAtivado = true;
         static string _nomeRedeSocial = "Apollo";
 
         public static bool DBAtivado

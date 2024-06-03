@@ -1,23 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text;
-using WebAPI_Apollo.Infraestrutura;
 using WebAPI_Apollo.Infraestrutura.Services;
 using WebAPI_Apollo.Infraestrutura.Services.Repository.RAM;
 using WebAPI_Apollo.Model;
 using WebAPI_Apollo.Model.DTOs;
 using WebAPI_Apollo.Model.Interacoes;
+using WebAPI_Apollo.Model.ViewModel;
 
-namespace WebAPI_Apollo.Controllers.DB
+namespace WebAPI_Apollo.Controllers
 {
     [ApiController]
-    [Route("RAM/Usuario")]
-    public class UsuarioRAMController : ControllerBase
+    [Route("Usuario")]
+    public class UsuarioController : ControllerBase
     {
-        private readonly UsuarioRepositoryRAM _usrRepository = new();
-        private readonly EstatisticasRepositoryRAM _estRepository = new();
-        private readonly NotificacaoRepositoryRAM _ntfRepository = new();
-        private readonly InformHomeRepositoryRAM _infHomeRepository = new();
-        private readonly AmizadeRepositoryRAM _amzdRepository = new();
+        private readonly IMensagemRepository _msgRepository;
+        private readonly IInformHomeRepository _infHomeRepository;
+        private readonly IUsuarioRepository _usrRepository;
+        private readonly IAmizadeRepository _amzdRepository;
+        private readonly IEstatisticasRepository _estRepository;
+        private readonly INotificacaoRepository _ntfRepository;
+
+        public UsuarioController(IMensagemRepository msgRepository, IInformHomeRepository infHomeRepository, IUsuarioRepository usrRepository, IAmizadeRepository amzdRepository, IEstatisticasRepository estRepository, INotificacaoRepository ntfRepository)
+        {
+            _msgRepository = msgRepository ?? throw new ArgumentNullException();
+            _infHomeRepository = infHomeRepository ?? throw new ArgumentNullException();
+            _usrRepository = usrRepository ?? throw new ArgumentNullException();
+            _amzdRepository = amzdRepository ?? throw new ArgumentNullException();
+            _estRepository = estRepository ?? throw new ArgumentNullException();
+            _ntfRepository = ntfRepository ?? throw new ArgumentNullException();
+        }
 
         // Usuario:
         // Adicionar um Usuario
@@ -862,31 +873,6 @@ namespace WebAPI_Apollo.Controllers.DB
             _usrRepository.Update(usuario);
 
             return Ok(resposta);
-        }
-    
-        // RAM/Usuario/Destroy:
-    // Deletar Tudo da Memória
-        [HttpDelete]
-        [Route("Destroy")]
-        public IActionResult DeleteAllDataRAM()
-        {
-            VolatileContext.Estatisticas.Clear();
-            VolatileContext.Usuarios.Clear();
-            VolatileContext.Notificacoes.Clear();
-            VolatileContext.InformHome.Clear();
-            VolatileContext.Amizades.Clear();
-
-            return NoContent();
-        }
-
-        // Deletar Tudo da Memória
-        [HttpDelete]
-        [Route("Destroy/Estatisticas")]
-        public IActionResult DeleteAllDataRAMEstatisticas()
-        {
-            VolatileContext.Estatisticas.Clear();
-
-            return NoContent();
         }
     }
 }

@@ -36,7 +36,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                     post.IdUsuario,
                     post.Titulo,
                     post.Descricao,
-                    post.CaminhoImagem,
+                    post.ImagemBase64,
                     post.NumCurtidas,
                     post.NumComentarios,
                     post.TimeStamp
@@ -61,7 +61,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                     post.IdUsuario,
                     post.Titulo,
                     post.Descricao,
-                    post.CaminhoImagem,
+                    post.ImagemBase64,
                     post.NumCurtidas,
                     post.NumComentarios,
                     post.TimeStamp
@@ -80,7 +80,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                     post.IdUsuario,
                     post.Titulo,
                     post.Descricao,
-                    post.CaminhoImagem,
+                    post.ImagemBase64,
                     post.NumCurtidas,
                     post.NumComentarios,
                     post.TimeStamp
@@ -115,7 +115,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                     post.IdUsuario,
                     post.Titulo,
                     post.Descricao,
-                    post.CaminhoImagem,
+                    post.ImagemBase64,
                     post.NumCurtidas,
                     post.NumComentarios,
                     post.TimeStamp

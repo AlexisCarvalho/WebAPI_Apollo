@@ -23,6 +23,10 @@ namespace WebAPI_Apollo.Infraestrutura
         public DbSet<Curtida> Curtidas { get; set; }
         public DbSet<Amizade> Amizades { get; set; }
 
+        /* --- Teste do Banco ---*/
+
+        public DbSet<TestTable> TestTable { get; set; }
+
         override protected void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlite("Data Source=ApolloDatabase.sqlite");

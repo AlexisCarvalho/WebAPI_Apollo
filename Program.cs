@@ -1,4 +1,8 @@
+using WebAPI_Apollo.Infraestrutura;
+using WebAPI_Apollo.Infraestrutura.Services;
 using WebAPI_Apollo.Infraestrutura.Services.Repository.DB;
+using WebAPI_Apollo.Infraestrutura.Services.Repository.RAM;
+using WebAPI_Apollo.Model;
 using WebAPI_Apollo.Model.ViewModel;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -65,14 +69,29 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddTransient<IAmizadeRepository, AmizadeRepository>();
-builder.Services.AddTransient<ICurtidaRepository, CurtidaRepository>();
-builder.Services.AddTransient<IEstatisticasRepository, EstatisticasRepository>();
-builder.Services.AddTransient<IInformHomeRepository, InformHomeRepository>();
-builder.Services.AddTransient<IMensagemRepository, MensagemRepository>();
-builder.Services.AddTransient<INotificacaoRepository, NotificacaoRepository>();
-builder.Services.AddTransient<IPostRepository, PostRepository>();
-builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
+TestarBDService.ExecutarTeste();
+
+if (ConfSistema.DBAtivado)
+{
+    builder.Services.AddTransient<IAmizadeRepository, AmizadeRepository>();
+    builder.Services.AddTransient<ICurtidaRepository, CurtidaRepository>();
+    builder.Services.AddTransient<IEstatisticasRepository, EstatisticasRepository>();
+    builder.Services.AddTransient<IInformHomeRepository, InformHomeRepository>();
+    builder.Services.AddTransient<IMensagemRepository, MensagemRepository>();
+    builder.Services.AddTransient<INotificacaoRepository, NotificacaoRepository>();
+    builder.Services.AddTransient<IPostRepository, PostRepository>();
+    builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
+} else
+{
+    builder.Services.AddTransient<IAmizadeRepository, AmizadeRepositoryRAM>();
+    builder.Services.AddTransient<ICurtidaRepository, CurtidaRepositoryRAM>();
+    builder.Services.AddTransient<IEstatisticasRepository, EstatisticasRepositoryRAM>();
+    builder.Services.AddTransient<IInformHomeRepository, InformHomeRepositoryRAM>();
+    builder.Services.AddTransient<IMensagemRepository, MensagemRepositoryRAM>();
+    builder.Services.AddTransient<INotificacaoRepository, NotificacaoRepositoryRAM>();
+    builder.Services.AddTransient<IPostRepository, PostRepositoryRAM>();
+    builder.Services.AddTransient<IUsuarioRepository, UsuarioRepositoryRAM>();
+}
 
 // Esse primeiro aqui limita por porta "endereço",
 // se descobrir como setar uma porta especifica no Electron

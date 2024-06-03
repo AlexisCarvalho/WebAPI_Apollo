@@ -1,25 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebAPI_Apollo.Infraestrutura;
-using WebAPI_Apollo.Infraestrutura.Services.Repository.RAM;
 using WebAPI_Apollo.Model;
 using WebAPI_Apollo.Model.DTOs;
 using WebAPI_Apollo.Model.Interacoes;
+using WebAPI_Apollo.Model.ViewModel;
 
-namespace WebAPI_Apollo.Controllers.RAM
+namespace WebAPI_Apollo.Controllers
 {
     [ApiController]
-    [Route("RAM/Posts")]
-    public class PostRAMController : ControllerBase
+    [Route("Post")]
+    public class PostController : ControllerBase
     {
-        private readonly PostRepositoryRAM _pstRepository = new();
-        private readonly MensagemRepositoryRAM _msgRepository = new();
-        private readonly UsuarioRepositoryRAM _usrRepository = new();
-        private readonly CurtidaRepositoryRAM _crtRepository = new();
-        private readonly AmizadeRepositoryRAM _amzdRepository = new();
-        private readonly InformHomeRepositoryRAM _infHomeRepository = new();
-        private readonly NotificacaoRepositoryRAM _ntfRepository = new();
+        private readonly IUsuarioRepository _usrRepository;
+        private readonly IPostRepository _pstRepository;
+        private readonly IMensagemRepository _msgRepository;
+        private readonly ICurtidaRepository _crtRepository;
+        private readonly IAmizadeRepository _amzdRepository;
+        private readonly INotificacaoRepository _ntfRepository;
+        private readonly IInformHomeRepository _infHomeRepository;
 
-        // RAM/Posts:
+        public PostController(IUsuarioRepository usrRepository, IPostRepository pstRepository, IMensagemRepository msgRepository, ICurtidaRepository crtRepository, IAmizadeRepository amzdRepository, INotificacaoRepository ntfRepository, IInformHomeRepository infHomeRepository)
+        {
+            _usrRepository = usrRepository ?? throw new ArgumentNullException();
+            _pstRepository = pstRepository ?? throw new ArgumentNullException();
+            _msgRepository = msgRepository ?? throw new ArgumentNullException();
+            _crtRepository = crtRepository ?? throw new ArgumentNullException();
+            _amzdRepository = amzdRepository ?? throw new ArgumentNullException();
+            _ntfRepository = ntfRepository ?? throw new ArgumentNullException();
+            _infHomeRepository = infHomeRepository ?? throw new ArgumentNullException();
+        }
+
+        // Posts:
 
         // Adicionar um Post Padrão da Rede, sem imagem
         [HttpPost]
@@ -211,14 +221,14 @@ namespace WebAPI_Apollo.Controllers.RAM
                 return NotFound();
             }
 
-            return Ok(new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.CaminhoImagem, post.NumCurtidas, post.NumComentarios, post.TimeStamp));
+            return Ok(new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.ImagemBase64, post.NumCurtidas, post.NumComentarios, post.TimeStamp));
         }
 
         // Atualizar informações por id
         // Isso pra editar o post já publicado (deixar pra mexer no final)
         [HttpPut]
-        [Route("{id}/{titulo}/{descricao}/{caminhoImagem}")]
-        public IActionResult AtualizaPost(Guid id, string titulo, string descricao, string caminhoImagem)
+        [Route("{id}/{titulo}/{descricao}/{imagemBase64}")]
+        public IActionResult AtualizaPost(Guid id, string titulo, string descricao, string imagemBase64)
         {
             var post = _pstRepository.Get(id);
 
@@ -229,11 +239,11 @@ namespace WebAPI_Apollo.Controllers.RAM
 
             post.Titulo = titulo;
             post.Descricao = descricao;
-            post.CaminhoImagem = caminhoImagem; // Alterar pra imagem nova
+            post.ImagemBase64 = imagemBase64; // Alterar pra imagem nova
 
             _pstRepository.Update(post);
 
-            return Ok(new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.CaminhoImagem, post.NumCurtidas, post.NumComentarios, post.TimeStamp));
+            return Ok(new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.ImagemBase64, post.NumCurtidas, post.NumComentarios, post.TimeStamp));
         }
 
         // Deletar Post por ID
@@ -253,7 +263,7 @@ namespace WebAPI_Apollo.Controllers.RAM
             return NoContent();
         }
 
-        // RAM/Posts/Comentarios:
+        // Posts/Comentarios:
 
         // Adicionar um comentario a um Post
         [HttpPost]
@@ -314,7 +324,7 @@ namespace WebAPI_Apollo.Controllers.RAM
             return Ok(comentariosFormatados);
         }
 
-        // RAM/Posts/Feed:
+        // Posts/Feed:
         [HttpGet]
         [Route("Feed/{idUsuario}")]
         public IActionResult GetFeedUsr(Guid idUsuario)
@@ -336,7 +346,7 @@ namespace WebAPI_Apollo.Controllers.RAM
             return Ok(posts);
         }
 
-        // RAM/Posts/Interagir:
+        // Posts/Interagir:
         // Adicionar uma curtida a um post
         [HttpPost]
         [Route("Interagir/Curtir/{idPost}/{idUsuario}")]
@@ -409,7 +419,7 @@ namespace WebAPI_Apollo.Controllers.RAM
             return Ok(resposta);
         }
 
-        // RAM/Posts/Pesquisa
+        // Posts/Pesquisa
         // Retornar somente posts que correspondem a determinada pesquisa
         [HttpGet]
         [Route("Pesquisa/{termo}")]
@@ -425,7 +435,7 @@ namespace WebAPI_Apollo.Controllers.RAM
             return Ok(postsCorrespondentes);
         }
 
-        // RAM/Posts/Usuario:
+        // Posts/Usuario:
         // Retornar somente posts feitos por aquele usuario
         [HttpGet]
         [Route("Usuario/{id}")]
@@ -446,17 +456,6 @@ namespace WebAPI_Apollo.Controllers.RAM
             }
 
             return Ok(posts);
-        }
-
-        // RAM/Posts/Destroy:
-        // Deletar Tudo da Memória
-        [HttpDelete]
-        [Route("Destroy")]
-        public IActionResult DeleteAllDataRAM()
-        {
-            VolatileContext.Posts.Clear();
-
-            return NoContent();
         }
     }
 }

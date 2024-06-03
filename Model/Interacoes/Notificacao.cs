@@ -4,6 +4,7 @@
     {
         private int _tipoDeNotificacao;
         private string _mensagemDaNotificacao;
+        private DateTime _timeStamp;
 
         // TIPOS:
         // 1 - Solicitação de Amizade
@@ -13,13 +14,15 @@
         public Notificacao(Guid remetente, Guid destinatario, int tipoDeNotificacao, string mensagemDaNotificacao) :
             base(remetente, destinatario)
         {
+            _timeStamp = DateTime.Now;
             _mensagemDaNotificacao = mensagemDaNotificacao;
             _tipoDeNotificacao = tipoDeNotificacao;
         }
 
-        public Notificacao(int id, Guid remetente, Guid destinatario, int tipoDeNotificacao, string mensagemDaNotificacao) :
+        public Notificacao(int id, Guid remetente, Guid destinatario, int tipoDeNotificacao, DateTime timeStamp, string mensagemDaNotificacao) :
             base(id, remetente, destinatario)
         {
+            _timeStamp = timeStamp;
             _mensagemDaNotificacao = mensagemDaNotificacao;
             _tipoDeNotificacao = tipoDeNotificacao;
         }
@@ -34,6 +37,12 @@
         {
             get { return _mensagemDaNotificacao; }
             set { _mensagemDaNotificacao = value; }
+        }
+
+        public DateTime TimeStamp
+        {
+            get { return _timeStamp; }
+            set { _timeStamp = value; }
         }
     }
 }

@@ -1,21 +1,29 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebAPI_Apollo.Infraestrutura;
-using WebAPI_Apollo.Infraestrutura.Services.Repository.RAM;
 using WebAPI_Apollo.Model.DTOs;
 using WebAPI_Apollo.Model.Interacoes;
+using WebAPI_Apollo.Model.ViewModel;
 
-namespace WebAPI_Apollo.Controllers.RAM
+namespace WebAPI_Apollo.Controllers
 {
     [ApiController]
-    [Route("RAM/Chat")]
-    public class ChatRAMController : ControllerBase
+    [Route("Chat")]
+    public class ChatController : ControllerBase
     {
-        private readonly MensagemRepositoryRAM _msgRepository = new();
-        private readonly InformHomeRepositoryRAM _infHomeRepository = new();
-        private readonly UsuarioRepositoryRAM _usrRepository = new();
-        private readonly AmizadeRepositoryRAM _amzdRepository = new();
+        private readonly IMensagemRepository _msgRepository;
+        private readonly IInformHomeRepository _infHomeRepository;
+        private readonly IUsuarioRepository _usrRepository;
+        private readonly IAmizadeRepository _amzdRepository;
 
-        // RAM/Chat:
+        public ChatController(IMensagemRepository msgRepository, IInformHomeRepository infHomeRepository, IUsuarioRepository usrRepository, IAmizadeRepository amzdRepository)
+        {
+            _msgRepository = msgRepository ?? throw new ArgumentNullException();
+            _infHomeRepository = infHomeRepository ?? throw new ArgumentNullException();
+            _usrRepository = usrRepository ?? throw new ArgumentNullException();
+            _amzdRepository = amzdRepository ?? throw new ArgumentNullException();
+        }
+
+        // Chat:
+
         [HttpPost]
         [Route("{remetente}/{destinatario}/{conteudo}")]
         public IActionResult AddMsg(Guid remetente, Guid destinatario, string conteudo)
@@ -56,7 +64,7 @@ namespace WebAPI_Apollo.Controllers.RAM
 
             var resposta = new ChatDto
                 (
-                    novaMensagem.Id, 
+                    novaMensagem.Id,
                     novaMensagem.Remetente,
                     novaMensagem.Destinatario,
                     novaMensagem.Conteudo,
@@ -166,7 +174,7 @@ namespace WebAPI_Apollo.Controllers.RAM
             return NoContent();
         }
 
-        // RAM/Chat/Usuario:
+        // Chat/Usuario:
 
         // Obter informações por ID
         // Mensagens Enviadas para aquele ID e Recebidas por aquele ID
@@ -196,17 +204,6 @@ namespace WebAPI_Apollo.Controllers.RAM
             }
 
             return Ok(mensagens);
-        }
-
-        // RAM/Chat/Destroy:
-        // Deletar Tudo da Memória
-        [HttpDelete]
-        [Route("Destroy")]
-        public IActionResult DeleteAllDataRAM()
-        {
-            VolatileContext.Mensagens.Clear();
-
-            return NoContent();
         }
     }
 }

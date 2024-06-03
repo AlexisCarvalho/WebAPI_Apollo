@@ -8,21 +8,8 @@
         private int _numComentarios;
         private string _titulo;
         private string _descricao;
-        private string _caminhoImagem; // Para memória mudar depois
+        private string _imagemBase64; // Para memória mudar depois
         private DateTime _timeStamp;
-
-        /*
-        public Post(string titulo, string caminhoImagem, Guid idUsuario)
-        {
-            _id = Guid.NewGuid();
-            _idUsuario = idUsuario;
-            _numCurtidas = 0;
-            _numComentarios = 0;
-            _titulo = titulo;
-            _descricao = "";
-            _caminhoImagem = caminhoImagem;
-        }
-        */
 
         public Post(Guid idUsuario, string titulo, string descricao)
         {
@@ -33,10 +20,10 @@
             _numComentarios = 0;
             _titulo = titulo;
             _descricao = descricao;
-            _caminhoImagem = "";
+            _imagemBase64 = "";
         }
 
-        public Post(Guid idUsuario, string titulo, string descricao, string caminhoImagem)
+        public Post(Guid idUsuario, string titulo, string descricao, string imagemBase64)
         {
             _id = Guid.NewGuid();
             _timeStamp = DateTime.Now;
@@ -45,7 +32,7 @@
             _numComentarios = 0;
             _titulo = titulo;
             _descricao = descricao;
-            _caminhoImagem = caminhoImagem;
+            _imagemBase64 = imagemBase64;
         }
 
         public Guid Id
@@ -84,10 +71,10 @@
             set { _descricao = value; }
         }
 
-        public string CaminhoImagem
+        public string ImagemBase64
         {
-            get { return _caminhoImagem; }
-            set { _caminhoImagem = value; }
+            get { return _imagemBase64; }
+            set { _imagemBase64 = value; }
         }
 
         public DateTime TimeStamp

@@ -49,6 +49,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                     noti.Remetente,
                     noti.Destinatario,
                     noti.TipoDeNotificacao,
+                    noti.TimeStamp,
                     noti.MensagemDaNotificacao
                 ))
                 .ToList();
@@ -65,6 +66,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                         usuarioQueEnviou.ImagemPerfil,
                         usuarioQueEnviou.Nome,
                         noti.TipoDeNotificacao,
+                        noti.TimeStamp,
                         noti.MensagemDaNotificacao
                     );
                 notificacoesSaida.Add(notiSaida);
@@ -84,6 +86,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                     noti.Remetente,
                     noti.Destinatario,
                     noti.TipoDeNotificacao,
+                    noti.TimeStamp,
                     noti.MensagemDaNotificacao
                 ))
                 .Where(noti => noti.Destinatario == idUsuario && noti.TipoDeNotificacao != 1)
@@ -101,6 +104,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                         usuarioQueEnviou.ImagemPerfil,
                         usuarioQueEnviou.Nome,
                         noti.TipoDeNotificacao,
+                        noti.TimeStamp,
                         noti.MensagemDaNotificacao
                     );
                 notificacoesSaida.Add(notiSaida);
@@ -120,6 +124,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                     noti.Remetente,
                     noti.Destinatario,
                     noti.TipoDeNotificacao,
+                    noti.TimeStamp,
                     noti.MensagemDaNotificacao
                 ))
                 .Where(noti => noti.Destinatario == idUsuario && noti.TipoDeNotificacao == 1)
@@ -137,6 +142,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                         usuarioQueEnviou.ImagemPerfil,
                         usuarioQueEnviou.Nome,
                         noti.TipoDeNotificacao,
+                        noti.TimeStamp,
                         noti.MensagemDaNotificacao
                     );
                 notificacoesSaida.Add(notiSaida);
@@ -156,6 +162,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                     noti.Remetente,
                     noti.Destinatario,
                     noti.TipoDeNotificacao,
+                    noti.TimeStamp,
                     noti.MensagemDaNotificacao
                 ))
                 .Where(noti => noti.Remetente == idUsuario && noti.TipoDeNotificacao == 1)
@@ -173,6 +180,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
                         usuarioQueEnviou.ImagemPerfil,
                         usuarioQueEnviou.Nome,
                         noti.TipoDeNotificacao,
+                        noti.TimeStamp,
                         noti.MensagemDaNotificacao
                     );
                 notificacoesSaida.Add(notiSaida);
@@ -206,13 +214,14 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
         public void DeletarReferencias(Guid idUsuario)
         {
             var notificacoesDoUsr = VolatileContext.Notificacoes
-                .Select(ntf => new Notificacao
+                .Select(noti => new Notificacao
                 (
-                    ntf.Id,
-                    ntf.Remetente,
-                    ntf.Destinatario,
-                    ntf.TipoDeNotificacao,
-                    ntf.MensagemDaNotificacao
+                    noti.Id,
+                    noti.Remetente,
+                    noti.Destinatario,
+                    noti.TipoDeNotificacao,
+                    noti.TimeStamp,
+                    noti.MensagemDaNotificacao
                 ))
                 .Where(ntf => ntf.Destinatario == idUsuario
                               || ntf.Remetente == idUsuario)

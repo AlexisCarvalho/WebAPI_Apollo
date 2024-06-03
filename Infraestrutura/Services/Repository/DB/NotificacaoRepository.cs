@@ -49,6 +49,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                     n.Remetente,
                     n.Destinatario,
                     n.TipoDeNotificacao,
+                    n.TimeStamp,
                     n.MensagemDaNotificacao
                 ))
                 .ToList();
@@ -65,6 +66,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                         usuarioQueEnviou.ImagemPerfil,
                         usuarioQueEnviou.Nome,
                         noti.TipoDeNotificacao,
+                        noti.TimeStamp,
                         noti.MensagemDaNotificacao
                     );
                 notificacoesSaida.Add(notiSaida);
@@ -85,6 +87,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                     n.Remetente,
                     n.Destinatario,
                     n.TipoDeNotificacao,
+                    n.TimeStamp,
                     n.MensagemDaNotificacao
                 ))
                 .ToList();
@@ -101,6 +104,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                         usuarioQueEnviou.ImagemPerfil,
                         usuarioQueEnviou.Nome,
                         noti.TipoDeNotificacao,
+                        noti.TimeStamp,
                         noti.MensagemDaNotificacao
                     );
                 notificacoesSaida.Add(notiSaida);
@@ -121,6 +125,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                     n.Remetente,
                     n.Destinatario,
                     n.TipoDeNotificacao,
+                    n.TimeStamp,
                     n.MensagemDaNotificacao
                 ))
                 .ToList();
@@ -137,6 +142,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                         usuarioQueEnviou.ImagemPerfil,
                         usuarioQueEnviou.Nome,
                         noti.TipoDeNotificacao,
+                        noti.TimeStamp,
                         noti.MensagemDaNotificacao
                     );
                 notificacoesSaida.Add(notiSaida);
@@ -157,6 +163,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                     n.Remetente,
                     n.Destinatario,
                     n.TipoDeNotificacao,
+                    n.TimeStamp,
                     n.MensagemDaNotificacao
                 ))
                 .ToList();
@@ -173,6 +180,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services.Repository.DB
                         usuarioQueEnviou.ImagemPerfil,
                         usuarioQueEnviou.Nome,
                         noti.TipoDeNotificacao,
+                        noti.TimeStamp,
                         noti.MensagemDaNotificacao
                     );
                 notificacoesSaida.Add(notiSaida);
