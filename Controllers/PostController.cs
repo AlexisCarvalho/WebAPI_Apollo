@@ -72,7 +72,16 @@ namespace WebAPI_Apollo.Controllers
                         return Problem("A Home do seu amigo parece não existir de modo inesperado");
                     }
 
-                    Notificacao ntf = new Notificacao(idUsuario, amizade.Destinatario, 2, $"{amigo.Nome.Split(" ")[0]}! Eu acabei de postar: {novoPost.Titulo}, vem dar uma olhada");
+                    var tipoNotificacao = 2;
+                    var mensagem = $"{amigo.Nome.Split(" ")[0]}! Eu acabei de postar: {novoPost.Titulo}, vem dar uma olhada";
+
+                    Notificacao ntf = new Notificacao
+                        (
+                            idUsuario, 
+                            amizade.Destinatario, 
+                            tipoNotificacao, 
+                            mensagem
+                         );
 
                     _ntfRepository.Add(ntf);
 
@@ -100,7 +109,16 @@ namespace WebAPI_Apollo.Controllers
                         return Problem("A Home do seu amigo parece não existir de modo inesperado");
                     }
 
-                    Notificacao ntf = new Notificacao(idUsuario, amizade.Remetente, 2, $"{amigo.Nome.Split(" ")[0]}! Eu acabei de postar: {novoPost.Titulo}, vêm dar uma olhada");
+                    var tipoNotificacao = 2;
+                    var mensagem = $"{amigo.Nome.Split(" ")[0]}! Eu acabei de postar: {novoPost.Titulo}, vem dar uma olhada";
+
+                    Notificacao ntf = new Notificacao
+                        (
+                            idUsuario, 
+                            amizade.Remetente, 
+                            tipoNotificacao, 
+                            mensagem
+                        );
 
                     _ntfRepository.Add(ntf);
 
@@ -109,7 +127,25 @@ namespace WebAPI_Apollo.Controllers
                 }
             }
 
-            var resposta = new PostPadraoDto(novoPost.Id, novoPost.IdUsuario, novoPost.Titulo, novoPost.Descricao, novoPost.NumCurtidas, novoPost.NumComentarios, novoPost.TimeStamp);
+            // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
+            Calculos c = new();
+
+            c.GanharXP(1000, ref usuario);
+
+            _usrRepository.Update(usuario);
+            // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
+
+            var resposta = new PostPadraoDto
+                (
+                    novoPost.Id, 
+                    novoPost.IdUsuario, 
+                    novoPost.Titulo, 
+                    novoPost.Descricao, 
+                    novoPost.NumCurtidas, 
+                    novoPost.NumComentarios, 
+                    novoPost.TimeStamp
+                );
+
             return Ok(resposta);
         }
 
@@ -154,7 +190,16 @@ namespace WebAPI_Apollo.Controllers
                         return Problem("A Home do seu amigo parece não existir de modo inesperado");
                     }
 
-                    Notificacao ntf = new Notificacao(idUsuario, amizade.Destinatario, 2, $"{amigo.Nome.Split(" ")[0]}! Eu acabei de postar: {novoPost.Titulo}, vem dar uma olhada");
+                    var tipoNotificacao = 2;
+                    var mensagem = $"{amigo.Nome.Split(" ")[0]}! Eu acabei de postar: {novoPost.Titulo}, vem dar uma olhada";
+
+                    Notificacao ntf = new Notificacao
+                        (
+                            idUsuario, 
+                            amizade.Destinatario, 
+                            tipoNotificacao, 
+                            mensagem
+                        );
 
                     _ntfRepository.Add(ntf);
 
@@ -182,7 +227,16 @@ namespace WebAPI_Apollo.Controllers
                         return Problem("A Home do seu amigo parece não existir de modo inesperado");
                     }
 
-                    Notificacao ntf = new Notificacao(idUsuario, amizade.Remetente, 2, $"{amigo.Nome.Split(" ")[0]}! Eu acabei de postar: {novoPost.Titulo}, vêm dar uma olhada");
+                    var tipoNotificacao = 2;
+                    var mensagem = $"{amigo.Nome.Split(" ")[0]}! Eu acabei de postar: {novoPost.Titulo}, vem dar uma olhada";
+
+                    Notificacao ntf = new Notificacao
+                        (
+                            idUsuario, 
+                            amizade.Remetente, 
+                            tipoNotificacao, 
+                            mensagem
+                        );
 
                     _ntfRepository.Add(ntf);
 
@@ -190,6 +244,14 @@ namespace WebAPI_Apollo.Controllers
                     _infHomeRepository.Update(homeAmigo);
                 }
             }
+
+            // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
+            Calculos c = new();
+
+            c.GanharXP(1200, ref usuario);
+
+            _usrRepository.Update(usuario);
+            // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
 
             var resposta = new PostPadraoDto(novoPost.Id, novoPost.IdUsuario, novoPost.Titulo, novoPost.Descricao, novoPost.NumCurtidas, novoPost.NumComentarios, novoPost.TimeStamp);
             return Ok(resposta);
@@ -221,7 +283,19 @@ namespace WebAPI_Apollo.Controllers
                 return NotFound();
             }
 
-            return Ok(new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.ImagemBase64, post.NumCurtidas, post.NumComentarios, post.TimeStamp));
+            var resposta = new PostCompletoDto
+                (
+                    post.Id, 
+                    post.IdUsuario, 
+                    post.Titulo, 
+                    post.Descricao, 
+                    post.ImagemBase64, 
+                    post.NumCurtidas, 
+                    post.NumComentarios, 
+                    post.TimeStamp
+                );
+
+            return Ok(resposta);
         }
 
         // Atualizar informações por id
@@ -243,7 +317,19 @@ namespace WebAPI_Apollo.Controllers
 
             _pstRepository.Update(post);
 
-            return Ok(new PostCompletoDto(post.Id, post.IdUsuario, post.Titulo, post.Descricao, post.ImagemBase64, post.NumCurtidas, post.NumComentarios, post.TimeStamp));
+            var resposta = new PostCompletoDto
+                (
+                    post.Id, 
+                    post.IdUsuario, 
+                    post.Titulo, 
+                    post.Descricao, 
+                    post.ImagemBase64, 
+                    post.NumCurtidas, 
+                    post.NumComentarios, 
+                    post.TimeStamp
+                );
+
+            return Ok(resposta);
         }
 
         // Deletar Post por ID
@@ -292,7 +378,23 @@ namespace WebAPI_Apollo.Controllers
 
             _pstRepository.Update(postComentado);
 
-            var resposta = new ChatDto(novaMensagem.Id, novaMensagem.Remetente, novaMensagem.Destinatario, novaMensagem.Conteudo, novaMensagem.TimeStamp);
+            var resposta = new ChatDto
+                (
+                    novaMensagem.Id, 
+                    novaMensagem.Remetente, 
+                    novaMensagem.Destinatario, 
+                    novaMensagem.Conteudo, 
+                    novaMensagem.TimeStamp
+                );
+
+            // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
+            Calculos c = new();
+
+            c.GanharXP(200, ref usuario);
+
+            _usrRepository.Update(usuario);
+            // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
+
             return Ok(resposta);
         }
 
@@ -318,7 +420,15 @@ namespace WebAPI_Apollo.Controllers
                     return Problem("Algo Inesperado Ocorreu, Usuario que Comentou não Encontrado");
                 }
 
-                comentariosFormatados.Add(new ComentariosDto(comentario.Remetente, comentario.Destinatario, usr.ImagemPerfil, usr.Nome, comentario.Conteudo, comentario.timeStamp));
+                comentariosFormatados.Add(new ComentariosDto
+                    (   
+                        comentario.Remetente, 
+                        comentario.Destinatario, 
+                        usr.ImagemPerfil, 
+                        usr.Nome, 
+                        comentario.Conteudo, 
+                        comentario.timeStamp
+                    ));
             }
 
             return Ok(comentariosFormatados);
@@ -370,18 +480,35 @@ namespace WebAPI_Apollo.Controllers
 
             var jaCurtiu = _crtRepository.JaCurtiu(curtida);
 
-            if (jaCurtiu is null)
-            {
-                _crtRepository.Add(curtida, ref postCurtido);
-                _pstRepository.Update(postCurtido);
-
-                var resposta = new PostPadraoDto(postCurtido.Id, postCurtido.IdUsuario, postCurtido.Titulo, postCurtido.Descricao, postCurtido.NumCurtidas, postCurtido.NumComentarios, postCurtido.TimeStamp);
-                return Ok(resposta);
-            }
-            else
+            if (jaCurtiu != null)
             {
                 return NotFound("Post Já foi Curtido Por Esse Usuario Antes");
+                
             }
+
+            _crtRepository.Add(curtida, ref postCurtido);
+            _pstRepository.Update(postCurtido);
+
+            // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
+            Calculos c = new();
+
+            c.GanharXP(50, ref usuario);
+
+            _usrRepository.Update(usuario);
+            // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
+
+            var resposta = new PostPadraoDto
+                (
+                    postCurtido.Id, 
+                    postCurtido.IdUsuario, 
+                    postCurtido.Titulo, 
+                    postCurtido.Descricao, 
+                    postCurtido.NumCurtidas, 
+                    postCurtido.NumComentarios, 
+                    postCurtido.TimeStamp
+                );
+
+            return Ok(resposta);
         }
 
         // Adicionar uma curtida a um post
@@ -415,7 +542,17 @@ namespace WebAPI_Apollo.Controllers
             _crtRepository.Delete(curtiuAntes, ref postDescurtido);
             _pstRepository.Update(postDescurtido);
 
-            var resposta = new PostPadraoDto(postDescurtido.Id, postDescurtido.IdUsuario, postDescurtido.Titulo, postDescurtido.Descricao, postDescurtido.NumCurtidas, postDescurtido.NumComentarios, postDescurtido.TimeStamp);
+            var resposta = new PostPadraoDto
+                (
+                    postDescurtido.Id, 
+                    postDescurtido.IdUsuario, 
+                    postDescurtido.Titulo, 
+                    postDescurtido.Descricao, 
+                    postDescurtido.NumCurtidas, 
+                    postDescurtido.NumComentarios, 
+                    postDescurtido.TimeStamp
+                );
+
             return Ok(resposta);
         }
 

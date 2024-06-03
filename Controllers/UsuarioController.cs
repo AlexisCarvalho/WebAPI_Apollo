@@ -82,9 +82,8 @@ namespace WebAPI_Apollo.Controllers
         [Route("{id}/{XP}")]
         public IActionResult AdcXPUsr(Guid id, int XP)
         {
-            Calculos c = new Calculos();
+            Calculos c = new();
 
-            //var usuario = await context.Usuarios.FindAsync(id);
             var usuario = _usrRepository.Get(id);
 
             if (usuario is null)
@@ -430,6 +429,14 @@ namespace WebAPI_Apollo.Controllers
             homeAmigo.NumSolicitacoesAmizade++;
             _infHomeRepository.Update(homeAmigo);
 
+            // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
+            Calculos c = new();
+
+            c.GanharXP(100, ref usuario);
+
+            _usrRepository.Update(usuario);
+            // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
+
             return Ok(solicitacaoAmizade);
         }
 
@@ -506,6 +513,14 @@ namespace WebAPI_Apollo.Controllers
 
             _amzdRepository.Add(amizade);
             _ntfRepository.Delete(pedidoExistente);
+
+            // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
+            Calculos c = new();
+
+            c.GanharXP(300, ref usuario);
+
+            _usrRepository.Update(usuario);
+            // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
 
             return Ok(resposta);
         }
