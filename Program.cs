@@ -1,66 +1,12 @@
+using WebAPI_Apollo.Domain.Model;
+using WebAPI_Apollo.Domain.Model.Interface;
 using WebAPI_Apollo.Infraestrutura;
 using WebAPI_Apollo.Infraestrutura.Services;
 using WebAPI_Apollo.Infraestrutura.Services.Repository.DB;
 using WebAPI_Apollo.Infraestrutura.Services.Repository.RAM;
-using WebAPI_Apollo.Model;
-using WebAPI_Apollo.Model.ViewModel;
+using WebAPI_Apollo.Infraestrutura.Services.Proxy;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-
-/*
- * Passado: UsuarioRAMController (Mudança da lógica "InformHome")
- *        Atualizar a Home nas rotas que envolvem ela                        (FAZER REVISÃO)
- * Passado: Impedir solicitação de amizade cruzada entre usuarios, se um já  (FAZER REVISÃO)
- *        tiver enviado o outro não pode.
- *        Garantir que o número de amigos esta aumentando onde devia
- *        Fazer o desfazer amizade
- *        
- * Atual: Finalizar os detalhes da lista de Amigos
-
-  _____________________________________________
- |******************* Facil *******************| //
- | TODO: Lista de amigos                       |  (EM PROGRESSO) 
- | TODO: Desfazer Amizade                      |  (CONCLUIDO)
- | TODO: Mandar mensagem apenas para amigos    |  (CONCLUIDO)
-  _____________________________________________
- |***************** Possivel ******************| 
- | TODO: Solicitações de amizade               |  (CONCLUIDO) 
- | TODO: Aceitar Solicitações de amizade       |  (CONCLUIDO)
- | TODO: Modo de diferenciar lidas e não lidas |  (CONCLUIDO)
- | TODO: Pesquisar por posts (pelos títulos)   |  (CONCLUIDO)
- | TODO: Delete deve apagar todas as referen-  |  (PRECISA DE REVISÃO)
- |       cias do usuario incluindo amizades,   |
- |       posts, enfim... Tudo que seu id esta  |
- |       relacionado                           |
- |                                             |
-  _____________________________________________
- |*********** Possivel mas difícil ************| 
- | TODO: Notificações                          |  (PRECISA DE REVISÃO) 
- | TODO: Feed gerado com pessoas ou perfis     |  (CONCLUIDO) 
- |       que o usuario segue (Amigos)          |  
- | TODO: Posts estão sendo retornados e orden  |  (CONCLUIDO)
- |       ados pelo id, por ser Guid a ordem    |
- |       fica bagunçada, como posts não tem    |
- |       timeStamp seria sabio adicionar e     |
- |       ordenar por ela                       |
-
-  _____________________________________________
- |************* Nearly Impossible *************| 
- | TODO: Compartilhar Post com Amigo           |
-  _____________________________________________
- |******* Mexer Quando Tiver Muito Tempo ******| 
- | TODO: Mudar todos os retornos Get para Dto, |
- |       pra evitar conversão na rota          |
- | TODO: Catalogar as respostas das rotas,     |
- |       possíveis retornos e código           |
- | TODO: Ao capturar dados do banco usar a     |
- |      model e converter para Dto depois      |
- |      usando mapper ao invés de capturar     |
- |       diretamente em Dto                    |
-
-*/
 
 // Add services to the container.
 
@@ -69,29 +15,98 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-TestarBDService.ExecutarTeste();
+builder.Services.AddSingleton<ConfigService>();
 
-if (ConfSistema.DBAtivado)
+// | Amizade Repository |
+builder.Services.AddTransient<AmizadeRepository>();
+builder.Services.AddTransient<AmizadeRepositoryRAM>();
+builder.Services.AddTransient<IAmizadeRepository>(provider =>
 {
-    builder.Services.AddTransient<IAmizadeRepository, AmizadeRepository>();
-    builder.Services.AddTransient<ICurtidaRepository, CurtidaRepository>();
-    builder.Services.AddTransient<IEstatisticasRepository, EstatisticasRepository>();
-    builder.Services.AddTransient<IInformHomeRepository, InformHomeRepository>();
-    builder.Services.AddTransient<IMensagemRepository, MensagemRepository>();
-    builder.Services.AddTransient<INotificacaoRepository, NotificacaoRepository>();
-    builder.Services.AddTransient<IPostRepository, PostRepository>();
-    builder.Services.AddTransient<IUsuarioRepository, UsuarioRepository>();
-} else
+    var configService = provider.GetRequiredService<ConfigService>();
+    var dbRepository = provider.GetRequiredService<AmizadeRepository>();
+    var ramRepository = provider.GetRequiredService<AmizadeRepositoryRAM>();
+    return new AmizadeRepositoryProxy(configService, dbRepository, ramRepository);
+});
+
+// | Curtida Repository |
+builder.Services.AddTransient<CurtidaRepository>();
+builder.Services.AddTransient<CurtidaRepositoryRAM>();
+builder.Services.AddTransient<ICurtidaRepository>(provider =>
 {
-    builder.Services.AddTransient<IAmizadeRepository, AmizadeRepositoryRAM>();
-    builder.Services.AddTransient<ICurtidaRepository, CurtidaRepositoryRAM>();
-    builder.Services.AddTransient<IEstatisticasRepository, EstatisticasRepositoryRAM>();
-    builder.Services.AddTransient<IInformHomeRepository, InformHomeRepositoryRAM>();
-    builder.Services.AddTransient<IMensagemRepository, MensagemRepositoryRAM>();
-    builder.Services.AddTransient<INotificacaoRepository, NotificacaoRepositoryRAM>();
-    builder.Services.AddTransient<IPostRepository, PostRepositoryRAM>();
-    builder.Services.AddTransient<IUsuarioRepository, UsuarioRepositoryRAM>();
-}
+    var configService = provider.GetRequiredService<ConfigService>();
+    var dbRepository = provider.GetRequiredService<CurtidaRepository>();
+    var ramRepository = provider.GetRequiredService<CurtidaRepositoryRAM>();
+    return new CurtidaRepositoryProxy(configService, dbRepository, ramRepository);
+});
+
+// | Estatistica Repository |
+builder.Services.AddTransient<EstatisticasRepository>();
+builder.Services.AddTransient<EstatisticasRepositoryRAM>();
+builder.Services.AddTransient<IEstatisticasRepository>(provider =>
+{
+    var configService = provider.GetRequiredService<ConfigService>();
+    var dbRepository = provider.GetRequiredService<EstatisticasRepository>();
+    var ramRepository = provider.GetRequiredService<EstatisticasRepositoryRAM>();
+    return new EstatisticasRepositoryProxy(configService, dbRepository, ramRepository);
+});
+
+// | InformHome Repository |
+builder.Services.AddTransient<InformHomeRepository>();
+builder.Services.AddTransient<InformHomeRepositoryRAM>();
+builder.Services.AddTransient<IInformHomeRepository>(provider =>
+{
+    var configService = provider.GetRequiredService<ConfigService>();
+    var dbRepository = provider.GetRequiredService<InformHomeRepository>();
+    var ramRepository = provider.GetRequiredService<InformHomeRepositoryRAM>();
+    return new InformHomeRepositoryProxy(configService, dbRepository, ramRepository);
+});
+
+// | Mensagem Repository |
+builder.Services.AddTransient<MensagemRepository>();
+builder.Services.AddTransient<MensagemRepositoryRAM>();
+builder.Services.AddTransient<IMensagemRepository>(provider =>
+{
+    var configService = provider.GetRequiredService<ConfigService>();
+    var dbRepository = provider.GetRequiredService<MensagemRepository>();
+    var ramRepository = provider.GetRequiredService<MensagemRepositoryRAM>();
+    return new MensagemRepositoryProxy(configService, dbRepository, ramRepository);
+});
+
+// | Notificacao Repository |
+builder.Services.AddTransient<NotificacaoRepository>();
+builder.Services.AddTransient<NotificacaoRepositoryRAM>();
+builder.Services.AddTransient<INotificacaoRepository>(provider =>
+{
+    var configService = provider.GetRequiredService<ConfigService>();
+    var dbRepository = provider.GetRequiredService<NotificacaoRepository>();
+    var ramRepository = provider.GetRequiredService<NotificacaoRepositoryRAM>();
+    return new NotificacaoRepositoryProxy(configService, dbRepository, ramRepository);
+});
+
+// | Post Repository |
+builder.Services.AddTransient<PostRepository>();
+builder.Services.AddTransient<PostRepositoryRAM>();
+builder.Services.AddTransient<IPostRepository>(provider =>
+{
+    var configService = provider.GetRequiredService<ConfigService>();
+    var dbRepository = provider.GetRequiredService<PostRepository>();
+    var ramRepository = provider.GetRequiredService<PostRepositoryRAM>();
+    return new PostRepositoryProxy(configService, dbRepository, ramRepository);
+});
+
+// | Usuario Repository |
+builder.Services.AddTransient<UsuarioRepository>();
+builder.Services.AddTransient<UsuarioRepositoryRAM>();
+builder.Services.AddTransient<IUsuarioRepository>(provider =>
+{
+    var configService = provider.GetRequiredService<ConfigService>();
+    var dbRepository = provider.GetRequiredService<UsuarioRepository>();
+    var ramRepository = provider.GetRequiredService<UsuarioRepositoryRAM>();
+    return new UsuarioRepositoryProxy(configService, dbRepository, ramRepository);
+});
+
+// Adicionar testes automaticos do Banco
+builder.Services.AddHostedService<TestarBDService>();
 
 // Esse primeiro aqui limita por porta "endereço",
 // se descobrir como setar uma porta especifica no Electron

@@ -1,11 +1,39 @@
-﻿using WebAPI_Apollo.Model;
+﻿using WebAPI_Apollo.Domain.Model.Interacoes;
+using WebAPI_Apollo.Domain.Model;
+using WebAPI_Apollo.Infraestrutura.Services.Repository.DB;
+using System.ComponentModel;
 
 namespace WebAPI_Apollo.Infraestrutura.Services
 {
-    public class TestarBDService
+    public class TestarBDService : IHostedService
     {
-        public static void ExecutarTeste()
+        private readonly IServiceProvider _serviceProvider;
+        private readonly ConfigService _configService;
+
+        public TestarBDService(IServiceProvider serviceProvider, ConfigService configService)
         {
+            _serviceProvider = serviceProvider;
+            _configService = configService;
+        }
+
+        public async Task StartAsync(CancellationToken cancellationToken)
+        {
+            await RunDatabaseTestsAsync();
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public async Task RunDatabaseTestsAsync()
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var serviceProvider = scope.ServiceProvider;
+            bool read = true;
+            bool write = true;
+            bool delete = true;
+
             try
             {
                 using AppDbContext TesteBanco = new();
@@ -31,7 +59,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services
 
                 if (ultimaEntrada is null)
                 {
-                    ConfSistema.DBAtivado = false;
+                    read = false;
                 }
                 else
                 {
@@ -39,7 +67,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services
                     // se trata da recém adicionada
                     if (ultimaEntrada.CriadaEm != entradaNova.CriadaEm)
                     {
-                        ConfSistema.DBAtivado = false;
+                        write = false;
                     }
 
                     TestTable? entradaMaisAntiga = TesteBanco.TestTable.FirstOrDefault();
@@ -54,7 +82,7 @@ namespace WebAPI_Apollo.Infraestrutura.Services
 
                         if (novoValorLido is null)
                         {
-                            ConfSistema.DBAtivado = false;
+                            read = false;
                         }
                         else
                         {
@@ -62,15 +90,24 @@ namespace WebAPI_Apollo.Infraestrutura.Services
                             // agora é a recém adicionada confirmando o DELETE
                             if (novoValorLido.CriadaEm != entradaNova.CriadaEm)
                             {
-                                ConfSistema.DBAtivado = false;
+                                delete = false;
                             }
                         }
                     }
                 }
+
+                if (read && write && delete)
+                {
+                    ConfigService.DBFuncionando = true; // Trocar aqui pra forçar uso da RAM no inicio
+                }
+
+                // Se todos os testes passarem ativa o banco
+                _configService.DBAtivado = ConfigService.DBFuncionando;
             }
-            catch (Microsoft.Data.Sqlite.SqliteException)
+            catch (Exception ex)
             {
-                ConfSistema.DBAtivado = false;
+                Console.WriteLine($"Erro nos Testes do Banco de Dados: {ex.Message}");
+                _configService.DBAtivado = false;
             }
         }
     }

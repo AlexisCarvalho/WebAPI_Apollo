@@ -1,5 +1,5 @@
-﻿using WebAPI_Apollo.Model;
-using WebAPI_Apollo.Model.ViewModel;
+﻿using WebAPI_Apollo.Domain.Model;
+using WebAPI_Apollo.Domain.Model.Interface;
 
 namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 {

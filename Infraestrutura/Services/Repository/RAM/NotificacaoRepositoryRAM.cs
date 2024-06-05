@@ -1,6 +1,6 @@
-﻿using WebAPI_Apollo.Model.DTOs;
-using WebAPI_Apollo.Model.Interacoes;
-using WebAPI_Apollo.Model.ViewModel;
+﻿using WebAPI_Apollo.Domain.DTOs;
+using WebAPI_Apollo.Domain.Model.Interacoes;
+using WebAPI_Apollo.Domain.Model.Interface;
 
 namespace WebAPI_Apollo.Infraestrutura.Services.Repository.RAM
 {

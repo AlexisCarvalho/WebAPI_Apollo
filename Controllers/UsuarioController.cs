@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using WebAPI_Apollo.Domain.DTOs;
+using WebAPI_Apollo.Domain.Model;
+using WebAPI_Apollo.Domain.Model.Interacoes;
+using WebAPI_Apollo.Domain.Model.Interface;
 using WebAPI_Apollo.Infraestrutura.Services;
 using WebAPI_Apollo.Infraestrutura.Services.Repository.RAM;
-using WebAPI_Apollo.Model;
-using WebAPI_Apollo.Model.DTOs;
-using WebAPI_Apollo.Model.Interacoes;
-using WebAPI_Apollo.Model.ViewModel;
 
 namespace WebAPI_Apollo.Controllers
 {
@@ -404,7 +404,7 @@ namespace WebAPI_Apollo.Controllers
                 return BadRequest("O Usuario requisitado já esta na sua lista de amigos");
             }
 
-            string mensagem = $"Olá {quemEleQuerPedir.Nome.Split(" ")[0]}, gostaria de ser meu amigo aqui na {ConfSistema.NomeRedeSocial}. Seria ótimo trocar ideias e experiências.";
+            string mensagem = $"Olá {quemEleQuerPedir.Nome.Split(" ")[0]}, gostaria de ser meu amigo aqui na {ConfigUsuario.NomeRedeSocial}. Seria ótimo trocar ideias e experiências.";
 
             Notificacao solicitacaoAmizade = new Notificacao(idUsuario, idAmigo, 1, mensagem);
             Notificacao solicitacaoDoAmigo = new Notificacao(idAmigo, idUsuario, 1, mensagem);
@@ -480,7 +480,7 @@ namespace WebAPI_Apollo.Controllers
                 return Problem("Informações da Home do Amigo não encontradas");
             }
 
-            string mensagem = $"{quemPediu.Nome.Split(" ")[0]}, agora somos amigos aqui na {ConfSistema.NomeRedeSocial}.";
+            string mensagem = $"{quemPediu.Nome.Split(" ")[0]}, agora somos amigos aqui na {ConfigUsuario.NomeRedeSocial}.";
 
             Notificacao resposta = new Notificacao(idUsuario, idDeQuemPediu, 3, mensagem);
             // Tipo 3, Resposta
@@ -565,7 +565,7 @@ namespace WebAPI_Apollo.Controllers
                 return Problem("Informações da Home do Amigo não encontradas");
             }
 
-            string mensagem = $"{quemPediu.Nome.Split(" ")[0]}, infelizmente não posso aceitar seu pedido de amizade aqui na {ConfSistema.NomeRedeSocial}.";
+            string mensagem = $"{quemPediu.Nome.Split(" ")[0]}, infelizmente não posso aceitar seu pedido de amizade aqui na {ConfigUsuario.NomeRedeSocial}.";
 
             Notificacao resposta = new Notificacao(idUsuario, idDeQuemPediu, 3, mensagem);
             // Tipo 3, Resposta
@@ -882,7 +882,7 @@ namespace WebAPI_Apollo.Controllers
 
             string senhaAleatoria = sb.ToString();
 
-            string resposta = $"{usuario.Nome}, agradecemos por usar a rede {ConfSistema.NomeRedeSocial}, sua nova senha temporaria pra acesso é: {senhaAleatoria}";
+            string resposta = $"{usuario.Nome}, agradecemos por usar a rede {ConfigUsuario.NomeRedeSocial}, sua nova senha temporaria pra acesso é: {senhaAleatoria}";
 
             usuario.Senha = senhaAleatoria;
             _usrRepository.Update(usuario);

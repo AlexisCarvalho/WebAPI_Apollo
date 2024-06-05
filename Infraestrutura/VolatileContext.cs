@@ -1,5 +1,5 @@
-﻿using WebAPI_Apollo.Model;
-using WebAPI_Apollo.Model.Interacoes;
+﻿using WebAPI_Apollo.Domain.Model;
+using WebAPI_Apollo.Domain.Model.Interacoes;
 
 namespace WebAPI_Apollo.Infraestrutura
 {

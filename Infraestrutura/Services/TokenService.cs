@@ -2,7 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using WebAPI_Apollo.Model;
+using WebAPI_Apollo.Domain.Model;
 
 namespace WebAPI_Apollo.Infraestrutura.Services
 {
