@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebAPI_Apollo.Domain.Model.Interface;
 using WebAPI_Apollo.Domain.DTOs;
 using WebAPI_Apollo.Domain.Model.Interacoes;
+using WebAPI_Apollo.Domain.Model.Interfaces;
 
 namespace WebAPI_Apollo.Controllers
 {

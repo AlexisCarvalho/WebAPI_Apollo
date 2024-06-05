@@ -21,6 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Application\Mapping\" />
+    <Folder Include="Application\ViewModel\" />
     <Folder Include="Storage\" />
   </ItemGroup>
 

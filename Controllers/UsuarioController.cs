@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Text;
+using WebAPI_Apollo.Application.Services;
 using WebAPI_Apollo.Domain.DTOs;
 using WebAPI_Apollo.Domain.Model;
 using WebAPI_Apollo.Domain.Model.Interacoes;
-using WebAPI_Apollo.Domain.Model.Interface;
-using WebAPI_Apollo.Infraestrutura.Services;
-using WebAPI_Apollo.Infraestrutura.Services.Repository.RAM;
+using WebAPI_Apollo.Domain.Model.Interfaces;
+using WebAPI_Apollo.Infraestrutura;
+using WebAPI_Apollo.Infraestrutura.Repository.RAM;
 
 namespace WebAPI_Apollo.Controllers
 {

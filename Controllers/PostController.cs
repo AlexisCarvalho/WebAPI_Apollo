@@ -2,7 +2,7 @@
 using WebAPI_Apollo.Domain.DTOs;
 using WebAPI_Apollo.Domain.Model;
 using WebAPI_Apollo.Domain.Model.Interacoes;
-using WebAPI_Apollo.Domain.Model.Interface;
+using WebAPI_Apollo.Domain.Model.Interfaces;
 
 namespace WebAPI_Apollo.Controllers
 {
@@ -77,9 +77,9 @@ namespace WebAPI_Apollo.Controllers
 
                     Notificacao ntf = new Notificacao
                         (
-                            idUsuario, 
-                            amizade.Destinatario, 
-                            tipoNotificacao, 
+                            idUsuario,
+                            amizade.Destinatario,
+                            tipoNotificacao,
                             mensagem
                          );
 
@@ -114,9 +114,9 @@ namespace WebAPI_Apollo.Controllers
 
                     Notificacao ntf = new Notificacao
                         (
-                            idUsuario, 
-                            amizade.Remetente, 
-                            tipoNotificacao, 
+                            idUsuario,
+                            amizade.Remetente,
+                            tipoNotificacao,
                             mensagem
                         );
 
@@ -137,12 +137,12 @@ namespace WebAPI_Apollo.Controllers
 
             var resposta = new PostPadraoDto
                 (
-                    novoPost.Id, 
-                    novoPost.IdUsuario, 
-                    novoPost.Titulo, 
-                    novoPost.Descricao, 
-                    novoPost.NumCurtidas, 
-                    novoPost.NumComentarios, 
+                    novoPost.Id,
+                    novoPost.IdUsuario,
+                    novoPost.Titulo,
+                    novoPost.Descricao,
+                    novoPost.NumCurtidas,
+                    novoPost.NumComentarios,
                     novoPost.TimeStamp
                 );
 
@@ -195,9 +195,9 @@ namespace WebAPI_Apollo.Controllers
 
                     Notificacao ntf = new Notificacao
                         (
-                            idUsuario, 
-                            amizade.Destinatario, 
-                            tipoNotificacao, 
+                            idUsuario,
+                            amizade.Destinatario,
+                            tipoNotificacao,
                             mensagem
                         );
 
@@ -232,9 +232,9 @@ namespace WebAPI_Apollo.Controllers
 
                     Notificacao ntf = new Notificacao
                         (
-                            idUsuario, 
-                            amizade.Remetente, 
-                            tipoNotificacao, 
+                            idUsuario,
+                            amizade.Remetente,
+                            tipoNotificacao,
                             mensagem
                         );
 
@@ -285,13 +285,13 @@ namespace WebAPI_Apollo.Controllers
 
             var resposta = new PostCompletoDto
                 (
-                    post.Id, 
-                    post.IdUsuario, 
-                    post.Titulo, 
-                    post.Descricao, 
-                    post.ImagemBase64, 
-                    post.NumCurtidas, 
-                    post.NumComentarios, 
+                    post.Id,
+                    post.IdUsuario,
+                    post.Titulo,
+                    post.Descricao,
+                    post.ImagemBase64,
+                    post.NumCurtidas,
+                    post.NumComentarios,
                     post.TimeStamp
                 );
 
@@ -319,13 +319,13 @@ namespace WebAPI_Apollo.Controllers
 
             var resposta = new PostCompletoDto
                 (
-                    post.Id, 
-                    post.IdUsuario, 
-                    post.Titulo, 
-                    post.Descricao, 
-                    post.ImagemBase64, 
-                    post.NumCurtidas, 
-                    post.NumComentarios, 
+                    post.Id,
+                    post.IdUsuario,
+                    post.Titulo,
+                    post.Descricao,
+                    post.ImagemBase64,
+                    post.NumCurtidas,
+                    post.NumComentarios,
                     post.TimeStamp
                 );
 
@@ -380,10 +380,10 @@ namespace WebAPI_Apollo.Controllers
 
             var resposta = new ChatDto
                 (
-                    novaMensagem.Id, 
-                    novaMensagem.Remetente, 
-                    novaMensagem.Destinatario, 
-                    novaMensagem.Conteudo, 
+                    novaMensagem.Id,
+                    novaMensagem.Remetente,
+                    novaMensagem.Destinatario,
+                    novaMensagem.Conteudo,
                     novaMensagem.TimeStamp
                 );
 
@@ -421,12 +421,12 @@ namespace WebAPI_Apollo.Controllers
                 }
 
                 comentariosFormatados.Add(new ComentariosDto
-                    (   
-                        comentario.Remetente, 
-                        comentario.Destinatario, 
-                        usr.ImagemPerfil, 
-                        usr.Nome, 
-                        comentario.Conteudo, 
+                    (
+                        comentario.Remetente,
+                        comentario.Destinatario,
+                        usr.ImagemPerfil,
+                        usr.Nome,
+                        comentario.Conteudo,
                         comentario.timeStamp
                     ));
             }
@@ -483,7 +483,7 @@ namespace WebAPI_Apollo.Controllers
             if (jaCurtiu != null)
             {
                 return NotFound("Post Já foi Curtido Por Esse Usuario Antes");
-                
+
             }
 
             _crtRepository.Add(curtida, ref postCurtido);
@@ -499,12 +499,12 @@ namespace WebAPI_Apollo.Controllers
 
             var resposta = new PostPadraoDto
                 (
-                    postCurtido.Id, 
-                    postCurtido.IdUsuario, 
-                    postCurtido.Titulo, 
-                    postCurtido.Descricao, 
-                    postCurtido.NumCurtidas, 
-                    postCurtido.NumComentarios, 
+                    postCurtido.Id,
+                    postCurtido.IdUsuario,
+                    postCurtido.Titulo,
+                    postCurtido.Descricao,
+                    postCurtido.NumCurtidas,
+                    postCurtido.NumComentarios,
                     postCurtido.TimeStamp
                 );
 
@@ -544,12 +544,12 @@ namespace WebAPI_Apollo.Controllers
 
             var resposta = new PostPadraoDto
                 (
-                    postDescurtido.Id, 
-                    postDescurtido.IdUsuario, 
-                    postDescurtido.Titulo, 
-                    postDescurtido.Descricao, 
-                    postDescurtido.NumCurtidas, 
-                    postDescurtido.NumComentarios, 
+                    postDescurtido.Id,
+                    postDescurtido.IdUsuario,
+                    postDescurtido.Titulo,
+                    postDescurtido.Descricao,
+                    postDescurtido.NumCurtidas,
+                    postDescurtido.NumComentarios,
                     postDescurtido.TimeStamp
                 );
 

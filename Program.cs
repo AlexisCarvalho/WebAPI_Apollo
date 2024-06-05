@@ -1,10 +1,9 @@
-using WebAPI_Apollo.Domain.Model;
-using WebAPI_Apollo.Domain.Model.Interface;
+using WebAPI_Apollo.Application.Services;
+using WebAPI_Apollo.Domain.Model.Interfaces;
 using WebAPI_Apollo.Infraestrutura;
-using WebAPI_Apollo.Infraestrutura.Services;
-using WebAPI_Apollo.Infraestrutura.Services.Repository.DB;
-using WebAPI_Apollo.Infraestrutura.Services.Repository.RAM;
-using WebAPI_Apollo.Infraestrutura.Services.Proxy;
+using WebAPI_Apollo.Infraestrutura.Proxy;
+using WebAPI_Apollo.Infraestrutura.Repository.DB;
+using WebAPI_Apollo.Infraestrutura.Repository.RAM;
 
 var builder = WebApplication.CreateBuilder(args);
 
