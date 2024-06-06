@@ -1,4 +1,6 @@
-﻿namespace WebAPI_Apollo.Domain.Model.Interacoes
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebAPI_Apollo.Domain.Model.Interacoes
 {
     public class Interacao
     {
@@ -19,6 +21,7 @@
             Destinatario = destinatario;
         }
 
+        [Key]
         public int Id
         {
             get { return _id; }

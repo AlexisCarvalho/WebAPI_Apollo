@@ -1,5 +1,8 @@
-﻿namespace WebAPI_Apollo.Domain.Model.Interacoes
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WebAPI_Apollo.Domain.Model.Interacoes
 {
+    [Table("Mensagens")]
     public class Mensagem : Interacao
     {
         private string _conteudo;

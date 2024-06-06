@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebAPI_Apollo.Application.Services;
 using WebAPI_Apollo.Infraestrutura;
 
 namespace WebAPI_Apollo.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/Config")]
     public class ConfigController : ControllerBase
     {
         private readonly ConfigService _configService;
@@ -15,6 +16,7 @@ namespace WebAPI_Apollo.Controllers
             _configService = configService;
         }
 
+        [Authorize]
         [HttpPost("AtivarBanco")]
         public IActionResult ToggleDB([FromBody] bool dbAtivado)
         {

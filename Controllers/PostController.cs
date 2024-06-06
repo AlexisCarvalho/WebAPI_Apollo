@@ -280,13 +280,22 @@ namespace WebAPI_Apollo.Controllers
 
             if (post is null)
             {
-                return NotFound();
+                return NotFound("Post Não Encontrado");
             }
 
-            var resposta = new PostCompletoDto
+            var usuario = _usrRepository.Get(post.IdUsuario);
+
+            if (usuario is null)
+            {
+                return NotFound("Usuario Que Postou Não Encontrado");
+            }
+
+            var resposta = new PostSistemaDto
                 (
                     post.Id,
                     post.IdUsuario,
+                    usuario.ImagemPerfil,
+                    usuario.Nome,
                     post.Titulo,
                     post.Descricao,
                     post.ImagemBase64,
@@ -308,7 +317,14 @@ namespace WebAPI_Apollo.Controllers
 
             if (post is null)
             {
-                return NotFound();
+                return NotFound("Post Não Encontrado");
+            }
+
+            var usuario = _usrRepository.Get(post.IdUsuario);
+
+            if(usuario is null)
+            {
+                return NotFound("Usuario Que Postou Não Encontrado");
             }
 
             post.Titulo = titulo;
@@ -317,10 +333,12 @@ namespace WebAPI_Apollo.Controllers
 
             _pstRepository.Update(post);
 
-            var resposta = new PostCompletoDto
+            var resposta = new PostSistemaDto
                 (
                     post.Id,
                     post.IdUsuario,
+                    usuario.ImagemPerfil,
+                    usuario.Nome,
                     post.Titulo,
                     post.Descricao,
                     post.ImagemBase64,

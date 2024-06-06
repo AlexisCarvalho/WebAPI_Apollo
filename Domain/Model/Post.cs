@@ -1,5 +1,9 @@
-﻿namespace WebAPI_Apollo.Domain.Model
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WebAPI_Apollo.Domain.Model
 {
+    [Table("Posts")]
     public class Post
     {
         private Guid _id;
@@ -35,6 +39,7 @@
             _imagemBase64 = imagemBase64;
         }
 
+        [Key]
         public Guid Id
         {
             get { return _id; }

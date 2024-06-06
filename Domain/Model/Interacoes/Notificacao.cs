@@ -1,5 +1,8 @@
-﻿namespace WebAPI_Apollo.Domain.Model.Interacoes
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WebAPI_Apollo.Domain.Model.Interacoes
 {
+    [Table("Notificacoes")]
     public class Notificacao : Interacao
     {
         private int _tipoDeNotificacao;

@@ -1,5 +1,9 @@
-﻿namespace WebAPI_Apollo.Domain.Model
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace WebAPI_Apollo.Domain.Model
 {
+    [Table("InformHome")]
     public class InformHome
     {
         int _id;
@@ -27,6 +31,7 @@
             _numMensagensNaoLidas = 0;
         }
 
+        [Key]
         public int Id
         {
             get { return _id; }

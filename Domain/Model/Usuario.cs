@@ -1,5 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace WebAPI_Apollo.Domain.Model
 {
+    [Table("Usuarios")]
     public class Usuario
     {
         private Guid _id;
@@ -62,6 +66,7 @@ namespace WebAPI_Apollo.Domain.Model
             _imagemPerfil = string.Empty;
         }
 
+        [Key]
         public Guid Id
         {
             get { return _id; }
