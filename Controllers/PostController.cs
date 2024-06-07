@@ -3,6 +3,7 @@ using WebAPI_Apollo.Domain.DTOs;
 using WebAPI_Apollo.Domain.Model;
 using WebAPI_Apollo.Domain.Model.Interacoes;
 using WebAPI_Apollo.Domain.Model.Interfaces;
+using WebAPI_Apollo.Infraestrutura;
 
 namespace WebAPI_Apollo.Controllers
 {
@@ -33,27 +34,27 @@ namespace WebAPI_Apollo.Controllers
 
         // Adicionar um Post Padrão da Rede, sem imagem
         [HttpPost]
-        [Route("{idUsuario}/{titulo}/{descricao}")]
-        public IActionResult AddPostPadrao(Guid idUsuario, string titulo, string descricao)
+        [Route("{titulo}/{descricao}")]
+        public IActionResult AddPostPadrao(string titulo, string descricao)
         {
-            var usuario = _usrRepository.Get(idUsuario);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound("Usuario não Encontrado");
+                return BadRequest("Nenhum Usuario Logado");
             }
 
-            var novoPost = new Post(idUsuario, titulo, descricao);
+            var novoPost = new Post(usuario.Id, titulo, descricao);
 
             _pstRepository.Add(novoPost);
 
-            var amizades = _amzdRepository.GetAllUsr(idUsuario);
+            var amizades = _amzdRepository.GetAllUsr(usuario.Id);
 
             foreach (var amizade in amizades)
             {
-                if (amizade.Remetente == idUsuario)
+                if (amizade.Remetente == usuario.Id)
                 {
-                    var usuarioQuePostou = _usrRepository.Get(idUsuario);
+                    var usuarioQuePostou = _usrRepository.Get(usuario.Id);
                     var amigo = _usrRepository.Get(amizade.Destinatario);
                     var homeAmigo = _infHomeRepository.GetViaUsr(amizade.Destinatario);
 
@@ -77,7 +78,7 @@ namespace WebAPI_Apollo.Controllers
 
                     Notificacao ntf = new Notificacao
                         (
-                            idUsuario,
+                            usuario.Id,
                             amizade.Destinatario,
                             tipoNotificacao,
                             mensagem
@@ -90,7 +91,7 @@ namespace WebAPI_Apollo.Controllers
                 }
                 else
                 {
-                    var usuarioQuePostou = _usrRepository.Get(idUsuario);
+                    var usuarioQuePostou = _usrRepository.Get(usuario.Id);
                     var amigo = _usrRepository.Get(amizade.Remetente);
                     var homeAmigo = _infHomeRepository.GetViaUsr(amizade.Remetente);
 
@@ -114,7 +115,7 @@ namespace WebAPI_Apollo.Controllers
 
                     Notificacao ntf = new Notificacao
                         (
-                            idUsuario,
+                            usuario.Id,
                             amizade.Remetente,
                             tipoNotificacao,
                             mensagem
@@ -151,27 +152,27 @@ namespace WebAPI_Apollo.Controllers
 
         // Adicionar um Post Padrão da Rede, com imagem
         [HttpPost]
-        [Route("{idUsuario}/{titulo}/{descricao}/{imagemBase64}")]
-        public IActionResult AddPostImagem(Guid idUsuario, string titulo, string descricao, string imagemBase64)
+        [Route("{titulo}/{descricao}/{imagemBase64}")]
+        public IActionResult AddPostImagem(string titulo, string descricao, string imagemBase64)
         {
-            var usuario = _usrRepository.Get(idUsuario);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound("Usuario não Encontrado");
+                return BadRequest("Nenhum Usuario Logado");
             }
 
-            var novoPost = new Post(idUsuario, titulo, descricao, imagemBase64);
+            var novoPost = new Post(usuario.Id, titulo, descricao, imagemBase64);
 
             _pstRepository.Add(novoPost);
 
-            var amizades = _amzdRepository.GetAllUsr(idUsuario);
+            var amizades = _amzdRepository.GetAllUsr(usuario.Id);
 
             foreach (var amizade in amizades)
             {
-                if (amizade.Remetente == idUsuario)
+                if (amizade.Remetente == usuario.Id)
                 {
-                    var usuarioQuePostou = _usrRepository.Get(idUsuario);
+                    var usuarioQuePostou = _usrRepository.Get(usuario.Id);
                     var amigo = _usrRepository.Get(amizade.Destinatario);
                     var homeAmigo = _infHomeRepository.GetViaUsr(amizade.Destinatario);
 
@@ -195,7 +196,7 @@ namespace WebAPI_Apollo.Controllers
 
                     Notificacao ntf = new Notificacao
                         (
-                            idUsuario,
+                            usuario.Id,
                             amizade.Destinatario,
                             tipoNotificacao,
                             mensagem
@@ -208,7 +209,7 @@ namespace WebAPI_Apollo.Controllers
                 }
                 else
                 {
-                    var usuarioQuePostou = _usrRepository.Get(idUsuario);
+                    var usuarioQuePostou = _usrRepository.Get(usuario.Id);
                     var amigo = _usrRepository.Get(amizade.Remetente);
                     var homeAmigo = _infHomeRepository.GetViaUsr(amizade.Remetente);
 
@@ -232,7 +233,7 @@ namespace WebAPI_Apollo.Controllers
 
                     Notificacao ntf = new Notificacao
                         (
-                            idUsuario,
+                            usuario.Id,
                             amizade.Remetente,
                             tipoNotificacao,
                             mensagem
@@ -322,7 +323,7 @@ namespace WebAPI_Apollo.Controllers
 
             var usuario = _usrRepository.Get(post.IdUsuario);
 
-            if(usuario is null)
+            if (usuario is null)
             {
                 return NotFound("Usuario Que Postou Não Encontrado");
             }
@@ -371,8 +372,8 @@ namespace WebAPI_Apollo.Controllers
 
         // Adicionar um comentario a um Post
         [HttpPost]
-        [Route("Comentarios/{id}/{usuarioQueComentou}/{comentario}")]
-        public IActionResult AddComentarioPost(Guid id, Guid usuarioQueComentou, string comentario)
+        [Route("Comentarios/{id}/{comentario}")]
+        public IActionResult AddComentarioPost(Guid id, string comentario)
         {
             var postComentado = _pstRepository.Get(id);
 
@@ -381,14 +382,14 @@ namespace WebAPI_Apollo.Controllers
                 return NotFound("Post não Encontrado");
             }
 
-            var usuario = _usrRepository.Get(usuarioQueComentou);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound("Usuario não Encontrado");
+                return BadRequest("Nenhum Usuario Logado");
             }
 
-            var novaMensagem = new Mensagem(usuarioQueComentou, id, comentario);
+            var novaMensagem = new Mensagem(usuario.Id, id, comentario);
 
             _msgRepository.Add(novaMensagem);
 
@@ -431,9 +432,9 @@ namespace WebAPI_Apollo.Controllers
 
             foreach (var comentario in comentarios)
             {
-                Usuario usr = _usrRepository.Get(comentario.Remetente);
+                Usuario? usuario = _usrRepository.Get(comentario.Remetente);
 
-                if (usr is null)
+                if (usuario is null)
                 {
                     return Problem("Algo Inesperado Ocorreu, Usuario que Comentou não Encontrado");
                 }
@@ -442,8 +443,8 @@ namespace WebAPI_Apollo.Controllers
                     (
                         comentario.Remetente,
                         comentario.Destinatario,
-                        usr.ImagemPerfil,
-                        usr.Nome,
+                        usuario.ImagemPerfil,
+                        usuario.Nome,
                         comentario.Conteudo,
                         comentario.timeStamp
                     ));
@@ -454,17 +455,17 @@ namespace WebAPI_Apollo.Controllers
 
         // Posts/Feed:
         [HttpGet]
-        [Route("Feed/{idUsuario}")]
-        public IActionResult GetFeedUsr(Guid idUsuario)
+        [Route("Feed")]
+        public IActionResult GetFeedUsr()
         {
-            var usuario = _usrRepository.Get(idUsuario);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound("Usuario não encontrado");
+                return BadRequest("Nenhum Usuario Logado");
             }
 
-            var posts = _pstRepository.GetFeedUsr(idUsuario);
+            var posts = _pstRepository.GetFeedUsr(usuario.Id);
 
             if (posts is null || posts.Count == 0)
             {
@@ -477,8 +478,8 @@ namespace WebAPI_Apollo.Controllers
         // Posts/Interagir:
         // Adicionar uma curtida a um post
         [HttpPost]
-        [Route("Interagir/Curtir/{idPost}/{idUsuario}")]
-        public IActionResult AddCurtidaPost(Guid idPost, Guid idUsuario)
+        [Route("Interagir/Curtir/{idPost}")]
+        public IActionResult AddCurtidaPost(Guid idPost)
         {
             var postCurtido = _pstRepository.Get(idPost);
 
@@ -487,20 +488,20 @@ namespace WebAPI_Apollo.Controllers
                 return NotFound();
             }
 
-            var usuario = _usrRepository.Get(idUsuario);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound("Usuario não Encontrado");
+                return BadRequest("Nenhum Usuario Logado");
             }
 
-            Curtida curtida = new Curtida(idUsuario, idPost);
+            Curtida curtida = new Curtida(usuario.Id, idPost);
 
             var jaCurtiu = _crtRepository.JaCurtiu(curtida);
 
             if (jaCurtiu != null)
             {
-                return NotFound("Post Já foi Curtido Por Esse Usuario Antes");
+                return NotFound("O Post Já foi Curtido Antes");
 
             }
 
@@ -531,8 +532,8 @@ namespace WebAPI_Apollo.Controllers
 
         // Adicionar uma curtida a um post
         [HttpPost]
-        [Route("Interagir/Descurtir/{idPost}/{idUsuario}")]
-        public IActionResult RemoverCurtidaPost(Guid idPost, Guid idUsuario)
+        [Route("Interagir/Descurtir/{idPost}")]
+        public IActionResult RemoverCurtidaPost(Guid idPost)
         {
             var postDescurtido = _pstRepository.Get(idPost);
 
@@ -541,14 +542,14 @@ namespace WebAPI_Apollo.Controllers
                 return NotFound();
             }
 
-            var usuario = _usrRepository.Get(idUsuario);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
                 return NotFound("Usuario não Encontrado");
             }
 
-            Curtida descurtida = new Curtida(idUsuario, idPost);
+            Curtida descurtida = new Curtida(usuario.Id, idPost);
 
             var curtiuAntes = _crtRepository.JaCurtiu(descurtida);
 
@@ -590,20 +591,20 @@ namespace WebAPI_Apollo.Controllers
             return Ok(postsCorrespondentes);
         }
 
-        // Posts/Usuario:
+        // Posts/DoUsuario:
         // Retornar somente posts feitos por aquele usuario
         [HttpGet]
-        [Route("Usuario/{id}")]
-        public IActionResult GetPostsDoUsuario(Guid id)
+        [Route("DoUsuario")]
+        public IActionResult GetPostsDoUsuario()
         {
-            var usuario = _usrRepository.Get(id);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound("Usuario não Encontrado");
+                return BadRequest("Nenhum Usuario Logado");
             }
 
-            var posts = _pstRepository.PostadosPor(id);
+            var posts = _pstRepository.PostadosPor(usuario.Id);
 
             if (posts is null || posts.Count == 0)
             {

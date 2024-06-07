@@ -2,21 +2,14 @@
 {
     public class ConfigUsuario
     {
-        int _id;
+        static Guid _currentUserId;
         bool _modoEscuro;
         static string _nomeRedeSocial = "Apollo";
 
-
-        public ConfigUsuario()
+        public static Guid CurrentUserId
         {
-            _id = 0;
-            _modoEscuro = false;
-        }
-
-        public int Id
-        {
-            get { return _id; }
-            set { _id = value; }
+            get { return _currentUserId; }
+            set { _currentUserId = value; }
         }
 
         public bool ModoEscuro

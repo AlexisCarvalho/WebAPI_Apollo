@@ -14,16 +14,14 @@ namespace WebAPI_Apollo.Controllers
     [Route("Usuario")]
     public class UsuarioController : ControllerBase
     {
-        private readonly IMensagemRepository _msgRepository;
         private readonly IInformHomeRepository _infHomeRepository;
         private readonly IUsuarioRepository _usrRepository;
         private readonly IAmizadeRepository _amzdRepository;
         private readonly IEstatisticasRepository _estRepository;
         private readonly INotificacaoRepository _ntfRepository;
 
-        public UsuarioController(IMensagemRepository msgRepository, IInformHomeRepository infHomeRepository, IUsuarioRepository usrRepository, IAmizadeRepository amzdRepository, IEstatisticasRepository estRepository, INotificacaoRepository ntfRepository)
+        public UsuarioController(IInformHomeRepository infHomeRepository, IUsuarioRepository usrRepository, IAmizadeRepository amzdRepository, IEstatisticasRepository estRepository, INotificacaoRepository ntfRepository)
         {
-            _msgRepository = msgRepository ?? throw new ArgumentNullException();
             _infHomeRepository = infHomeRepository ?? throw new ArgumentNullException();
             _usrRepository = usrRepository ?? throw new ArgumentNullException();
             _amzdRepository = amzdRepository ?? throw new ArgumentNullException();
@@ -80,16 +78,16 @@ namespace WebAPI_Apollo.Controllers
 
         // Adicionar XP em Usuarios especificos por um ID 
         [HttpPost]
-        [Route("{id}/{XP}")]
-        public IActionResult AdcXPUsr(Guid id, int XP)
+        [Route("{XP}")]
+        public IActionResult AdcXPUsr(int XP)
         {
             Calculos c = new();
 
-            var usuario = _usrRepository.Get(id);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound();
+                return BadRequest("Nenhum Usuario Logado");
             }
 
             c.GanharXP(XP, ref usuario);
@@ -106,44 +104,45 @@ namespace WebAPI_Apollo.Controllers
             return Ok(resposta);
         }
 
-        // Retornar todos os Usuarios 
+        // Obter informações do usuario logado
         [HttpGet]
-        public IActionResult GetAllUsr()
+        public IActionResult GetUsr()
         {
-            var usuarios = _usrRepository.GetAll();
-
-            if (usuarios is null || usuarios.Count == 0)
-            {
-                return NotFound();
-            }
-
-            return Ok(usuarios);
-        }
-
-        // Obter informações por id 
-        [HttpGet]
-        [Route("{id}")]
-        public IActionResult GetUsr(Guid id)
-        {
-            var usuario = _usrRepository.Get(id);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound();
+                return BadRequest("Nenhum Usuario Logado");
             }
 
             var resposta = new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura, usuario.ImagemPerfil);
             return Ok(resposta);
         }
 
-        // Atualizar informações por id 
+        // Obter informações do usuario
+        [HttpGet]
+        [Route("{id}")]
+        public IActionResult GetUsuarioSist(Guid id)
+        {
+            var usuario = _usrRepository.Get(id);
+
+            if (usuario is null)
+            {
+                return BadRequest("Nenhum Usuario Encontrado");
+            }
+
+            var resposta = new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura, usuario.ImagemPerfil);
+            return Ok(resposta);
+        }
+
+        // Atualizar informações do usuario logado
         [HttpPut]
-        [Route("{id}/{nome}/{esporte}/{genero}/{userName}/{palavraRecuperacao}/{dataNascimento}/{peso}/{altura}")]
-        public IActionResult AtualizarUsr(Guid id, string nome, string esporte, string genero, string userName, string palavraRecuperacao, string dataNascimento, float peso, float altura)
+        [Route("{nome}/{esporte}/{genero}/{userName}/{palavraRecuperacao}/{dataNascimento}/{peso}/{altura}")]
+        public IActionResult AtualizarUsr(string nome, string esporte, string genero, string userName, string palavraRecuperacao, string dataNascimento, float peso, float altura)
         {
             var calculos = new Calculos();
 
-            var usuario = _usrRepository.Get(id);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             var usuarioSemelhante = _usrRepository.GetSemelhanteUserName(userName);
 
@@ -154,7 +153,7 @@ namespace WebAPI_Apollo.Controllers
 
             if (usuario is null || usuarioSemelhante is null)
             {
-                return NotFound();
+                return BadRequest("Nenhum Usuario Logado");
             }
 
             if (usuarioSemelhante.Id != usuario.Id)
@@ -266,16 +265,15 @@ namespace WebAPI_Apollo.Controllers
             return Ok(resposta);
         }
 
-        // Deletar Usuario por ID
+        // Deletar Usuario logado
         [HttpDelete]
-        [Route("{id}")]
-        public IActionResult DeleteUsr(Guid id)
+        public IActionResult DeleteUsr()
         {
-            var usuario = _usrRepository.Get(id);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound();
+                return BadRequest("Nenhum Usuario Logado");
             }
 
             var estUsuario = _estRepository.Get(usuario.IdEstatisticas);
@@ -289,7 +287,7 @@ namespace WebAPI_Apollo.Controllers
 
             if (infHomeUsr is null)
             {
-                return Problem();
+                return Problem("Informações da Home não podem ser nulas");
             }
 
             // Limpa todas as informações e referências do usuario
@@ -321,17 +319,24 @@ namespace WebAPI_Apollo.Controllers
         }
 
         // Usuario/Amizades:
-        // Carregar a Home 
+        // Obter amizades do Usuario Logado
         [HttpGet]
-        [Route("Amizades/{id}")]
-        public IActionResult GetAmigosUsr(Guid id)
+        [Route("Amizades")]
+        public IActionResult GetAmigosUsr()
         {
-            var amizades = _amzdRepository.GetAllUsr(id);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+
+            if (usuario is null)
+            {
+                return BadRequest("Nenhum Usuario Logado");
+            }
+
+            var amizades = _amzdRepository.GetAllUsr(ConfigUsuario.CurrentUserId);
             List<AmizadeListaAmigos> listaAmigos = new List<AmizadeListaAmigos>();
 
             foreach (var amizade in amizades)
             {
-                if (amizade.Remetente == id)
+                if (amizade.Remetente == ConfigUsuario.CurrentUserId)
                 {
                     var amigo = _usrRepository.Get(amizade.Destinatario);
 
@@ -371,22 +376,22 @@ namespace WebAPI_Apollo.Controllers
         // Entre o conjunto de Solicitar Aceitar e Recusar atualmente existe
         // a chance de ambos mandarem um pro outro uma solicitaão antes de algum aceitar
         [HttpPost]
-        [Route("Amizades/Solicitar/{idUsuario}/{idAmigo}")]
-        public IActionResult AdcSoliAmiza(Guid idUsuario, Guid idAmigo)
+        [Route("Amizades/Solicitar/{idAmigo}")]
+        public IActionResult AdcSoliAmiza(Guid idAmigo)
         {
             // Usuarios 
-            var usuario = _usrRepository.Get(idUsuario);
-            var quemEleQuerPedir = _usrRepository.Get(idAmigo);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var solicitado = _usrRepository.Get(idAmigo);
 
             // Home do amigo atualizada com a notificação
             var homeAmigo = _infHomeRepository.GetViaUsr(idAmigo);
 
             if (usuario is null)
             {
-                return NotFound("Usuario não encontrado");
+                return BadRequest("Nenhum Usuario Logado");
             }
 
-            if (quemEleQuerPedir is null)
+            if (solicitado is null)
             {
                 return NotFound("Usuario solicitado não encontrado");
             }
@@ -396,7 +401,12 @@ namespace WebAPI_Apollo.Controllers
                 return Problem("Informações da Home do amigo não encontradas");
             }
 
-            Amizade amizade = new(usuario.Id, quemEleQuerPedir.Id);
+            if (usuario.Id == solicitado.Id)
+            {
+                return BadRequest("Você não pode enviar uma solicitação de amizade para si mesmo");
+            }
+
+            Amizade amizade = new(usuario.Id, solicitado.Id);
 
             var jaEAmigo = _amzdRepository.VerificarAmizade(amizade);
 
@@ -405,10 +415,10 @@ namespace WebAPI_Apollo.Controllers
                 return BadRequest("O Usuario requisitado já esta na sua lista de amigos");
             }
 
-            string mensagem = $"Olá {quemEleQuerPedir.Nome.Split(" ")[0]}, gostaria de ser meu amigo aqui na {ConfigUsuario.NomeRedeSocial}. Seria ótimo trocar ideias e experiências.";
+            string mensagem = $"Olá {solicitado.Nome.Split(" ")[0]}, gostaria de ser meu amigo aqui na {ConfigUsuario.NomeRedeSocial}. Seria ótimo trocar ideias e experiências.";
 
-            Notificacao solicitacaoAmizade = new Notificacao(idUsuario, idAmigo, 1, mensagem);
-            Notificacao solicitacaoDoAmigo = new Notificacao(idAmigo, idUsuario, 1, mensagem);
+            Notificacao solicitacaoAmizade = new Notificacao(usuario.Id, solicitado.Id, 1, mensagem);
+            Notificacao solicitacaoDoAmigo = new Notificacao(solicitado.Id, usuario.Id, 1, mensagem);
             // Tipo 1, solicitação de amizade
 
             var jaExisteSolicitacao = _ntfRepository.JaFoiNotificado(solicitacaoAmizade);
@@ -443,32 +453,33 @@ namespace WebAPI_Apollo.Controllers
 
         // Aceitar solicitação de amizade
         [HttpPost]
-        [Route("Amizades/Aceitar/{idUsuario}/{idDeQuemPediu}")]
-        public IActionResult AceitarSoliAmiza(Guid idUsuario, Guid idDeQuemPediu)
+        [Route("Amizades/Aceitar/{idDeQuemPediu}")]
+        public IActionResult AceitarSoliAmiza(Guid idDeQuemPediu)
         {
-            var pedidoExistente = _ntfRepository.JaFoiNotificado(new Notificacao(idDeQuemPediu, idUsuario, 1, ""));
-
-            if (pedidoExistente is null)
-            {
-                return NotFound("Não Existe nenhum Pedido de Amizade pra Aceitar");
-            }
-
             // Usuarios 
-            var usuario = _usrRepository.Get(idUsuario);
-            var quemPediu = _usrRepository.Get(idDeQuemPediu);
-
-            // Home do amigo atualizada com a notificação
-            var home = _infHomeRepository.GetViaUsr(idUsuario);
-            var homeAmigo = _infHomeRepository.GetViaUsr(idDeQuemPediu);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound("Usuario não encontrado");
+                return BadRequest("Nenhum Usuario Logado");
             }
+
+            var quemPediu = _usrRepository.Get(idDeQuemPediu);
 
             if (quemPediu is null)
             {
                 return NotFound("Usuario que solicitou não encontrado");
+            }
+
+            // Home do amigo atualizada com a notificação
+            var home = _infHomeRepository.GetViaUsr(ConfigUsuario.CurrentUserId);
+            var homeAmigo = _infHomeRepository.GetViaUsr(idDeQuemPediu);
+
+            var pedidoExistente = _ntfRepository.JaFoiNotificado(new Notificacao(quemPediu.Id, usuario.Id, 1, ""));
+
+            if (pedidoExistente is null)
+            {
+                return NotFound("Não Existe nenhum Pedido de Amizade pra Aceitar");
             }
 
             if (home is null)
@@ -483,7 +494,7 @@ namespace WebAPI_Apollo.Controllers
 
             string mensagem = $"{quemPediu.Nome.Split(" ")[0]}, agora somos amigos aqui na {ConfigUsuario.NomeRedeSocial}.";
 
-            Notificacao resposta = new Notificacao(idUsuario, idDeQuemPediu, 3, mensagem);
+            Notificacao resposta = new Notificacao(usuario.Id, quemPediu.Id, 3, mensagem);
             // Tipo 3, Resposta
 
             var jaExiste = _ntfRepository.JaFoiNotificado(resposta);
@@ -528,32 +539,33 @@ namespace WebAPI_Apollo.Controllers
 
         // Aceitar solicitação de amizade
         [HttpPost]
-        [Route("Amizades/Recusar/{idUsuario}/{idDeQuemPediu}")]
-        public IActionResult RecusarSoliAmiza(Guid idUsuario, Guid idDeQuemPediu)
+        [Route("Amizades/Recusar/{idDeQuemPediu}")]
+        public IActionResult RecusarSoliAmiza(Guid idDeQuemPediu)
         {
-            var pedidoExistente = _ntfRepository.JaFoiNotificado(new Notificacao(idDeQuemPediu, idUsuario, 1, ""));
-
-            if (pedidoExistente is null)
-            {
-                return NotFound("Não Existe nenhum Pedido de Amizade pra Recusar");
-            }
-
             // Usuarios 
-            var usuario = _usrRepository.Get(idUsuario);
-            var quemPediu = _usrRepository.Get(idDeQuemPediu);
-
-            // Home do amigo atualizada com a notificação
-            var home = _infHomeRepository.GetViaUsr(idUsuario);
-            var homeAmigo = _infHomeRepository.GetViaUsr(idDeQuemPediu);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound("Usuario não encontrado");
+                return BadRequest("Nenhum Usuario Logado");
             }
+
+            var quemPediu = _usrRepository.Get(idDeQuemPediu);
 
             if (quemPediu is null)
             {
                 return NotFound("Usuario que solicitou não encontrado");
+            }
+
+            // Home do amigo atualizada com a notificação
+            var home = _infHomeRepository.GetViaUsr(ConfigUsuario.CurrentUserId);
+            var homeAmigo = _infHomeRepository.GetViaUsr(idDeQuemPediu);
+
+            var pedidoExistente = _ntfRepository.JaFoiNotificado(new Notificacao(quemPediu.Id, usuario.Id, 1, ""));
+
+            if (pedidoExistente is null)
+            {
+                return NotFound("Não Existe nenhum Pedido de Amizade pra Recusar");
             }
 
             if (home is null)
@@ -568,7 +580,7 @@ namespace WebAPI_Apollo.Controllers
 
             string mensagem = $"{quemPediu.Nome.Split(" ")[0]}, infelizmente não posso aceitar seu pedido de amizade aqui na {ConfigUsuario.NomeRedeSocial}.";
 
-            Notificacao resposta = new Notificacao(idUsuario, idDeQuemPediu, 3, mensagem);
+            Notificacao resposta = new Notificacao(usuario.Id, quemPediu.Id, 3, mensagem);
             // Tipo 3, Resposta
 
             var jaExiste = _ntfRepository.JaFoiNotificado(resposta);
@@ -602,18 +614,31 @@ namespace WebAPI_Apollo.Controllers
 
         // Desfazer amizades
         [HttpDelete]
-        [Route("Amizades/Desfazer/{idUsuario}/{idAmigo}")]
-        public IActionResult DesfazerAmiza(Guid idUsuario, Guid idAmigo)
+        [Route("Amizades/Desfazer/{idAmigo}")]
+        public IActionResult DesfazerAmiza(Guid idAmigo)
         {
-            var amizade = _amzdRepository.VerificarAmizade(new Amizade(idUsuario, idAmigo));
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var amigo = _usrRepository.Get(idAmigo);
+
+            if (usuario is null)
+            {
+                return BadRequest("Nenhum Usuario Logado");
+            }
+
+            if (amigo is null)
+            {
+                return NotFound("Usuario Não Encontrado");
+            }
+
+            var amizade = _amzdRepository.VerificarAmizade(new Amizade(usuario.Id, idAmigo));
 
             if (amizade is null)
             {
                 return BadRequest("Os usuários não são amigos");
             }
 
-            var usrHome = _infHomeRepository.GetViaUsr(idUsuario);
-            var amigoHome = _infHomeRepository.GetViaUsr(idUsuario);
+            var usrHome = _infHomeRepository.GetViaUsr(usuario.Id);
+            var amigoHome = _infHomeRepository.GetViaUsr(amigo.Id);
 
             if (usrHome is null)
             {
@@ -638,20 +663,20 @@ namespace WebAPI_Apollo.Controllers
         // Usuario/Home:
         // Carregar a Home 
         [HttpGet]
-        [Route("Home/{idUsuario}")]
-        public IActionResult GetHomeUsr(Guid idUsuario)
+        [Route("Home")]
+        public IActionResult GetHomeUsr()
         {
-            var usuario = _usrRepository.Get(idUsuario);
-            var homeUsuario = _infHomeRepository.GetViaUsr(idUsuario);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var homeUsuario = _infHomeRepository.GetViaUsr(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound("Usuario não encontrado");
+                return BadRequest("Nenhum Usuario Logado");
             }
 
             if (homeUsuario is null)
             {
-                return NotFound("Home do Usuario Não Encontrada");
+                return Problem("Home do Usuario Não Encontrada");
             }
 
             var resposta = new InformHomeDto
@@ -680,19 +705,22 @@ namespace WebAPI_Apollo.Controllers
                 return NotFound("Email ou Senha Errados");
             }
 
-            return Ok(usuario);
+            ConfigUsuario.CurrentUserId = usuario.Id;
+
+            var token = TokenService.GenerateToken(usuario);
+            return Ok(token);
         }
 
         // Rota para alterar as informações do Login
         [HttpPut]
-        [Route("Login/{id}/{email}/{senha}")]
-        public IActionResult LoginUpdate(Guid id, string email, string senha)
+        [Route("Login/{email}/{senha}")]
+        public IActionResult LoginUpdate(string email, string senha)
         {
-            var usuario = _usrRepository.Get(id);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound("Usuario Não Encontrado");
+                return BadRequest("Nenhum Usuario Logado");
             }
 
             // Lógica pra impedir a troca pra email existente
@@ -724,15 +752,22 @@ namespace WebAPI_Apollo.Controllers
         // Usuario/Notificacoes:
         // Carregar as Notificacoes 
         [HttpGet]
-        [Route("Notificacoes/{idUsuario}")]
-        public IActionResult GetNotiUsr(Guid idUsuario)
+        [Route("Notificacoes")]
+        public IActionResult GetNotiUsr()
         {
-            var notiUsuario = _ntfRepository.GetAllUsr(idUsuario);
-            var homeUsr = _infHomeRepository.GetViaUsr(idUsuario);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+
+            if (usuario is null)
+            {
+                return BadRequest("Nenhum Usuario Logado");
+            }
+
+            var notiUsuario = _ntfRepository.GetAllUsr(usuario.Id);
+            var homeUsr = _infHomeRepository.GetViaUsr(usuario.Id);
 
             if (notiUsuario is null || notiUsuario.Count == 0)
             {
-                return NotFound();
+                return NotFound("Nenhuma Notificação Existente");
             }
 
             if (homeUsr is null)
@@ -748,14 +783,21 @@ namespace WebAPI_Apollo.Controllers
 
         // Carregar os Pedidos de Amizade 
         [HttpGet]
-        [Route("Notificacoes/PedidoAmizade/{idUsuario}")]
-        public IActionResult GetNotiUsrAmizade(Guid idUsuario)
+        [Route("Notificacoes/PedidoAmizade")]
+        public IActionResult GetNotiUsrAmizade()
         {
-            var notiUsuario = _ntfRepository.GetAllNotiAmizadeUsr(idUsuario);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+
+            if (usuario is null)
+            {
+                return BadRequest("Nenhum Usuario Logado");
+            }
+
+            var notiUsuario = _ntfRepository.GetAllNotiAmizadeUsr(usuario.Id);
 
             if (notiUsuario is null || notiUsuario.Count == 0)
             {
-                return NotFound();
+                return NotFound("Nenhum Pedido de Amizade Pendente");
             }
 
             return Ok(notiUsuario);
@@ -764,16 +806,16 @@ namespace WebAPI_Apollo.Controllers
         // Usuario/Perfil:
         // Rota para carregar o perfil do usuario *
         [HttpGet]
-        [Route("Perfil/{id}")]
-        public IActionResult PerfilUsr(Guid id)
+        [Route("Perfil")]
+        public IActionResult PerfilUsr()
         {
-            var usuario = _usrRepository.Get(id);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             Calculos c = new Calculos();
 
             if (usuario is null)
             {
-                return NotFound();
+                return BadRequest("Nenhum Usuario Logado");
             }
 
             var estatisticas = _estRepository.Get(usuario.IdEstatisticas);
@@ -827,31 +869,33 @@ namespace WebAPI_Apollo.Controllers
 
         // Rota pra atualizar a foto do Perfil
         [HttpPost]
-        [Route("Perfil/Foto/{id}/{imagemBase64}")]
-        public IActionResult PerfilUsrImagem(Guid id, string imagemBase64)
+        [Route("Perfil/Foto/{imagemBase64}")]
+        public IActionResult PerfilUsrImagem(string imagemBase64)
         {
-            var usuario = _usrRepository.Get(id);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound();
+                return BadRequest("Nenhum Usuario Logado");
             }
 
             usuario.ImagemPerfil = imagemBase64;
+
+            _usrRepository.Update(usuario);
 
             return Ok();
         }
 
         // Rota pra pegar apenas a foto do Perfil
         [HttpGet]
-        [Route("Perfil/Foto/{id}")]
-        public IActionResult GetPerfilUsrImagem(Guid id)
+        [Route("Perfil/Foto")]
+        public IActionResult GetPerfilUsrImagem()
         {
-            var usuario = _usrRepository.Get(id);
+            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
 
             if (usuario is null)
             {
-                return NotFound();
+                return BadRequest("Nenhum Usuario Logado");
             }
 
             return Ok(usuario.ImagemPerfil);
@@ -867,7 +911,7 @@ namespace WebAPI_Apollo.Controllers
 
             if (usuario is null)
             {
-                return NotFound();
+                return NotFound("Email ou Palavra de Recuperação Errados");
             }
 
             string caracteresPermitidos = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
@@ -889,6 +933,22 @@ namespace WebAPI_Apollo.Controllers
             _usrRepository.Update(usuario);
 
             return Ok(resposta);
+        }
+
+        // Usuario/Todos:
+        // Retornar todos os Usuarios 
+        [HttpGet]
+        [Route("Todos")]
+        public IActionResult GetAllUsr()
+        {
+            var usuarios = _usrRepository.GetAll();
+
+            if (usuarios is null || usuarios.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return Ok(usuarios);
         }
     }
 }

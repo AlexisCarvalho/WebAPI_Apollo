@@ -29,5 +29,36 @@ namespace WebAPI_Apollo.Application.Services
                 token = tokenString
             };
         }
+
+        public static Guid? GetUserIdFromToken(string token)
+        {
+            try
+            {
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(Key.Secret);
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
+                var userIdClaim = principal.Claims.FirstOrDefault(c => c.Type == "IdUsuario");
+
+                if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out Guid userId))
+                {
+                    return userId;
+                }
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

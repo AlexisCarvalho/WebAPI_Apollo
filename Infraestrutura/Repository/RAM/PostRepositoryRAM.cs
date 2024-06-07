@@ -59,7 +59,7 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                 }
                 else
                 {
-                    idAmigos.Add(amizade.Destinatario);
+                    idAmigos.Add(amizade.Remetente);
                 }
             }
 

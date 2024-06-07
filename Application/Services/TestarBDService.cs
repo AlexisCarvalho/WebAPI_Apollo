@@ -96,7 +96,7 @@ namespace WebAPI_Apollo.Application.Services
 
                 if (read && write && delete)
                 {
-                    ConfigService.DBFuncionando = true; // Trocar aqui pra forçar uso da RAM no inicio
+                    ConfigService.DBFuncionando = false; // Trocar aqui pra forçar uso da RAM no inicio
                 }
 
                 // Se todos os testes passarem ativa o banco
