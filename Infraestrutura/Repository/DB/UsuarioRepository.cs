@@ -1,4 +1,5 @@
-﻿using WebAPI_Apollo.Domain.DTOs;
+﻿using WebAPI_Apollo.Application.Services;
+using WebAPI_Apollo.Domain.DTOs;
 using WebAPI_Apollo.Domain.Model;
 using WebAPI_Apollo.Domain.Model.Interfaces;
 
@@ -82,6 +83,33 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
             return _context.Usuarios
                 .Any(usuario => usuario.UserName == usuarioInformado.UserName
                                 || usuario.Email == usuarioInformado.Email);
+        }
+
+        public List<UsuarioDto> GetUsuariosNome(string nome)
+        {
+            return _context.Usuarios
+                .Select(u => new UsuarioDto
+                (
+                    u.Id,
+                    u.Idade,
+                    u.XP,
+                    u.Level,
+                    u.XP_ProximoNivel,
+                    u.Nome,
+                    u.Email,
+                    u.Senha,
+                    u.Esporte,
+                    u.Genero,
+                    u.UserName,
+                    u.PalavraRecuperacao,
+                    u.DataNascimento,
+                    u.Peso,
+                    u.Altura,
+                    u.ImagemPerfil
+                ))
+                .AsEnumerable() // TODO: (Modificar Pra Uso Real) Traz os dados para a memória, Isso pode gerar um problema futuro causo seja implementado na vida real
+                .Where(usuario => AlgoritmosDePesquisa.SimilaridadeDeJaccard(usuario.nome, nome) > 0.3)
+                .ToList();
         }
     }
 }

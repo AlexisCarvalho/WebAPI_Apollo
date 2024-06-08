@@ -1,4 +1,5 @@
-﻿using WebAPI_Apollo.Domain.DTOs;
+﻿using WebAPI_Apollo.Application.Services;
+using WebAPI_Apollo.Domain.DTOs;
 using WebAPI_Apollo.Domain.Model;
 using WebAPI_Apollo.Domain.Model.Interfaces;
 
@@ -81,6 +82,32 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
             return VolatileContext.Usuarios
                 .Any(usuario => usuario.UserName == usuarioInformado.UserName
                                 || usuario.Email == usuarioInformado.Email);
+        }
+
+        public List<UsuarioDto> GetUsuariosNome(string nome)
+        {
+            return VolatileContext.Usuarios
+                .Select(u => new UsuarioDto
+                (
+                    u.Id,
+                    u.Idade,
+                    u.XP,
+                    u.Level,
+                    u.XP_ProximoNivel,
+                    u.Nome,
+                    u.Email,
+                    u.Senha,
+                    u.Esporte,
+                    u.Genero,
+                    u.UserName,
+                    u.PalavraRecuperacao,
+                    u.DataNascimento,
+                    u.Peso,
+                    u.Altura,
+                    u.ImagemPerfil
+                ))
+                .Where(usuario => AlgoritmosDePesquisa.SimilaridadeDeJaccard(usuario.nome, nome) > 0.6)
+                .ToList();
         }
     }
 }

@@ -10,6 +10,7 @@ namespace WebAPI_Apollo.Domain.Model.Interfaces
         List<UsuarioDto> GetAll();
         Usuario? GetSemelhanteEmail(string email);
         Usuario? GetSemelhanteUserName(string userName);
+        List<UsuarioDto> GetUsuariosNome(string nome);
         Usuario? GetViaLogin(string email, string senha);
         Usuario? RecuperarSenha(string email, string palavraRecuperacao);
         void Update(Usuario usuario);

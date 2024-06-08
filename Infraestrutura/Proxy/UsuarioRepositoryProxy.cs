@@ -83,5 +83,10 @@ namespace WebAPI_Apollo.Infraestrutura.Proxy
         {
             return CurrentRepository.VerificaSeCadastrado(email);
         }
+
+        public List<UsuarioDto> GetUsuariosNome(string nome)
+        {
+            return CurrentRepository.GetUsuariosNome(nome);
+        }
     }
 }

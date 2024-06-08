@@ -372,6 +372,21 @@ namespace WebAPI_Apollo.Controllers
             return Ok(listaAmigos);
         }
 
+        // Pesquisar por amigos
+        [HttpGet]
+        [Route("Amizades/Procurar/{nome}")]
+        public IActionResult PesquisarAmigo(string nome)
+        {
+            var amigosCorrespontes = _usrRepository.GetUsuariosNome(nome);
+
+            if (amigosCorrespontes is null || amigosCorrespontes.Count == 0)
+            {
+                return NotFound("Nenhum Usuario Correspondente Encontrado");
+            }
+
+            return Ok(amigosCorrespontes);
+        }
+
         // Adicionar Solicitacoes de Amizade 
         // Entre o conjunto de Solicitar Aceitar e Recusar atualmente existe
         // a chance de ambos mandarem um pro outro uma solicitaão antes de algum aceitar
