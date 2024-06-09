@@ -1,4 +1,5 @@
-﻿using WebAPI_Apollo.Domain.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using WebAPI_Apollo.Domain.Model;
 using WebAPI_Apollo.Domain.Model.Interfaces;
 
 namespace WebAPI_Apollo.Infraestrutura.Repository.DB
@@ -7,46 +8,47 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
     {
         private readonly AppDbContext _context = new();
 
-        public void Add(InformHome informHome)
+        public async Task Add(InformHome informHome)
         {
-            _context.InformHome.Add(informHome);
-            _context.SaveChanges();
+            await _context.InformHome.AddAsync(informHome);
+            await _context.SaveChangesAsync();
         }
 
-        public InformHome? JaExiste(InformHome informHome)
+        public async Task<InformHome?> Get(int id)
         {
-            return _context.InformHome
-                .FirstOrDefault(h => h.IdUsuario == informHome.IdUsuario);
+            return await _context.InformHome.FirstOrDefaultAsync(h => h.Id == id);
         }
 
-        public InformHome? Get(int id)
+        public async Task<InformHome?> GetLast()
         {
-            return _context.InformHome.FirstOrDefault(h => h.Id == id);
-        }
-
-        public InformHome? GetViaUsr(Guid idUsuario)
-        {
-            return _context.InformHome
-                .FirstOrDefault(h => h.IdUsuario == idUsuario);
-        }
-
-        public InformHome? GetLast()
-        {
-            return _context.InformHome
+            return await _context.InformHome
                 .OrderByDescending(h => h.Id)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
         }
 
-        public void Update(InformHome informHome)
+        public async Task<InformHome?> GetViaUsr(Guid idUsuario)
+        {
+            return await _context.InformHome
+                .FirstOrDefaultAsync(h => h.IdUsuario == idUsuario);
+        }
+
+
+        public async Task Update(InformHome informHome)
         {
             _context.InformHome.Update(informHome);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(InformHome informHome)
+        public async Task Delete(InformHome informHome)
         {
             _context.InformHome.Remove(informHome);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<InformHome?> JaExiste(InformHome informHome)
+        {
+            return await _context.InformHome
+                .FirstOrDefaultAsync(h => h.IdUsuario == informHome.IdUsuario);
         }
     }
 }

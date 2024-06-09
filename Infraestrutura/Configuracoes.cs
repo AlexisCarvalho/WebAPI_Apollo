@@ -1,15 +1,16 @@
-﻿namespace WebAPI_Apollo.Infraestrutura
+﻿using WebAPI_Apollo.Domain.Model;
+namespace WebAPI_Apollo.Infraestrutura
 {
     public class ConfigUsuario
     {
-        static Guid _currentUserId;
+        static Usuario? _currentUser = null;
         bool _modoEscuro;
         static string _nomeRedeSocial = "Apollo";
 
-        public static Guid CurrentUserId
+        public static Usuario? CurrentUser
         {
-            get { return _currentUserId; }
-            set { _currentUserId = value; }
+            get { return _currentUser; }
+            set { _currentUser = value; }
         }
 
         public bool ModoEscuro

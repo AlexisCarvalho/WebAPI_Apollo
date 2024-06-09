@@ -1,4 +1,5 @@
-﻿using WebAPI_Apollo.Domain.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using WebAPI_Apollo.Domain.DTOs;
 using WebAPI_Apollo.Domain.Model.Interacoes;
 using WebAPI_Apollo.Domain.Model.Interfaces;
 
@@ -8,26 +9,20 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
     {
         private readonly AppDbContext _context = new();
 
-        public void Add(Mensagem mensagem)
+        public async Task Add(Mensagem mensagem)
         {
-            _context.Mensagens.Add(mensagem);
-            _context.SaveChanges();
+            await _context.Mensagens.AddAsync(mensagem);
+            await _context.SaveChangesAsync();
         }
 
-        public Mensagem? Get(int id)
+        public async Task<Mensagem?> Get(int id)
         {
-            return _context.Mensagens.FirstOrDefault(m => m.Id == id);
+            return await _context.Mensagens.FirstOrDefaultAsync(m => m.Id == id);
         }
 
-        public void Update(Mensagem mensagem)
+        public async Task<List<ChatDto>> GetAll()
         {
-            _context.Mensagens.Update(mensagem);
-            _context.SaveChanges();
-        }
-
-        public List<ChatDto> GetAll()
-        {
-            return _context.Mensagens
+            return await _context.Mensagens
                 .Select(m => new ChatDto
                 (
                     m.Id,
@@ -36,18 +31,19 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
                     m.Conteudo,
                     m.TimeStamp
                 ))
-                .ToList();
+                .ToListAsync();
         }
 
-        public void Delete(Mensagem mensagem)
+        public async Task<Mensagem?> GetLast()
         {
-            _context.Mensagens.Remove(mensagem);
-            _context.SaveChanges();
+            return await _context.Mensagens
+                .OrderByDescending(m => m.Id)
+                .FirstOrDefaultAsync();
         }
 
-        public List<ChatDto> EnviadasPor(Guid id)
+        public async Task<List<ChatDto>> EnviadasPor(Guid id)
         {
-            return _context.Mensagens
+            return await _context.Mensagens
                 .Where(m => m.Remetente == id)
                 .OrderByDescending(m => m.Id)
                 .Select(m => new ChatDto
@@ -58,12 +54,12 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
                     m.Conteudo,
                     m.TimeStamp
                 ))
-                .ToList();
+                .ToListAsync();
         }
 
-        public List<ChatDto> RecebidasPor(Guid id)
+        public async Task<List<ChatDto>> RecebidasPor(Guid id)
         {
-            return _context.Mensagens
+            return await _context.Mensagens
                 .Where(m => m.Destinatario == id)
                 .OrderByDescending(m => m.Id)
                 .Select(m => new ChatDto
@@ -74,12 +70,12 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
                     m.Conteudo,
                     m.TimeStamp
                 ))
-                .ToList();
+                .ToListAsync();
         }
 
-        public List<ChatDto> EnviadasEntre(Guid remetente, Guid destinatario)
+        public async Task<List<ChatDto>> EnviadasEntre(Guid remetente, Guid destinatario)
         {
-            return _context.Mensagens
+            return await _context.Mensagens
                 .Where(m => m.Remetente == remetente
                             && m.Destinatario == destinatario)
                 .OrderByDescending(m => m.Id)
@@ -91,14 +87,19 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
                     m.Conteudo,
                     m.TimeStamp
                 ))
-                .ToList();
+                .ToListAsync();
         }
 
-        public Mensagem? GetLast()
+        public async Task Update(Mensagem mensagem)
         {
-            return _context.Mensagens
-                .OrderByDescending(m => m.Id)
-                .FirstOrDefault();
+            _context.Mensagens.Update(mensagem);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task Delete(Mensagem mensagem)
+        {
+            _context.Mensagens.Remove(mensagem);
+            await _context.SaveChangesAsync();
         }
     }
 }

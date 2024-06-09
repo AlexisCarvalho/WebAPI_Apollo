@@ -29,34 +29,34 @@ namespace WebAPI_Apollo.Infraestrutura.Proxy
 
         private ICurtidaRepository CurrentRepository => _currentRepository;
 
-        public void Add(Curtida curtida, ref Post postCurtido)
+        public async Task Add(Curtida curtida)
         {
-            CurrentRepository.Add(curtida, ref postCurtido);
+            await CurrentRepository.Add(curtida);
         }
 
-        public void Delete(Curtida curtida, ref Post postDescurtido)
+        public async Task Delete(Curtida curtida)
         {
-            CurrentRepository.Delete(curtida, ref postDescurtido);
+            await CurrentRepository.Delete(curtida);
         }
 
-        public Curtida? Get(int id)
+        public Task<Curtida?> Get(int id)
         {
             return CurrentRepository.Get(id);
         }
 
-        public Curtida? GetLast()
+        public Task<Curtida?> GetLast()
         {
             return CurrentRepository.GetLast();
         }
 
-        public Curtida? JaCurtiu(Curtida curtida)
+        public Task<Curtida?> JaCurtiu(Curtida curtida)
         {
             return CurrentRepository.JaCurtiu(curtida);
         }
 
-        public void Update(Curtida curtida)
+        public async Task Update(Curtida curtida)
         {
-            CurrentRepository.Update(curtida);
+            await CurrentRepository.Update(curtida);
         }
     }
 }

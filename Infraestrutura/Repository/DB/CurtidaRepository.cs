@@ -1,4 +1,5 @@
-﻿using WebAPI_Apollo.Domain.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using WebAPI_Apollo.Domain.Model;
 using WebAPI_Apollo.Domain.Model.Interacoes;
 using WebAPI_Apollo.Domain.Model.Interfaces;
 
@@ -8,43 +9,41 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
     {
         private readonly AppDbContext _context = new();
 
-        public void Add(Curtida curtida, ref Post postCurtido)
+        public async Task Add(Curtida curtida)
         {
-            postCurtido.NumCurtidas++;
-            _context.Curtidas.Add(curtida);
-            _context.SaveChanges();
+            await _context.Curtidas.AddAsync(curtida);
+            await _context.SaveChangesAsync();
         }
 
-        public Curtida? JaCurtiu(Curtida curtida)
+        public async Task<Curtida?> Get(int id)
         {
-            return _context.Curtidas
-                .FirstOrDefault(c => c.Remetente == curtida.Remetente
-                                     && c.Destinatario == curtida.Destinatario);
+            return await _context.Curtidas.FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public Curtida? Get(int id)
+        public async Task<Curtida?> GetLast()
         {
-            return _context.Curtidas.FirstOrDefault(c => c.Id == id);
-        }
-
-        public Curtida? GetLast()
-        {
-            return _context.Curtidas
+            return await _context.Curtidas
                 .OrderByDescending(c => c.Id)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
         }
 
-        public void Update(Curtida curtida)
+        public async Task Update(Curtida curtida)
         {
             _context.Curtidas.Update(curtida);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(Curtida curtida, ref Post postDescurtido)
+        public async Task Delete(Curtida curtida)
         {
-            postDescurtido.NumCurtidas--;
             _context.Curtidas.Remove(curtida);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Curtida?> JaCurtiu(Curtida curtida)
+        {
+            return await _context.Curtidas
+                .FirstOrDefaultAsync(c => c.Remetente == curtida.Remetente
+                                     && c.Destinatario == curtida.Destinatario);
         }
     }
 }

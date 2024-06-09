@@ -20,7 +20,7 @@ namespace WebAPI_Apollo.Controllers
         {
             if (!ConfigService.DBFuncionando)
             {
-                TesteBanco.ExecutarTeste();
+                TestarBDService.ExecutarTeste();
             }
 
             if (!ConfigService.DBFuncionando)

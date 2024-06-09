@@ -4,17 +4,17 @@ namespace WebAPI_Apollo.Domain.Model.Interfaces
 {
     public interface IUsuarioRepository
     {
-        void Add(Usuario usuario);
-        void Delete(Usuario usuario);
-        Usuario? Get(Guid id);
-        List<UsuarioDto> GetAll();
-        Usuario? GetSemelhanteEmail(string email);
-        Usuario? GetSemelhanteUserName(string userName);
-        List<UsuarioDto> GetUsuariosNome(string nome);
-        Usuario? GetViaLogin(string email, string senha);
-        Usuario? RecuperarSenha(string email, string palavraRecuperacao);
-        void Update(Usuario usuario);
-        bool VerificarSeExisteEmailUsername(Usuario usuarioInformado);
-        bool VerificaSeCadastrado(string email);
+        Task Add(Usuario usuario);
+        Task<Usuario?> Get(Guid id);
+        Task<List<UsuarioDto>> GetAll();
+        Task<Usuario?> GetSemelhanteEmail(string email);
+        Task<Usuario?> GetSemelhanteUserName(string userName);
+        Task<List<UsuarioDto>> GetUsuariosNome(string nome);
+        Task<Usuario?> GetViaLogin(string email, string senha);
+        Task Update(Usuario usuario);
+        Task Delete(Usuario usuario);
+        Task<Usuario?> RecuperarSenha(string email, string palavraRecuperacao);
+        Task<bool> VerificarSeExisteEmailUsername(Usuario usuarioInformado);
+        Task<bool> VerificaSeCadastrado(string email);
     }
 }

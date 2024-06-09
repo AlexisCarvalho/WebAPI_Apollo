@@ -30,54 +30,54 @@ namespace WebAPI_Apollo.Infraestrutura.Proxy
 
         private IPostRepository CurrentRepository => _currentRepository;
 
-        public void Add(Post post)
+        public async Task Add(Post post)
         {
-            CurrentRepository.Add(post);
+            await CurrentRepository.Add(post);
         }
 
-        public void Delete(Post post)
+        public async Task Delete(Post post)
         {
-            CurrentRepository.Delete(post);
+            await CurrentRepository.Delete(post);
         }
 
-        public Post? Get(Guid id)
+        public Task<Post?> Get(Guid id)
         {
             return CurrentRepository.Get(id);
         }
 
-        public List<PostCompletoDto> GetAll()
+        public Task<List<PostCompletoDto>> GetAll()
         {
             return CurrentRepository.GetAll();
         }
 
-        public List<Amizade> GetAllAmz(Guid idUsuario)
+        public Task<List<Amizade>> GetAllAmz(Guid idUsuario)
         {
             return CurrentRepository.GetAllAmz(idUsuario);
         }
 
-        public List<PostCompletoDto> GetFeedUsr(Guid idUsuario)
+        public Task<List<PostCompletoDto>> GetFeedUsr(Guid idUsuario)
         {
             return CurrentRepository.GetFeedUsr(idUsuario);
         }
 
-        public Post? GetLast()
+        public Task<Post?> GetLast()
         {
             return CurrentRepository.GetLast();
         }
 
-        public List<PostCompletoDto> GetPostsPesquisa(string pesquisa)
+        public Task<List<PostCompletoDto>> GetPostsPesquisa(string pesquisa)
         {
             return CurrentRepository.GetPostsPesquisa(pesquisa);
         }
 
-        public List<PostCompletoDto> PostadosPor(Guid idUsuario)
+        public Task<List<PostCompletoDto>> PostadosPor(Guid idUsuario)
         {
             return CurrentRepository.PostadosPor(idUsuario);
         }
 
-        public void Update(Post post)
+        public async Task Update(Post post)
         {
-            CurrentRepository.Update(post);
+            await CurrentRepository.Update(post);
         }
     }
 }

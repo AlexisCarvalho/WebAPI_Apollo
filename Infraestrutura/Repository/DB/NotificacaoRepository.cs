@@ -1,4 +1,5 @@
-﻿using WebAPI_Apollo.Domain.DTOs;
+﻿using Microsoft.EntityFrameworkCore;
+using WebAPI_Apollo.Domain.DTOs;
 using WebAPI_Apollo.Domain.Model.Interacoes;
 using WebAPI_Apollo.Domain.Model.Interfaces;
 
@@ -8,40 +9,29 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
     {
         private readonly AppDbContext _context = new();
 
-        public void Add(Notificacao notificacao)
+        public async Task Add(Notificacao notificacao)
         {
-            var ultimaNotificacao = GetLast();
-
-            if (ultimaNotificacao != null)
-            {
-                notificacao.Id = ultimaNotificacao.Id + 1;
-            }
-            else
-            {
-                notificacao.Id = 1;
-            }
-
-            _context.Notificacoes.Add(notificacao);
-            _context.SaveChanges();
+            await _context.Notificacoes.AddAsync(notificacao);
+            await _context.SaveChangesAsync();
         }
 
-        public Notificacao? JaFoiNotificado(Notificacao notificacao)
+        public async Task<Notificacao?> Get(int id)
         {
-            return _context.Notificacoes
-                .FirstOrDefault(n => n.Remetente == notificacao.Remetente
-                                    && n.Destinatario == notificacao.Destinatario
-                                    && n.TipoDeNotificacao == notificacao.TipoDeNotificacao);
+            return await _context.Notificacoes
+                .FirstOrDefaultAsync(n => n.Id == id);
         }
 
-        public Notificacao? Get(int id)
+        public async Task<Notificacao?> GetLast()
         {
-            return _context.Notificacoes.FirstOrDefault(n => n.Id == id);
+            return await _context.Notificacoes
+                .OrderByDescending(n => n.Id)
+                .FirstOrDefaultAsync();
         }
 
-        public List<NotificacoesDaRedeDto> GetAll()
+        public async Task<List<NotificacoesDaRedeDto>> GetAll()
         {
             var notificacoesSaida = new List<NotificacoesDaRedeDto>();
-            var notificacoes = _context.Notificacoes
+            var notificacoes = await _context.Notificacoes
                 .OrderByDescending(n => n.Id)
                 .Select(n => new Notificacao
                 (
@@ -52,33 +42,34 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
                     n.TimeStamp,
                     n.MensagemDaNotificacao
                 ))
-                .ToList();
+                .ToListAsync();
 
-            foreach (var noti in notificacoes)
+            var tasks = notificacoes.Select(async noti =>
             {
-                var usuarioQueEnviou = _context.Usuarios
-                    .FirstOrDefault(usr => usr.Id == noti.Remetente);
+                var usuarioQueEnviou = await _context.Usuarios
+                    .FirstOrDefaultAsync(usr => usr.Id == noti.Remetente);
 
-                var notiSaida = new NotificacoesDaRedeDto
-                    (
-                        noti.Remetente,
-                        noti.Destinatario,
-                        usuarioQueEnviou.ImagemPerfil,
-                        usuarioQueEnviou.Nome,
-                        noti.TipoDeNotificacao,
-                        noti.TimeStamp,
-                        noti.MensagemDaNotificacao
-                    );
-                notificacoesSaida.Add(notiSaida);
-            }
+                return new NotificacoesDaRedeDto
+                (
+                    noti.Remetente,
+                    noti.Destinatario,
+                    usuarioQueEnviou.ImagemPerfil,
+                    usuarioQueEnviou.Nome,
+                    noti.TipoDeNotificacao,
+                    noti.TimeStamp,
+                    noti.MensagemDaNotificacao
+                );
+            }).ToArray();
+
+            notificacoesSaida = (await Task.WhenAll(tasks)).ToList();
 
             return notificacoesSaida;
         }
 
-        public List<NotificacoesDaRedeDto> GetAllUsr(Guid idUsuario)
+        public async Task<List<NotificacoesDaRedeDto>> GetAllUsr(Guid idUsuario)
         {
             var notificacoesSaida = new List<NotificacoesDaRedeDto>();
-            var notificacoes = _context.Notificacoes
+            var notificacoes = await _context.Notificacoes
                 .Where(n => n.Destinatario == idUsuario && n.TipoDeNotificacao != 1)
                 .OrderByDescending(n => n.Id)
                 .Select(n => new Notificacao
@@ -90,33 +81,35 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
                     n.TimeStamp,
                     n.MensagemDaNotificacao
                 ))
-                .ToList();
+                .ToListAsync();
 
-            foreach (var noti in notificacoes)
+            var tasks = notificacoes.Select(async noti =>
             {
-                var usuarioQueEnviou = _context.Usuarios
-                    .FirstOrDefault(usr => usr.Id == noti.Remetente);
+                var usuarioQueEnviou = await _context.Usuarios
+                    .FirstOrDefaultAsync(usr => usr.Id == noti.Remetente);
 
-                var notiSaida = new NotificacoesDaRedeDto
-                    (
-                        noti.Remetente,
-                        noti.Destinatario,
-                        usuarioQueEnviou.ImagemPerfil,
-                        usuarioQueEnviou.Nome,
-                        noti.TipoDeNotificacao,
-                        noti.TimeStamp,
-                        noti.MensagemDaNotificacao
-                    );
-                notificacoesSaida.Add(notiSaida);
-            }
+                return new NotificacoesDaRedeDto
+                (
+                    noti.Remetente,
+                    noti.Destinatario,
+                    usuarioQueEnviou.ImagemPerfil,
+                    usuarioQueEnviou.Nome,
+                    noti.TipoDeNotificacao,
+                    noti.TimeStamp,
+                    noti.MensagemDaNotificacao
+                );
+            }).ToArray();
+
+            notificacoesSaida = (await Task.WhenAll(tasks)).ToList();
 
             return notificacoesSaida;
         }
 
-        public List<NotificacoesDaRedeDto> GetAllNotiAmizadeUsr(Guid idUsuario)
+        public async Task<List<NotificacoesDaRedeDto>> GetAllNotiAmizadeUsr(Guid idUsuario)
         {
             var notificacoesSaida = new List<NotificacoesDaRedeDto>();
-            var notificacoes = _context.Notificacoes
+
+            var notificacoes = await _context.Notificacoes
                 .Where(n => n.Destinatario == idUsuario && n.TipoDeNotificacao == 1)
                 .OrderByDescending(n => n.Id)
                 .Select(n => new Notificacao
@@ -128,33 +121,36 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
                     n.TimeStamp,
                     n.MensagemDaNotificacao
                 ))
-                .ToList();
+                .ToListAsync();
 
-            foreach (var noti in notificacoes)
+            var tasks = notificacoes.Select(async noti =>
             {
-                var usuarioQueEnviou = _context.Usuarios
-                    .FirstOrDefault(usr => usr.Id == noti.Remetente);
+                var usuarioQueEnviou = await _context.Usuarios
+                    .FirstOrDefaultAsync(usr => usr.Id == noti.Remetente);
 
-                var notiSaida = new NotificacoesDaRedeDto
-                    (
-                        noti.Remetente,
-                        noti.Destinatario,
-                        usuarioQueEnviou.ImagemPerfil,
-                        usuarioQueEnviou.Nome,
-                        noti.TipoDeNotificacao,
-                        noti.TimeStamp,
-                        noti.MensagemDaNotificacao
-                    );
-                notificacoesSaida.Add(notiSaida);
-            }
+                return new NotificacoesDaRedeDto
+                (
+                    noti.Remetente,
+                    noti.Destinatario,
+                    usuarioQueEnviou.ImagemPerfil,
+                    usuarioQueEnviou.Nome,
+                    noti.TipoDeNotificacao,
+                    noti.TimeStamp,
+                    noti.MensagemDaNotificacao
+                );
+            }).ToArray();
+
+            notificacoesSaida = (await Task.WhenAll(tasks)).ToList();
 
             return notificacoesSaida;
         }
 
-        public List<NotificacoesDaRedeDto> GetAllEnviadasNotiAmizadeUsr(Guid idUsuario)
+
+        public async Task<List<NotificacoesDaRedeDto>> GetAllEnviadasNotiAmizadeUsr(Guid idUsuario)
         {
             var notificacoesSaida = new List<NotificacoesDaRedeDto>();
-            var notificacoes = _context.Notificacoes
+
+            var notificacoes = await _context.Notificacoes
                 .Where(n => n.Remetente == idUsuario && n.TipoDeNotificacao == 1)
                 .OrderByDescending(n => n.Id)
                 .Select(n => new Notificacao
@@ -166,57 +162,59 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
                     n.TimeStamp,
                     n.MensagemDaNotificacao
                 ))
-                .ToList();
+                .ToListAsync();
 
-            foreach (var noti in notificacoes)
+            var tasks = notificacoes.Select(async noti =>
             {
-                var usuarioQueEnviou = _context.Usuarios
-                    .FirstOrDefault(usr => usr.Id == noti.Remetente);
+                var usuarioQueEnviou = await _context.Usuarios
+                    .FirstOrDefaultAsync(usr => usr.Id == noti.Remetente);
 
-                var notiSaida = new NotificacoesDaRedeDto
-                    (
-                        noti.Remetente,
-                        noti.Destinatario,
-                        usuarioQueEnviou.ImagemPerfil,
-                        usuarioQueEnviou.Nome,
-                        noti.TipoDeNotificacao,
-                        noti.TimeStamp,
-                        noti.MensagemDaNotificacao
-                    );
-                notificacoesSaida.Add(notiSaida);
-            }
+                return new NotificacoesDaRedeDto
+                (
+                    noti.Remetente,
+                    noti.Destinatario,
+                    usuarioQueEnviou.ImagemPerfil,
+                    usuarioQueEnviou.Nome,
+                    noti.TipoDeNotificacao,
+                    noti.TimeStamp,
+                    noti.MensagemDaNotificacao
+                );
+            }).ToArray();
+
+            notificacoesSaida = (await Task.WhenAll(tasks)).ToList();
 
             return notificacoesSaida;
         }
 
-        public Notificacao? GetLast()
-        {
-            return _context.Notificacoes
-                .OrderByDescending(n => n.Id)
-                .FirstOrDefault();
-        }
-
-        public void Update(Notificacao notificacao)
+        public async Task Update(Notificacao notificacao)
         {
             _context.Notificacoes.Update(notificacao);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(Notificacao notificacao)
+        public async Task Delete(Notificacao notificacao)
         {
             _context.Notificacoes.Remove(notificacao);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void DeletarReferencias(Guid idUsuario)
+        public async Task DeletarReferencias(Guid idUsuario)
         {
-            var notificacoesDoUsr = _context.Notificacoes
+            var notificacoesDoUsr = await _context.Notificacoes
                 .Where(n => n.Destinatario == idUsuario
                             || n.Remetente == idUsuario)
-                .ToList();
+                .ToListAsync();
 
             _context.Notificacoes.RemoveRange(notificacoesDoUsr);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Notificacao?> JaFoiNotificado(Notificacao notificacao)
+        {
+            return await _context.Notificacoes
+                .FirstOrDefaultAsync(n => n.Remetente == notificacao.Remetente
+                                    && n.Destinatario == notificacao.Destinatario
+                                    && n.TipoDeNotificacao == notificacao.TipoDeNotificacao);
         }
     }
 }

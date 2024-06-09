@@ -48,8 +48,8 @@ namespace WebAPI_Apollo.Controllers
 
             var usuario = new Usuario(nome, email, senha, userName, palavraRecuperacao, dataConvertida);
 
-            var existenteEmail = _usrRepository.GetSemelhanteEmail(usuario.Email);
-            var existenteUserName = _usrRepository.GetSemelhanteUserName(usuario.UserName);
+            var existenteEmail = _usrRepository.GetSemelhanteEmail(usuario.Email).Result;
+            var existenteUserName = _usrRepository.GetSemelhanteUserName(usuario.UserName).Result;
 
             if (existenteEmail != null)
             {
@@ -73,6 +73,7 @@ namespace WebAPI_Apollo.Controllers
                 usuario.Esporte, usuario.Genero, usuario.UserName,
                 usuario.PalavraRecuperacao, usuario.DataNascimento,
                 usuario.Peso, usuario.Altura, usuario.ImagemPerfil);
+
             return Ok(resposta);
         }
 
@@ -83,16 +84,40 @@ namespace WebAPI_Apollo.Controllers
         {
             Calculos c = new();
 
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
-
-            if (usuario is null)
+            if (ConfigUsuario.CurrentUser is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }
 
-            c.GanharXP(XP, ref usuario);
+            var usuario = ConfigUsuario.CurrentUser;
+
+            c.GanharXP(XP, ref usuario);             // TODO: Arrumar isso aqui depois
 
             _usrRepository.Update(usuario);
+
+            var resposta = new UsuarioDto
+                (
+                    usuario.Id, usuario.Idade, usuario.XP,
+                    usuario.Level, usuario.XP_ProximoNivel,
+                    usuario.Nome, usuario.Email, usuario.Senha,
+                    usuario.Esporte, usuario.Genero, usuario.UserName,
+                    usuario.PalavraRecuperacao, usuario.DataNascimento,
+                    usuario.Peso, usuario.Altura, usuario.ImagemPerfil
+                );
+
+            return Ok(resposta);
+        }
+
+        // Obter informações do usuario logado
+        [HttpGet]
+        public IActionResult GetUsr()
+        {
+            if (ConfigUsuario.CurrentUser is null)
+            {
+                return BadRequest("Nenhum Usuario Logado");
+            }
+
+            var usuario = ConfigUsuario.CurrentUser;
 
             var resposta = new UsuarioDto
                 (usuario.Id, usuario.Idade, usuario.XP,
@@ -101,21 +126,7 @@ namespace WebAPI_Apollo.Controllers
                 usuario.Esporte, usuario.Genero, usuario.UserName,
                 usuario.PalavraRecuperacao, usuario.DataNascimento,
                 usuario.Peso, usuario.Altura, usuario.ImagemPerfil);
-            return Ok(resposta);
-        }
 
-        // Obter informações do usuario logado
-        [HttpGet]
-        public IActionResult GetUsr()
-        {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
-
-            if (usuario is null)
-            {
-                return BadRequest("Nenhum Usuario Logado");
-            }
-
-            var resposta = new UsuarioDto(usuario.Id, usuario.Idade, usuario.XP, usuario.Level, usuario.XP_ProximoNivel, usuario.Nome, usuario.Email, usuario.Senha, usuario.Esporte, usuario.Genero, usuario.UserName, usuario.PalavraRecuperacao, usuario.DataNascimento, usuario.Peso, usuario.Altura, usuario.ImagemPerfil);
             return Ok(resposta);
         }
 
@@ -124,7 +135,7 @@ namespace WebAPI_Apollo.Controllers
         [Route("{id}")]
         public IActionResult GetUsuarioSist(Guid id)
         {
-            var usuario = _usrRepository.Get(id);
+            var usuario = _usrRepository.Get(id).Result;
 
             if (usuario is null)
             {
@@ -142,9 +153,9 @@ namespace WebAPI_Apollo.Controllers
         {
             var calculos = new Calculos();
 
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
-            var usuarioSemelhante = _usrRepository.GetSemelhanteUserName(userName);
+            var usuarioSemelhante = _usrRepository.GetSemelhanteUserName(userName).Result;
 
             if (usuarioSemelhante is null)
             {
@@ -175,7 +186,7 @@ namespace WebAPI_Apollo.Controllers
 
             if (usuario.Altura != altura || usuario.Peso != peso)
             {
-                var estatisticas = _estRepository.Get(usuario.IdEstatisticas);
+                var estatisticas = _estRepository.Get(usuario.IdEstatisticas).Result;
 
                 if (estatisticas is null)
                 {
@@ -184,9 +195,9 @@ namespace WebAPI_Apollo.Controllers
                         usuario.Peso = peso;
                         usuario.Altura = altura;
 
-                        Estatisticas est = new Estatisticas(calculos.CalcularIMC(usuario), calculos.CalcularAguaDiaria(true, usuario));
+                        Estatisticas est = new(calculos.CalcularIMC(usuario), calculos.CalcularAguaDiaria(true, usuario));
 
-                        var ultimaEstatistica = _estRepository.GetLast();
+                        var ultimaEstatistica = _estRepository.GetLast().Result;
 
                         // Código pra substituir o autoIncrement do Banco
                         if (ultimaEstatistica != null)
@@ -201,12 +212,11 @@ namespace WebAPI_Apollo.Controllers
 
                         _estRepository.Add(est);
 
-                        ultimaEstatistica = _estRepository.GetLast();
+                        ultimaEstatistica = _estRepository.GetLast().Result;
 
                         if (ultimaEstatistica != null)
                         {
                             usuario.IdEstatisticas = ultimaEstatistica.Id;
-                            _usrRepository.Update(usuario);
                         }
                     }
                     else if (peso == 0)
@@ -262,6 +272,7 @@ namespace WebAPI_Apollo.Controllers
                 usuario.Esporte, usuario.Genero, usuario.UserName,
                 usuario.PalavraRecuperacao, usuario.DataNascimento,
                 usuario.Peso, usuario.Altura, usuario.ImagemPerfil);
+
             return Ok(resposta);
         }
 
@@ -269,21 +280,21 @@ namespace WebAPI_Apollo.Controllers
         [HttpDelete]
         public IActionResult DeleteUsr()
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }
 
-            var estUsuario = _estRepository.Get(usuario.IdEstatisticas);
+            var estUsuario = _estRepository.Get(usuario.IdEstatisticas).Result;
 
             if (estUsuario != null)
             {
                 _estRepository.Delete(estUsuario);
             }
 
-            var infHomeUsr = _infHomeRepository.GetViaUsr(usuario.Id);
+            var infHomeUsr = _infHomeRepository.GetViaUsr(usuario.Id).Result;
 
             if (infHomeUsr is null)
             {
@@ -296,11 +307,11 @@ namespace WebAPI_Apollo.Controllers
             _amzdRepository.DeletarReferencias(usuario.Id);
 
             // Todas essa são solicitações de amizade enviadas pelo usuario
-            var notificacoesDoUsr = _ntfRepository.GetAllEnviadasNotiAmizadeUsr(usuario.Id);
+            var notificacoesDoUsr = _ntfRepository.GetAllEnviadasNotiAmizadeUsr(usuario.Id).Result;
 
             foreach (var noti in notificacoesDoUsr)
             {
-                var homeAmigo = _infHomeRepository.GetViaUsr(noti.destinatario);
+                var homeAmigo = _infHomeRepository.GetViaUsr(noti.destinatario).Result;
 
                 if (homeAmigo is null)
                 {
@@ -324,21 +335,21 @@ namespace WebAPI_Apollo.Controllers
         [Route("Amizades")]
         public IActionResult GetAmigosUsr()
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }
 
-            var amizades = _amzdRepository.GetAllUsr(ConfigUsuario.CurrentUserId);
-            List<AmizadeListaAmigos> listaAmigos = new List<AmizadeListaAmigos>();
+            var amizades = _amzdRepository.GetAllUsr(usuario.Id).Result;
+            var listaAmigos = new List<AmizadeListaAmigos>();
 
             foreach (var amizade in amizades)
             {
-                if (amizade.Remetente == ConfigUsuario.CurrentUserId)
+                if (amizade.Remetente == usuario.Id)
                 {
-                    var amigo = _usrRepository.Get(amizade.Destinatario);
+                    var amigo = _usrRepository.Get(amizade.Destinatario).Result;
 
                     if (amigo != null)
                     {
@@ -351,7 +362,7 @@ namespace WebAPI_Apollo.Controllers
                 }
                 else
                 {
-                    var amigo = _usrRepository.Get(amizade.Remetente);
+                    var amigo = _usrRepository.Get(amizade.Remetente).Result;
 
                     if (amigo != null)
                     {
@@ -377,7 +388,7 @@ namespace WebAPI_Apollo.Controllers
         [Route("Amizades/Procurar/{nome}")]
         public IActionResult PesquisarAmigo(string nome)
         {
-            var amigosCorrespontes = _usrRepository.GetUsuariosNome(nome);
+            var amigosCorrespontes = _usrRepository.GetUsuariosNome(nome).Result;
 
             if (amigosCorrespontes is null || amigosCorrespontes.Count == 0)
             {
@@ -395,11 +406,11 @@ namespace WebAPI_Apollo.Controllers
         public IActionResult AdcSoliAmiza(Guid idAmigo)
         {
             // Usuarios 
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
-            var solicitado = _usrRepository.Get(idAmigo);
+            var usuario = ConfigUsuario.CurrentUser;
+            var solicitado = _usrRepository.Get(idAmigo).Result;
 
             // Home do amigo atualizada com a notificação
-            var homeAmigo = _infHomeRepository.GetViaUsr(idAmigo);
+            var homeAmigo = _infHomeRepository.GetViaUsr(idAmigo).Result;
 
             if (usuario is null)
             {
@@ -423,7 +434,7 @@ namespace WebAPI_Apollo.Controllers
 
             Amizade amizade = new(usuario.Id, solicitado.Id);
 
-            var jaEAmigo = _amzdRepository.VerificarAmizade(amizade);
+            var jaEAmigo = _amzdRepository.VerificarAmizade(amizade).Result;
 
             if (jaEAmigo != null)
             {
@@ -432,12 +443,12 @@ namespace WebAPI_Apollo.Controllers
 
             string mensagem = $"Olá {solicitado.Nome.Split(" ")[0]}, gostaria de ser meu amigo aqui na {ConfigUsuario.NomeRedeSocial}. Seria ótimo trocar ideias e experiências.";
 
-            Notificacao solicitacaoAmizade = new Notificacao(usuario.Id, solicitado.Id, 1, mensagem);
-            Notificacao solicitacaoDoAmigo = new Notificacao(solicitado.Id, usuario.Id, 1, mensagem);
+            var notificacao = new Notificacao(usuario.Id, solicitado.Id, 1, mensagem);
+            var solicitacaoDoAmigo = new Notificacao(solicitado.Id, usuario.Id, 1, mensagem);
             // Tipo 1, solicitação de amizade
 
-            var jaExisteSolicitacao = _ntfRepository.JaFoiNotificado(solicitacaoAmizade);
-            var jaExisteSolicitacaoDoAmigo = _ntfRepository.JaFoiNotificado(solicitacaoDoAmigo);
+            var jaExisteSolicitacao = _ntfRepository.JaFoiNotificado(notificacao).Result;
+            var jaExisteSolicitacaoDoAmigo = _ntfRepository.JaFoiNotificado(solicitacaoDoAmigo).Result;
 
             if (jaExisteSolicitacao != null)
             {
@@ -449,7 +460,7 @@ namespace WebAPI_Apollo.Controllers
                 return BadRequest("Solicitação do Amigo em Questão Pendente");
             }
 
-            _ntfRepository.Add(solicitacaoAmizade);
+            _ntfRepository.Add(notificacao);
 
             // Incrementa as solicitações de amizade do amigo
             homeAmigo.NumSolicitacoesAmizade++;
@@ -463,7 +474,9 @@ namespace WebAPI_Apollo.Controllers
             _usrRepository.Update(usuario);
             // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
 
-            return Ok(solicitacaoAmizade);
+            var resposta = new NotificacoesDoUsuarioDto(notificacao.Remetente, notificacao.TipoDeNotificacao, notificacao.MensagemDaNotificacao);
+
+            return Ok(resposta);
         }
 
         // Aceitar solicitação de amizade
@@ -472,14 +485,14 @@ namespace WebAPI_Apollo.Controllers
         public IActionResult AceitarSoliAmiza(Guid idDeQuemPediu)
         {
             // Usuarios 
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }
 
-            var quemPediu = _usrRepository.Get(idDeQuemPediu);
+            var quemPediu = _usrRepository.Get(idDeQuemPediu).Result;
 
             if (quemPediu is null)
             {
@@ -487,10 +500,17 @@ namespace WebAPI_Apollo.Controllers
             }
 
             // Home do amigo atualizada com a notificação
-            var home = _infHomeRepository.GetViaUsr(ConfigUsuario.CurrentUserId);
-            var homeAmigo = _infHomeRepository.GetViaUsr(idDeQuemPediu);
+            var home = _infHomeRepository.GetViaUsr(usuario.Id).Result;
+            var homeAmigo = _infHomeRepository.GetViaUsr(idDeQuemPediu).Result;
 
-            var pedidoExistente = _ntfRepository.JaFoiNotificado(new Notificacao(quemPediu.Id, usuario.Id, 1, ""));
+            var pedidoExistente = _ntfRepository.JaFoiNotificado(
+                new Notificacao
+                (
+                    quemPediu.Id, 
+                    usuario.Id, 
+                    1,
+                    ""
+                )).Result;
 
             if (pedidoExistente is null)
             {
@@ -509,17 +529,17 @@ namespace WebAPI_Apollo.Controllers
 
             string mensagem = $"{quemPediu.Nome.Split(" ")[0]}, agora somos amigos aqui na {ConfigUsuario.NomeRedeSocial}.";
 
-            Notificacao resposta = new Notificacao(usuario.Id, quemPediu.Id, 3, mensagem);
+            var notificacao = new Notificacao(usuario.Id, quemPediu.Id, 3, mensagem);
             // Tipo 3, Resposta
 
-            var jaExiste = _ntfRepository.JaFoiNotificado(resposta);
+            var jaExiste = _ntfRepository.JaFoiNotificado(notificacao).Result;
 
             if (jaExiste != null)
             {
                 return BadRequest("Solicitação já aceita");
             }
 
-            _ntfRepository.Add(resposta);
+            _ntfRepository.Add(notificacao);
 
             home.NumSolicitacoesAmizade--;
             home.NumAmigos++;
@@ -530,13 +550,6 @@ namespace WebAPI_Apollo.Controllers
             _infHomeRepository.Update(homeAmigo);
 
             Amizade amizade = new(quemPediu.Id, usuario.Id);
-
-            var jaEAmigo = _amzdRepository.VerificarAmizade(amizade);
-
-            if (jaEAmigo != null)
-            {
-                return BadRequest("O Usuario requisitado já esta na sua lista de amigos");
-            }
 
             _amzdRepository.Add(amizade);
             _ntfRepository.Delete(pedidoExistente);
@@ -549,6 +562,8 @@ namespace WebAPI_Apollo.Controllers
             _usrRepository.Update(usuario);
             // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
 
+            var resposta = new NotificacoesDoUsuarioDto(notificacao.Remetente, notificacao.TipoDeNotificacao, notificacao.MensagemDaNotificacao);
+
             return Ok(resposta);
         }
 
@@ -558,14 +573,14 @@ namespace WebAPI_Apollo.Controllers
         public IActionResult RecusarSoliAmiza(Guid idDeQuemPediu)
         {
             // Usuarios 
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }
 
-            var quemPediu = _usrRepository.Get(idDeQuemPediu);
+            var quemPediu = _usrRepository.Get(idDeQuemPediu).Result;
 
             if (quemPediu is null)
             {
@@ -573,10 +588,17 @@ namespace WebAPI_Apollo.Controllers
             }
 
             // Home do amigo atualizada com a notificação
-            var home = _infHomeRepository.GetViaUsr(ConfigUsuario.CurrentUserId);
-            var homeAmigo = _infHomeRepository.GetViaUsr(idDeQuemPediu);
+            var home = _infHomeRepository.GetViaUsr(usuario.Id).Result;
+            var homeAmigo = _infHomeRepository.GetViaUsr(idDeQuemPediu).Result;
 
-            var pedidoExistente = _ntfRepository.JaFoiNotificado(new Notificacao(quemPediu.Id, usuario.Id, 1, ""));
+            var pedidoExistente = _ntfRepository
+                .JaFoiNotificado(new Notificacao
+                (
+                    quemPediu.Id,
+                    usuario.Id, 
+                    1, 
+                    ""
+                )).Result;
 
             if (pedidoExistente is null)
             {
@@ -595,17 +617,17 @@ namespace WebAPI_Apollo.Controllers
 
             string mensagem = $"{quemPediu.Nome.Split(" ")[0]}, infelizmente não posso aceitar seu pedido de amizade aqui na {ConfigUsuario.NomeRedeSocial}.";
 
-            Notificacao resposta = new Notificacao(usuario.Id, quemPediu.Id, 3, mensagem);
+            var notificacao = new Notificacao(usuario.Id, quemPediu.Id, 3, mensagem);
             // Tipo 3, Resposta
 
-            var jaExiste = _ntfRepository.JaFoiNotificado(resposta);
+            var jaExiste = _ntfRepository.JaFoiNotificado(notificacao).Result;
 
             if (jaExiste != null)
             {
                 return BadRequest("Solicitação já recusada");
             }
 
-            _ntfRepository.Add(resposta);
+            _ntfRepository.Add(notificacao);
 
             home.NumSolicitacoesAmizade--;
             _infHomeRepository.Update(home);
@@ -615,7 +637,7 @@ namespace WebAPI_Apollo.Controllers
 
             Amizade amizade = new(quemPediu.Id, usuario.Id);
 
-            var jaEAmigo = _amzdRepository.VerificarAmizade(amizade);
+            var jaEAmigo = _amzdRepository.VerificarAmizade(amizade).Result;
 
             if (jaEAmigo != null)
             {
@@ -623,6 +645,8 @@ namespace WebAPI_Apollo.Controllers
             }
 
             _ntfRepository.Delete(pedidoExistente);
+
+            var resposta = new NotificacoesDoUsuarioDto(notificacao.Remetente, notificacao.TipoDeNotificacao, notificacao.MensagemDaNotificacao);
 
             return Ok(resposta);
         }
@@ -632,8 +656,8 @@ namespace WebAPI_Apollo.Controllers
         [Route("Amizades/Desfazer/{idAmigo}")]
         public IActionResult DesfazerAmiza(Guid idAmigo)
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
-            var amigo = _usrRepository.Get(idAmigo);
+            var usuario = ConfigUsuario.CurrentUser;
+            var amigo = _usrRepository.Get(idAmigo).Result;
 
             if (usuario is null)
             {
@@ -645,15 +669,15 @@ namespace WebAPI_Apollo.Controllers
                 return NotFound("Usuario Não Encontrado");
             }
 
-            var amizade = _amzdRepository.VerificarAmizade(new Amizade(usuario.Id, idAmigo));
+            var amizade = _amzdRepository.VerificarAmizade(new Amizade(usuario.Id, idAmigo)).Result;
 
             if (amizade is null)
             {
                 return BadRequest("Os usuários não são amigos");
             }
 
-            var usrHome = _infHomeRepository.GetViaUsr(usuario.Id);
-            var amigoHome = _infHomeRepository.GetViaUsr(amigo.Id);
+            var usrHome = _infHomeRepository.GetViaUsr(usuario.Id).Result;
+            var amigoHome = _infHomeRepository.GetViaUsr(amigo.Id).Result;
 
             if (usrHome is null)
             {
@@ -681,13 +705,14 @@ namespace WebAPI_Apollo.Controllers
         [Route("Home")]
         public IActionResult GetHomeUsr()
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
-            var homeUsuario = _infHomeRepository.GetViaUsr(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }
+
+            var homeUsuario = _infHomeRepository.GetViaUsr(usuario.Id).Result;
 
             if (homeUsuario is null)
             {
@@ -713,16 +738,17 @@ namespace WebAPI_Apollo.Controllers
         [Route("Login/{email}/{senha}")]
         public IActionResult Login(string email, string senha)
         {
-            var usuario = _usrRepository.GetViaLogin(email, senha);
+            var usuario = _usrRepository.GetViaLogin(email, senha).Result;
 
             if (usuario is null)
             {
                 return NotFound("Email ou Senha Errados");
             }
 
-            ConfigUsuario.CurrentUserId = usuario.Id;
+            ConfigUsuario.CurrentUser = usuario;
 
             var token = TokenService.GenerateToken(usuario);
+
             return Ok(token);
         }
 
@@ -731,7 +757,7 @@ namespace WebAPI_Apollo.Controllers
         [Route("Login/{email}/{senha}")]
         public IActionResult LoginUpdate(string email, string senha)
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
@@ -739,7 +765,7 @@ namespace WebAPI_Apollo.Controllers
             }
 
             // Lógica pra impedir a troca pra email existente
-            var usuarioSemelhante = _usrRepository.GetSemelhanteEmail(email);
+            var usuarioSemelhante = _usrRepository.GetSemelhanteEmail(email).Result;
 
             if (usuarioSemelhante is null)
             {
@@ -770,15 +796,15 @@ namespace WebAPI_Apollo.Controllers
         [Route("Notificacoes")]
         public IActionResult GetNotiUsr()
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }
 
-            var notiUsuario = _ntfRepository.GetAllUsr(usuario.Id);
-            var homeUsr = _infHomeRepository.GetViaUsr(usuario.Id);
+            var notiUsuario = _ntfRepository.GetAllUsr(usuario.Id).Result;
+            var homeUsr = _infHomeRepository.GetViaUsr(usuario.Id).Result;
 
             if (notiUsuario is null || notiUsuario.Count == 0)
             {
@@ -801,14 +827,14 @@ namespace WebAPI_Apollo.Controllers
         [Route("Notificacoes/PedidoAmizade")]
         public IActionResult GetNotiUsrAmizade()
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }
 
-            var notiUsuario = _ntfRepository.GetAllNotiAmizadeUsr(usuario.Id);
+            var notiUsuario = _ntfRepository.GetAllNotiAmizadeUsr(usuario.Id).Result;
 
             if (notiUsuario is null || notiUsuario.Count == 0)
             {
@@ -824,23 +850,23 @@ namespace WebAPI_Apollo.Controllers
         [Route("Perfil")]
         public IActionResult PerfilUsr()
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
-            Calculos c = new Calculos();
+            Calculos c = new();
 
             if (usuario is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }
 
-            var estatisticas = _estRepository.Get(usuario.IdEstatisticas);
+            var estatisticas = _estRepository.Get(usuario.IdEstatisticas).Result;
 
             if (estatisticas is null)
             {
                 if (usuario.Peso != 0 && usuario.Altura != 0)
                 {
-                    Estatisticas novasEst = new Estatisticas(c.CalcularIMC(usuario), c.CalcularAguaDiaria(true, usuario));
-                    var ultimaEstatistica = _estRepository.GetLast();
+                    Estatisticas novasEst = new(c.CalcularIMC(usuario), c.CalcularAguaDiaria(true, usuario));
+                    var ultimaEstatistica = _estRepository.GetLast().Result;
 
                     // Código pra substituir o autoIncrement do Banco
                     if (ultimaEstatistica != null)
@@ -855,7 +881,7 @@ namespace WebAPI_Apollo.Controllers
 
                     _estRepository.Add(novasEst);
 
-                    ultimaEstatistica = _estRepository.GetLast();
+                    ultimaEstatistica = _estRepository.GetLast().Result;
                     if (ultimaEstatistica != null)
                     {
                         usuario.IdEstatisticas = ultimaEstatistica.Id;
@@ -887,7 +913,7 @@ namespace WebAPI_Apollo.Controllers
         [Route("Perfil/Foto/{imagemBase64}")]
         public IActionResult PerfilUsrImagem(string imagemBase64)
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
@@ -906,7 +932,7 @@ namespace WebAPI_Apollo.Controllers
         [Route("Perfil/Foto")]
         public IActionResult GetPerfilUsrImagem()
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
@@ -922,7 +948,7 @@ namespace WebAPI_Apollo.Controllers
         [Route("Recuperacao/{email}/{palavraRecuperacao}")]
         public IActionResult RecuperarSenha(string email, string palavraRecuperacao)
         {
-            var usuario = _usrRepository.RecuperarSenha(email, palavraRecuperacao);
+            var usuario = _usrRepository.RecuperarSenha(email, palavraRecuperacao).Result;
 
             if (usuario is null)
             {
@@ -931,8 +957,8 @@ namespace WebAPI_Apollo.Controllers
 
             string caracteresPermitidos = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?";
 
-            StringBuilder sb = new StringBuilder();
-            Random random = new Random();
+            StringBuilder sb = new();
+            Random random = new();
 
             for (int i = 0; i < 10; i++)
             {
@@ -956,7 +982,7 @@ namespace WebAPI_Apollo.Controllers
         [Route("Todos")]
         public IActionResult GetAllUsr()
         {
-            var usuarios = _usrRepository.GetAll();
+            var usuarios = _usrRepository.GetAll().Result;
 
             if (usuarios is null || usuarios.Count == 0)
             {

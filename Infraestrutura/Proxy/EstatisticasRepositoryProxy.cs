@@ -28,34 +28,34 @@ namespace WebAPI_Apollo.Infraestrutura.Proxy
 
         private IEstatisticasRepository CurrentRepository => _currentRepository;
 
-        public void Add(Estatisticas estatisticas)
+        public async Task Add(Estatisticas estatisticas)
         {
-            CurrentRepository.Add(estatisticas);
+            await CurrentRepository.Add(estatisticas);
         }
 
-        public void DeletarReferencias(int idEstatisticas)
+        public async Task DeletarReferencias(int idEstatisticas)
         {
-            CurrentRepository.DeletarReferencias(idEstatisticas);
+            await CurrentRepository.DeletarReferencias(idEstatisticas);
         }
 
-        public void Delete(Estatisticas est)
+        public async Task Delete(Estatisticas est)
         {
-            CurrentRepository.Delete(est);
+            await CurrentRepository.Delete(est);
         }
 
-        public Estatisticas? Get(int id)
+        public Task<Estatisticas?> Get(int id)
         {
             return CurrentRepository.Get(id);
         }
 
-        public Estatisticas? GetLast()
+        public Task<Estatisticas?> GetLast()
         {
             return CurrentRepository.GetLast();
         }
 
-        public void Update(Estatisticas estatisticas)
+        public async Task Update(Estatisticas estatisticas)
         {
-            CurrentRepository.Update(estatisticas);
+            await CurrentRepository.Update(estatisticas);
         }
     }
 }

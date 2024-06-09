@@ -1,4 +1,5 @@
-﻿using WebAPI_Apollo.Domain.Model.Interacoes;
+﻿using Microsoft.EntityFrameworkCore;
+using WebAPI_Apollo.Domain.Model.Interacoes;
 using WebAPI_Apollo.Domain.Model.Interfaces;
 
 namespace WebAPI_Apollo.Infraestrutura.Repository.DB
@@ -7,90 +8,88 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
     {
         private readonly AppDbContext _context = new();
 
-        public void Add(Amizade amizade)
+        public async Task Add(Amizade amizade)
         {
-            _context.Amizades.Add(amizade);
-            _context.SaveChanges();
+            await _context.Amizades.AddAsync(amizade);
+            await _context.SaveChangesAsync();
         }
 
-        public Amizade? VerificarAmizade(Amizade amizade)
+        public async Task<Amizade?> Get(int id)
         {
-            return _context.Amizades
-                .FirstOrDefault(amz => amz.Remetente == amizade.Remetente
-                                        && amz.Destinatario == amizade.Destinatario
-                                        || amz.Destinatario == amizade.Remetente
-                                        && amz.Remetente == amizade.Destinatario);
+            return await _context.Amizades.FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public Amizade? Get(int id)
+        public async Task<List<Amizade>> GetAllUsr(Guid idUsuario)
         {
-            return _context.Amizades.FirstOrDefault(e => e.Id == id);
-        }
-
-        public List<Amizade> GetAllUsr(Guid idUsuario)
-        {
-            return _context.Amizades
+            return await _context.Amizades
                 .Where(amz => amz.Destinatario == idUsuario
                               || amz.Remetente == idUsuario)
                 .OrderByDescending(amz => amz.Id)
-                .ToList();
+                .ToListAsync();
         }
 
-        public Amizade? GetLast()
+        public async Task<Amizade?> GetLast()
         {
-            return _context.Amizades
+            return await _context.Amizades
                 .OrderByDescending(e => e.Id)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
         }
 
-        public void Update(Amizade amizade)
+        public async Task Update(Amizade amizade)
         {
             _context.Amizades.Update(amizade);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(Amizade amizade)
+        public async Task Delete(Amizade amizade)
         {
             _context.Amizades.Remove(amizade);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public void DeletarReferencias(Guid idUsuario)
+        public async Task DeletarReferencias(Guid idUsuario)
         {
-            var amizadesDoUsr = _context.Amizades
+            var amizadesDoUsr = await _context.Amizades
                 .Where(amz => amz.Destinatario == idUsuario
                               || amz.Remetente == idUsuario)
-                .ToList();
+                .ToListAsync();
 
             foreach (var amizade in amizadesDoUsr)
             {
                 if (amizade.Remetente == idUsuario)
                 {
-                    var homeAmigo = _context.InformHome
-                        .FirstOrDefault(h => h.IdUsuario == amizade.Destinatario);
+                    var homeAmigo = await _context.InformHome
+                        .FirstOrDefaultAsync(h => h.IdUsuario == amizade.Destinatario);
 
                     if (homeAmigo != null)
                     {
                         homeAmigo.NumAmigos--;
                         _context.InformHome.Update(homeAmigo);
-                        _context.SaveChanges();
                     }
                 }
                 else
                 {
-                    var homeAmigo = _context.InformHome
-                        .FirstOrDefault(h => h.IdUsuario == amizade.Remetente);
+                    var homeAmigo = await _context.InformHome
+                        .FirstOrDefaultAsync(h => h.IdUsuario == amizade.Remetente);
 
                     if (homeAmigo != null)
                     {
                         homeAmigo.NumAmigos--;
                         _context.InformHome.Update(homeAmigo);
-                        _context.SaveChanges();
                     }
                 }
             }
             _context.Amizades.RemoveRange(amizadesDoUsr);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Amizade?> VerificarAmizade(Amizade amizade)
+        {
+            return await _context.Amizades
+                .FirstOrDefaultAsync(amz => amz.Remetente == amizade.Remetente
+                                        && amz.Destinatario == amizade.Destinatario
+                                        || amz.Destinatario == amizade.Remetente
+                                        && amz.Remetente == amizade.Destinatario);
         }
     }
 }

@@ -29,62 +29,62 @@ namespace WebAPI_Apollo.Infraestrutura.Proxy
 
         private IUsuarioRepository CurrentRepository => _currentRepository;
 
-        public void Add(Usuario usuario)
+        public async Task Add(Usuario usuario)
         {
-            CurrentRepository.Add(usuario);
+            await CurrentRepository.Add(usuario);
         }
 
-        public void Delete(Usuario usuario)
+        public async Task Delete(Usuario usuario)
         {
-            CurrentRepository.Delete(usuario);
+            await CurrentRepository.Delete(usuario);
         }
 
-        public Usuario? Get(Guid id)
+        public Task<Usuario?> Get(Guid id)
         {
             return CurrentRepository.Get(id);
         }
 
-        public List<UsuarioDto> GetAll()
+        public Task<List<UsuarioDto>> GetAll()
         {
             return CurrentRepository.GetAll();
         }
 
-        public Usuario? GetSemelhanteEmail(string email)
+        public Task<Usuario?> GetSemelhanteEmail(string email)
         {
             return CurrentRepository.GetSemelhanteEmail(email);
         }
 
-        public Usuario? GetSemelhanteUserName(string userName)
+        public Task<Usuario?> GetSemelhanteUserName(string userName)
         {
             return CurrentRepository.GetSemelhanteUserName(userName);
         }
 
-        public Usuario? GetViaLogin(string email, string senha)
+        public Task<Usuario?> GetViaLogin(string email, string senha)
         {
             return CurrentRepository.GetViaLogin(email, senha);
         }
 
-        public Usuario? RecuperarSenha(string email, string palavraRecuperacao)
+        public Task<Usuario?> RecuperarSenha(string email, string palavraRecuperacao)
         {
             return CurrentRepository.RecuperarSenha(email, palavraRecuperacao);
         }
 
-        public void Update(Usuario usuario)
+        public async Task Update(Usuario usuario)
         {
-            CurrentRepository.Update(usuario);
+            await CurrentRepository.Update(usuario);
         }
 
-        public bool VerificarSeExisteEmailUsername(Usuario usuarioInformado)
+        public Task<bool> VerificarSeExisteEmailUsername(Usuario usuarioInformado)
         {
             return CurrentRepository.VerificarSeExisteEmailUsername(usuarioInformado);
         }
 
-        public bool VerificaSeCadastrado(string email)
+        public Task<bool> VerificaSeCadastrado(string email)
         {
             return CurrentRepository.VerificaSeCadastrado(email);
         }
 
-        public List<UsuarioDto> GetUsuariosNome(string nome)
+        public Task<List<UsuarioDto>> GetUsuariosNome(string nome)
         {
             return CurrentRepository.GetUsuariosNome(nome);
         }

@@ -5,63 +5,80 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
 {
     public class InformHomeRepositoryRAM : IInformHomeRepository
     {
-        public void Add(InformHome informHome)
+        public async Task Add(InformHome informHome)
         {
-            // Código pra substituir o autoIncrement do Banco
-            var ultimaHome = GetLast();
-
-            if (ultimaHome != null)
+            await Task.Run(() =>
             {
-                informHome.Id = ultimaHome.Id + 1;
-            }
-            else
-            {
-                informHome.Id = 1;
-            }
-            // Visa manter o uso de id int ao invés de trocar pra Guid
+                // Código pra substituir o autoIncrement do Banco
+                var ultimaHome = GetLast().Result;
 
-            VolatileContext.InformHome.Add(informHome);
+                if (ultimaHome != null)
+                {
+                    informHome.Id = ultimaHome.Id + 1;
+                }
+                else
+                {
+                    informHome.Id = 1;
+                }
+                // Visa manter o uso de id int ao invés de trocar pra Guid
+
+                VolatileContext.InformHome.Add(informHome);
+            });
         }
 
-        public InformHome? JaExiste(InformHome informHome)
+        public Task<InformHome?> JaExiste(InformHome informHome)
         {
-            return VolatileContext.InformHome
+            var resultado = VolatileContext.InformHome
                 .FirstOrDefault(informHomesNoBanco =>
                     informHomesNoBanco.IdUsuario == informHome.IdUsuario);
+
+            return Task.FromResult(resultado);
         }
 
-        public InformHome? Get(int id)
+        public Task<InformHome?> Get(int id)
         {
-            return VolatileContext.InformHome
+            var resultado = VolatileContext.InformHome
                 .FirstOrDefault(e => e.Id == id);
+
+            return Task.FromResult(resultado);
         }
 
-        public InformHome? GetViaUsr(Guid idUsuario)
+        public Task<InformHome?> GetViaUsr(Guid idUsuario)
         {
-            return VolatileContext.InformHome
+            var resultado = VolatileContext.InformHome
                 .FirstOrDefault(e => e.IdUsuario == idUsuario);
+
+            return Task.FromResult(resultado);
         }
 
-        public InformHome? GetLast()
+        public Task<InformHome?> GetLast()
         {
-            return VolatileContext.InformHome
+            var resultado = VolatileContext.InformHome
                 .OrderByDescending(e => e.Id)
                 .FirstOrDefault();
+
+            return Task.FromResult(resultado);
         }
 
-        public void Update(InformHome informHome)
+        public async Task Update(InformHome informHome)
         {
-            var index = VolatileContext.InformHome
-                .FindIndex(e => e.Id == informHome.Id);
-            if (index != -1)
+            await Task.Run(() =>
             {
-                VolatileContext.InformHome[index] = informHome;
-            }
+                var index = VolatileContext.InformHome
+                .FindIndex(e => e.Id == informHome.Id);
+                if (index != -1)
+                {
+                    VolatileContext.InformHome[index] = informHome;
+                }
+            });
         }
 
-        public void Delete(InformHome informHome)
+        public async Task Delete(InformHome informHome)
         {
-            VolatileContext.InformHome.Remove(informHome);
+            await Task.Run(() =>
+            {
+                VolatileContext.InformHome.Remove(informHome);
+            });
         }
     }
 }

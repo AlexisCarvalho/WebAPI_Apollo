@@ -6,59 +6,71 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
 {
     public class CurtidaRepositoryRAM : ICurtidaRepository
     {
-        public void Add(Curtida curtida, ref Post postCurtido)
+        public async Task Add(Curtida curtida)
         {
-            // Código pra substituir o autoIncrement do Banco
-            var ultimaCurtida = GetLast();
+            await Task.Run(() => 
+            { 
+                // Código pra substituir o autoIncrement do Banco
+                var ultimaCurtida = GetLast().Result;
 
-            if (ultimaCurtida != null)
-            {
-                curtida.Id = ultimaCurtida.Id + 1;
-            }
-            else
-            {
-                curtida.Id = 1;
-            }
-            // Visa manter o uso de id int ao invés de trocar pra Guid
+                if (ultimaCurtida != null)
+                {
+                    curtida.Id = ultimaCurtida.Id + 1;
+                }
+                else
+                {
+                    curtida.Id = 1;
+                }
+                // Visa manter o uso de id int ao invés de trocar pra Guid
 
-            postCurtido.NumCurtidas++;
-            VolatileContext.Curtidas.Add(curtida);
+                VolatileContext.Curtidas.Add(curtida);
+            });
         }
 
-        public Curtida? JaCurtiu(Curtida curtida)
+        public Task<Curtida?> JaCurtiu(Curtida curtida)
         {
-            return VolatileContext.Curtidas
+            var resultado = VolatileContext.Curtidas
                 .FirstOrDefault(curtidaNoBanco =>
                 curtidaNoBanco.Remetente == curtida.Remetente &&
                 curtidaNoBanco.Destinatario == curtida.Destinatario);
+
+            return Task.FromResult(resultado);
         }
 
-        public Curtida? Get(int id)
+        public Task<Curtida?> Get(int id)
         {
-            return VolatileContext.Curtidas.FirstOrDefault(e => e.Id == id);
+            var resultado = VolatileContext.Curtidas.FirstOrDefault(e => e.Id == id);
+            return Task.FromResult(resultado);
         }
 
-        public Curtida? GetLast()
+        public Task<Curtida?> GetLast()
         {
-            return VolatileContext.Curtidas
+            var resultado = VolatileContext.Curtidas
                 .OrderByDescending(e => e.Id)
                 .FirstOrDefault();
+
+            return Task.FromResult(resultado);
         }
 
-        public void Update(Curtida curtida)
+        public async Task Update(Curtida curtida)
         {
-            var index = VolatileContext.Curtidas
-                .FindIndex(e => e.Id == curtida.Id);
-            if (index != -1)
+            await Task.Run(() => 
             {
-                VolatileContext.Curtidas[index] = curtida;
-            }
+                var index = VolatileContext.Curtidas
+                    .FindIndex(e => e.Id == curtida.Id);
+                if (index != -1)
+                {
+                    VolatileContext.Curtidas[index] = curtida;
+                }
+            });
         }
 
-        public void Delete(Curtida curtida, ref Post postDescurtido)
+        public async Task Delete(Curtida curtida)
         {
-            postDescurtido.NumCurtidas--;
-            VolatileContext.Curtidas.Remove(curtida);
+            await Task.Run(() =>
+            {
+                VolatileContext.Curtidas.Remove(curtida);
+            });
         }
     }
 }

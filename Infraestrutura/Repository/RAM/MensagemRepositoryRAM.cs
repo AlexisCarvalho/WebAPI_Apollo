@@ -6,43 +6,51 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
 {
     public class MensagemRepositoryRAM : IMensagemRepository
     {
-        public void Add(Mensagem mensagem)
+        public async Task Add(Mensagem mensagem)
         {
-            // Código pra substituir o autoIncrement do Banco
-            var ultimaMensagem = GetLast();
-
-            if (ultimaMensagem != null)
+            await Task.Run(() =>
             {
-                mensagem.Id = ultimaMensagem.Id + 1;
-            }
-            else
-            {
-                mensagem.Id = 1;
-            }
-            // Visa manter o uso de id int ao invés de trocar pra Guid
+                // Código pra substituir o autoIncrement do Banco
+                var ultimaMensagem = GetLast().Result;
 
-            VolatileContext.Mensagens.Add(mensagem);
+                if (ultimaMensagem != null)
+                {
+                    mensagem.Id = ultimaMensagem.Id + 1;
+                }
+                else
+                {
+                    mensagem.Id = 1;
+                }
+                // Visa manter o uso de id int ao invés de trocar pra Guid
+
+                VolatileContext.Mensagens.Add(mensagem);
+            });
         }
 
-        public Mensagem? Get(int id)
+        public Task<Mensagem?> Get(int id)
         {
-            return VolatileContext.Mensagens
+            var resultado = VolatileContext.Mensagens
                 .FirstOrDefault(mensagem => mensagem.Id == id);
+
+            return Task.FromResult(resultado);
         }
 
-        public void Update(Mensagem mensagem)
+        public async Task Update(Mensagem mensagem)
         {
-            var index = VolatileContext.Mensagens
-                .FindIndex(m => m.Id == mensagem.Id);
-            if (index != -1)
+            await Task.Run(() =>
             {
-                VolatileContext.Mensagens[index] = mensagem;
-            }
+                var index = VolatileContext.Mensagens
+                .FindIndex(m => m.Id == mensagem.Id);
+                if (index != -1)
+                {
+                    VolatileContext.Mensagens[index] = mensagem;
+                }
+            });
         }
 
-        public List<ChatDto> GetAll()
+        public Task<List<ChatDto>> GetAll()
         {
-            return VolatileContext.Mensagens
+            var resultado = VolatileContext.Mensagens
                 .Select(mensagem => new ChatDto
                 (
                     mensagem.Id,
@@ -52,16 +60,21 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                     mensagem.TimeStamp
                 ))
                 .ToList();
+
+            return Task.FromResult(resultado);
         }
 
-        public void Delete(Mensagem mensagem)
+        public async Task Delete(Mensagem mensagem)
         {
-            VolatileContext.Mensagens.Remove(mensagem);
+            await Task.Run(() =>
+            {
+                VolatileContext.Mensagens.Remove(mensagem);
+            });
         }
 
-        public List<ChatDto> EnviadasPor(Guid id)
+        public Task<List<ChatDto>> EnviadasPor(Guid id)
         {
-            return VolatileContext.Mensagens
+            var resultado = VolatileContext.Mensagens
                 .OrderByDescending(msg => msg.Id)
                 .Select(mensagem => new ChatDto
                 (
@@ -73,11 +86,13 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                 ))
                 .Where(mensagem => mensagem.Remetente == id)
                 .ToList();
+
+            return Task.FromResult(resultado);
         }
 
-        public List<ChatDto> RecebidasPor(Guid id)
+        public Task<List<ChatDto>> RecebidasPor(Guid id)
         {
-            return VolatileContext.Mensagens
+            var resultado = VolatileContext.Mensagens
                 .OrderByDescending(msg => msg.Id)
                 .Select(mensagem => new ChatDto
                 (
@@ -89,11 +104,13 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                 ))
                 .Where(mensagem => mensagem.Destinatario == id)
                 .ToList();
+
+            return Task.FromResult(resultado);
         }
 
-        public List<ChatDto> EnviadasEntre(Guid remetente, Guid destinatario)
+        public Task<List<ChatDto>> EnviadasEntre(Guid remetente, Guid destinatario)
         {
-            return VolatileContext.Mensagens
+            var resultado = VolatileContext.Mensagens
                 .OrderByDescending(msg => msg.Id)
                 .Select(mensagem => new ChatDto
                 (
@@ -106,13 +123,17 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                 .Where(mensagem => mensagem.Remetente == remetente
                                    && mensagem.Destinatario == destinatario)
                 .ToList();
+
+            return Task.FromResult(resultado);
         }
 
-        public Mensagem? GetLast()
+        public Task<Mensagem?> GetLast()
         {
-            return VolatileContext.Mensagens
+            var resultado = VolatileContext.Mensagens
                 .OrderByDescending(e => e.Id)
                 .FirstOrDefault();
+
+            return Task.FromResult(resultado);
         }
     }
 }

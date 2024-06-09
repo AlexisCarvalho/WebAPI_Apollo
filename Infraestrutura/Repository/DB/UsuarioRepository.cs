@@ -1,4 +1,6 @@
-﻿using WebAPI_Apollo.Application.Services;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata.Ecma335;
+using WebAPI_Apollo.Application.Services;
 using WebAPI_Apollo.Domain.DTOs;
 using WebAPI_Apollo.Domain.Model;
 using WebAPI_Apollo.Domain.Model.Interfaces;
@@ -9,41 +11,21 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
     {
         private readonly AppDbContext _context = new();
 
-        public void Add(Usuario usuario)
+        public async Task Add(Usuario usuario)
         {
             _context.Usuarios.Add(usuario);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
-        public Usuario? Get(Guid id)
+        public async Task<Usuario?> Get(Guid id)
         {
-            return _context.Usuarios.FirstOrDefault(usuario => usuario.Id == id);
+            return await _context.Usuarios
+                .FirstOrDefaultAsync(usuario => usuario.Id == id);
         }
 
-        public Usuario? GetSemelhanteUserName(string userName)
+        public async Task<List<UsuarioDto>> GetAll()
         {
-            return _context.Usuarios.FirstOrDefault(usuario => usuario.UserName == userName);
-        }
-
-        public Usuario? GetSemelhanteEmail(string email)
-        {
-            return _context.Usuarios.FirstOrDefault(usuario => usuario.Email == email);
-        }
-
-        public void Update(Usuario usuario)
-        {
-            _context.Usuarios.Update(usuario);
-            _context.SaveChanges();
-        }
-
-        public bool VerificaSeCadastrado(string email)
-        {
-            return _context.Usuarios.Any(usuario => usuario.Email == email);
-        }
-
-        public List<UsuarioDto> GetAll()
-        {
-            return _context.Usuarios
+            return await _context.Usuarios
                 .Select(usuario => new UsuarioDto
                 (
                     usuario.Id, usuario.Idade,
@@ -55,61 +37,86 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
                     usuario.DataNascimento, usuario.Peso,
                     usuario.Altura, usuario.ImagemPerfil
                 ))
-                .ToList();
+                .ToListAsync();
         }
 
-        public Usuario? GetViaLogin(string email, string senha)
+        public async Task<Usuario?> GetSemelhanteEmail(string email)
         {
-            return _context.Usuarios
-                .FirstOrDefault(usuario => usuario.Email == email
+            return await _context.Usuarios
+                .FirstOrDefaultAsync(usuario => usuario.Email == email);
+        }
+
+        public async Task<Usuario?> GetSemelhanteUserName(string userName)
+        {
+            return await _context.Usuarios
+                .FirstOrDefaultAsync(usuario => usuario.UserName == userName);
+        }
+
+        public async Task<List<UsuarioDto>> GetUsuariosNome(string nome)
+        {
+            var candidatos = await _context.Usuarios
+                .Where(usuario => 
+                    usuario.Nome.ToLower().Contains
+                        (nome.ToLower()))
+                .Select(usuario => new UsuarioDto
+                (
+                    usuario.Id, usuario.Idade,
+                    usuario.XP, usuario.Level,
+                    usuario.XP_ProximoNivel, usuario.Nome,
+                    usuario.Email, usuario.Senha,
+                    usuario.Esporte, usuario.Genero,
+                    usuario.UserName, usuario.PalavraRecuperacao,
+                    usuario.DataNascimento, usuario.Peso,
+                    usuario.Altura, usuario.ImagemPerfil
+                ))
+                .ToListAsync();
+
+            var resultados = candidatos
+                .Where(usuarios => AlgoritmosDePesquisa.SimilaridadeDeJaccard(usuarios.nome, nome) > 0.4)
+                .ToList();
+
+            return resultados;
+        }
+
+        public async Task<Usuario?> GetViaLogin(string email, string senha)
+        {
+            return await _context.Usuarios
+                .FirstOrDefaultAsync(usuario => usuario.Email == email
                                            && usuario.Senha == senha);
         }
 
-        public void Delete(Usuario usuario)
+        public async Task Update(Usuario usuario)
         {
-            _context.Usuarios.Remove(usuario);
-            _context.SaveChanges();
+            _context.Usuarios.Update(usuario);
+            await _context.SaveChangesAsync();
+            ConfigUsuario.CurrentUser = usuario;
         }
 
-        public Usuario? RecuperarSenha(string email, string palavraRecuperacao)
+        public async Task Delete(Usuario usuario)
         {
-            return _context.Usuarios
-                .FirstOrDefault(usuario => usuario.PalavraRecuperacao == palavraRecuperacao
+            _context.Usuarios.Remove(usuario);
+            await _context.SaveChangesAsync();
+            ConfigUsuario.CurrentUser = null;
+        }
+
+        public async Task<Usuario?> RecuperarSenha(string email, string palavraRecuperacao)
+        {
+            return await _context.Usuarios
+                .FirstOrDefaultAsync(usuario => usuario.PalavraRecuperacao == palavraRecuperacao
                                            && usuario.Email == email);
         }
 
-        public bool VerificarSeExisteEmailUsername(Usuario usuarioInformado)
+        public async Task<bool> VerificarSeExisteEmailUsername(Usuario usuarioInformado)
         {
-            return _context.Usuarios
-                .Any(usuario => usuario.UserName == usuarioInformado.UserName
+            return await _context.Usuarios
+                .AnyAsync(usuario => usuario.UserName == usuarioInformado.UserName
                                 || usuario.Email == usuarioInformado.Email);
         }
 
-        public List<UsuarioDto> GetUsuariosNome(string nome)
+        public async Task<bool> VerificaSeCadastrado(string email)
         {
-            return _context.Usuarios
-                .Select(u => new UsuarioDto
-                (
-                    u.Id,
-                    u.Idade,
-                    u.XP,
-                    u.Level,
-                    u.XP_ProximoNivel,
-                    u.Nome,
-                    u.Email,
-                    u.Senha,
-                    u.Esporte,
-                    u.Genero,
-                    u.UserName,
-                    u.PalavraRecuperacao,
-                    u.DataNascimento,
-                    u.Peso,
-                    u.Altura,
-                    u.ImagemPerfil
-                ))
-                .AsEnumerable() // TODO: (Modificar Pra Uso Real) Traz os dados para a memória, Isso pode gerar um problema futuro causo seja implementado na vida real
-                .Where(usuario => AlgoritmosDePesquisa.SimilaridadeDeJaccard(usuario.nome, nome) > 0.3)
-                .ToList();
+            return await _context.Usuarios
+                .AnyAsync(usuario => usuario.Email == email);
         }
     }
 }

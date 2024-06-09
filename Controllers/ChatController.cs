@@ -29,7 +29,7 @@ namespace WebAPI_Apollo.Controllers
         [Route("{destinatario}/{conteudo}")]
         public IActionResult AddMsg(Guid destinatario, string conteudo)
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
@@ -41,7 +41,7 @@ namespace WebAPI_Apollo.Controllers
                 return BadRequest("Não é possível mandar uma mensagem para si mesmo");
             }
 
-            var amigos = _amzdRepository.VerificarAmizade(new Amizade(usuario.Id, destinatario));
+            var amigos = _amzdRepository.VerificarAmizade(new Amizade(usuario.Id, destinatario)).Result;
 
             if (amigos is null)
             {
@@ -50,8 +50,8 @@ namespace WebAPI_Apollo.Controllers
 
             var novaMensagem = new Mensagem(usuario.Id, destinatario, conteudo);
 
-            var amigo = _usrRepository.Get(destinatario);
-            var home = _infHomeRepository.GetViaUsr(destinatario);
+            var amigo = _usrRepository.Get(destinatario).Result;
+            var home = _infHomeRepository.GetViaUsr(destinatario).Result;
 
             if (amigo is null)
             {
@@ -68,9 +68,8 @@ namespace WebAPI_Apollo.Controllers
             _infHomeRepository.Update(home);
             _msgRepository.Add(novaMensagem);
 
-            var resposta = new ChatDto
+            var resposta = new ChatDtoRetornoPost
                 (
-                    novaMensagem.Id,
                     novaMensagem.Remetente,
                     novaMensagem.Destinatario,
                     novaMensagem.Conteudo,
@@ -84,7 +83,7 @@ namespace WebAPI_Apollo.Controllers
         [HttpGet]
         public IActionResult GetAllMsg()
         {
-            var mensagem = _msgRepository.GetAll();
+            var mensagem = _msgRepository.GetAll().Result;
 
             if (mensagem is null || mensagem.Count == 0)
             {
@@ -99,16 +98,15 @@ namespace WebAPI_Apollo.Controllers
         [Route("{id}")]
         public IActionResult GetMsg(int id)
         {
-            var mensagem = _msgRepository.Get(id);
+            var mensagem = _msgRepository.Get(id).Result;
 
             if (mensagem is null)
             {
                 return NotFound();
             }
 
-            var resposta = new ChatDto
+            var resposta = new ChatDtoRetornoPost
                 (
-                    mensagem.Id,
                     mensagem.Remetente,
                     mensagem.Destinatario,
                     mensagem.Conteudo,
@@ -124,7 +122,7 @@ namespace WebAPI_Apollo.Controllers
         [Route("{id}/{conteudo}")]
         public IActionResult AtualizarMsg(int id, string conteudo)
         {
-            var mensagem = _msgRepository.Get(id);
+            var mensagem = _msgRepository.Get(id).Result;
 
             if (mensagem is null)
             {
@@ -136,9 +134,8 @@ namespace WebAPI_Apollo.Controllers
 
             _msgRepository.Update(mensagem);
 
-            var resposta = new ChatDto
+            var resposta = new ChatDtoRetornoPost
                 (
-                    mensagem.Id,
                     mensagem.Remetente,
                     mensagem.Destinatario,
                     mensagem.Conteudo,
@@ -153,7 +150,7 @@ namespace WebAPI_Apollo.Controllers
         [Route("{id}")]
         public IActionResult Delete(int id)
         {
-            var mensagem = _msgRepository.Get(id);
+            var mensagem = _msgRepository.Get(id).Result;
 
             if (mensagem is null)
             {
@@ -173,14 +170,14 @@ namespace WebAPI_Apollo.Controllers
         [Route("Usuario/Enviadas")]
         public IActionResult GetEnviadas()
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }
 
-            var mensagens = _msgRepository.EnviadasPor(usuario.Id);
+            var mensagens = _msgRepository.EnviadasPor(usuario.Id).Result;
 
             if (mensagens is null || mensagens.Count == 0)
             {
@@ -194,14 +191,14 @@ namespace WebAPI_Apollo.Controllers
         [Route("Usuario/Recebidas")]
         public IActionResult GetRecebidas()
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }
 
-            var mensagens = _msgRepository.RecebidasPor(usuario.Id);
+            var mensagens = _msgRepository.RecebidasPor(usuario.Id).Result;
 
             if (mensagens is null || mensagens.Count == 0)
             {
@@ -216,14 +213,14 @@ namespace WebAPI_Apollo.Controllers
         [Route("Usuario/TrocadasCom/{destinatario}")]
         public IActionResult GetEnviadasEntreIDs(Guid destinatario)
         {
-            var usuario = _usrRepository.Get(ConfigUsuario.CurrentUserId);
+            var usuario = ConfigUsuario.CurrentUser;
 
             if (usuario is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }
 
-            var mensagens = _msgRepository.EnviadasEntre(usuario.Id, destinatario);
+            var mensagens = _msgRepository.EnviadasEntre(usuario.Id, destinatario).Result;
 
             if (mensagens is null || mensagens.Count == 0)
             {

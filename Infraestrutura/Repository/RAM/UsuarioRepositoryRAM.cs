@@ -8,43 +8,60 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
     public class UsuarioRepositoryRAM : IUsuarioRepository
     {
 
-        public void Add(Usuario usuario)
+        public async Task Add(Usuario usuario)
         {
-            VolatileContext.Usuarios.Add(usuario);
-        }
-
-        public Usuario? Get(Guid id)
-        {
-            return VolatileContext.Usuarios.FirstOrDefault(usuario => usuario.Id == id);
-        }
-
-        public Usuario? GetSemelhanteUserName(string userName)
-        {
-            return VolatileContext.Usuarios.FirstOrDefault(usuario => usuario.UserName == userName);
-        }
-
-        public Usuario? GetSemelhanteEmail(string email)
-        {
-            return VolatileContext.Usuarios.FirstOrDefault(usuario => usuario.Email == email);
-        }
-
-        public void Update(Usuario usuario)
-        {
-            var index = VolatileContext.Usuarios.FindIndex(u => u.Id == usuario.Id);
-            if (index != -1)
+            await Task.Run(() =>
             {
-                VolatileContext.Usuarios[index] = usuario;
-            }
+                VolatileContext.Usuarios.Add(usuario);
+            });
         }
 
-        public bool VerificaSeCadastrado(string email)
+        public Task<Usuario?> Get(Guid id)
         {
-            return VolatileContext.Usuarios.Any(usuario => usuario.Email == email);
+            var resultado = VolatileContext.Usuarios
+                .FirstOrDefault(usuario => usuario.Id == id);
+
+            return Task.FromResult(resultado);
         }
 
-        public List<UsuarioDto> GetAll()
+        public Task<Usuario?> GetSemelhanteUserName(string userName)
         {
-            return VolatileContext.Usuarios
+            var resultado = VolatileContext.Usuarios
+                .FirstOrDefault(usuario => usuario.UserName == userName);
+
+            return Task.FromResult(resultado);
+        }
+
+        public Task<Usuario?> GetSemelhanteEmail(string email)
+        {
+            var resultado = VolatileContext.Usuarios.FirstOrDefault(usuario => usuario.Email == email);
+
+            return Task.FromResult(resultado);
+        }
+
+        public async Task Update(Usuario usuario)
+        {
+            await Task.Run(() =>
+            {
+                var index = VolatileContext.Usuarios.FindIndex(u => u.Id == usuario.Id);
+                if (index != -1)
+                {
+                    VolatileContext.Usuarios[index] = usuario;
+                    ConfigUsuario.CurrentUser = usuario;
+                }
+            });
+        }
+
+        public Task<bool> VerificaSeCadastrado(string email)
+        {
+            var resultado = VolatileContext.Usuarios.Any(usuario => usuario.Email == email);
+
+            return Task.FromResult(resultado);
+        }
+
+        public Task<List<UsuarioDto>> GetAll()
+        {
+            var resultado = VolatileContext.Usuarios
                 .Select(usuario => new UsuarioDto
                 (
                     usuario.Id, usuario.Idade,
@@ -57,57 +74,69 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                     usuario.Altura, usuario.ImagemPerfil
                 ))
                 .ToList();
+
+            return Task.FromResult(resultado);
         }
 
-        public Usuario? GetViaLogin(string email, string senha)
+        public Task<Usuario?> GetViaLogin(string email, string senha)
         {
-            return VolatileContext.Usuarios
+            var resultado = VolatileContext.Usuarios
                 .FirstOrDefault(usuario => usuario.Email == email && usuario.Senha == senha);
+
+            return Task.FromResult(resultado);
         }
 
-        public void Delete(Usuario usuario)
+        public async Task Delete(Usuario usuario)
         {
-            VolatileContext.Usuarios.Remove(usuario);
+            await Task.Run(() =>
+            {
+                VolatileContext.Usuarios.Remove(usuario);
+                ConfigUsuario.CurrentUser = null;
+            });
         }
 
-        public Usuario? RecuperarSenha(string email, string palavraRecuperacao)
+        public Task<Usuario?> RecuperarSenha(string email, string palavraRecuperacao)
         {
-            return VolatileContext.Usuarios
+            var resultado = VolatileContext.Usuarios
                 .FirstOrDefault(usuario => usuario.PalavraRecuperacao == palavraRecuperacao
                                            && usuario.Email == email);
+
+            return Task.FromResult(resultado);
         }
 
-        public bool VerificarSeExisteEmailUsername(Usuario usuarioInformado)
+        public Task<bool> VerificarSeExisteEmailUsername(Usuario usuarioInformado)
         {
-            return VolatileContext.Usuarios
+            var resultado = VolatileContext.Usuarios
                 .Any(usuario => usuario.UserName == usuarioInformado.UserName
                                 || usuario.Email == usuarioInformado.Email);
+
+            return Task.FromResult(resultado);
         }
 
-        public List<UsuarioDto> GetUsuariosNome(string nome)
+        public Task<List<UsuarioDto>> GetUsuariosNome(string nome)
         {
-            return VolatileContext.Usuarios
-                .Select(u => new UsuarioDto
+            var candidatos = VolatileContext.Usuarios
+                .Where(usuario =>
+                    usuario.Nome.Contains
+                        (nome, StringComparison.CurrentCultureIgnoreCase))
+                .Select(usuario => new UsuarioDto
                 (
-                    u.Id,
-                    u.Idade,
-                    u.XP,
-                    u.Level,
-                    u.XP_ProximoNivel,
-                    u.Nome,
-                    u.Email,
-                    u.Senha,
-                    u.Esporte,
-                    u.Genero,
-                    u.UserName,
-                    u.PalavraRecuperacao,
-                    u.DataNascimento,
-                    u.Peso,
-                    u.Altura,
-                    u.ImagemPerfil
+                    usuario.Id, usuario.Idade,
+                    usuario.XP, usuario.Level,
+                    usuario.XP_ProximoNivel, usuario.Nome,
+                    usuario.Email, usuario.Senha,
+                    usuario.Esporte, usuario.Genero,
+                    usuario.UserName, usuario.PalavraRecuperacao,
+                    usuario.DataNascimento, usuario.Peso,
+                    usuario.Altura, usuario.ImagemPerfil
                 ))
+                .ToList();
+
+            var resultados = candidatos    
                 .Where(usuario => AlgoritmosDePesquisa.SimilaridadeDeJaccard(usuario.nome, nome) > 0.6)
                 .ToList();
+
+            return Task.FromResult(resultados);
         }
     }
 }

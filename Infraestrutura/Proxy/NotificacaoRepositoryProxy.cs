@@ -29,59 +29,59 @@ namespace WebAPI_Apollo.Infraestrutura.Proxy
 
         private INotificacaoRepository CurrentRepository => _currentRepository;
 
-        public void Add(Notificacao notificacao)
+        public async Task Add(Notificacao notificacao)
         {
-            CurrentRepository.Add(notificacao);
+            await CurrentRepository.Add(notificacao);
         }
 
-        public void DeletarReferencias(Guid idUsuario)
+        public async Task DeletarReferencias(Guid idUsuario)
         {
-            CurrentRepository.DeletarReferencias(idUsuario);
+            await CurrentRepository.DeletarReferencias(idUsuario);
         }
 
-        public void Delete(Notificacao notificacao)
+        public async Task Delete(Notificacao notificacao)
         {
-            CurrentRepository.Delete(notificacao);
+            await CurrentRepository.Delete(notificacao);
         }
 
-        public Notificacao? Get(int id)
+        public Task<Notificacao?> Get(int id)
         {
             return CurrentRepository.Get(id);
         }
 
-        public List<NotificacoesDaRedeDto> GetAll()
+        public Task<List<NotificacoesDaRedeDto>> GetAll()
         {
             return CurrentRepository.GetAll();
         }
 
-        public List<NotificacoesDaRedeDto> GetAllEnviadasNotiAmizadeUsr(Guid idUsuario)
+        public Task<List<NotificacoesDaRedeDto>> GetAllEnviadasNotiAmizadeUsr(Guid idUsuario)
         {
             return CurrentRepository.GetAllEnviadasNotiAmizadeUsr(idUsuario);
         }
 
-        public List<NotificacoesDaRedeDto> GetAllNotiAmizadeUsr(Guid idUsuario)
+        public Task<List<NotificacoesDaRedeDto>> GetAllNotiAmizadeUsr(Guid idUsuario)
         {
             return CurrentRepository.GetAllNotiAmizadeUsr(idUsuario);
         }
 
-        public List<NotificacoesDaRedeDto> GetAllUsr(Guid idUsuario)
+        public Task<List<NotificacoesDaRedeDto>> GetAllUsr(Guid idUsuario)
         {
             return CurrentRepository.GetAllUsr(idUsuario);
         }
 
-        public Notificacao? GetLast()
+        public Task<Notificacao?> GetLast()
         {
             return CurrentRepository.GetLast();
         }
 
-        public Notificacao? JaFoiNotificado(Notificacao notificacao)
+        public Task<Notificacao?> JaFoiNotificado(Notificacao notificacao)
         {
             return CurrentRepository.JaFoiNotificado(notificacao);
         }
 
-        public void Update(Notificacao notificacao)
+        public async Task Update(Notificacao notificacao)
         {
-            CurrentRepository.Update(notificacao);
+            await CurrentRepository.Update(notificacao);
         }
     }
 }

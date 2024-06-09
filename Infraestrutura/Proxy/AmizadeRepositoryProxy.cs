@@ -28,42 +28,42 @@ namespace WebAPI_Apollo.Infraestrutura.Proxy
 
         private IAmizadeRepository CurrentRepository => _currentRepository;
 
-        public void Add(Amizade amizade)
+        public async Task Add(Amizade amizade)
         {
-            CurrentRepository.Add(amizade);
+            await CurrentRepository.Add(amizade);
         }
 
-        public void DeletarReferencias(Guid idUsuario)
+        public async Task DeletarReferencias(Guid idUsuario)
         {
-            CurrentRepository.DeletarReferencias(idUsuario);
+            await CurrentRepository.DeletarReferencias(idUsuario);
         }
 
-        public void Delete(Amizade amizade)
+        public async Task Delete(Amizade amizade)
         {
-            CurrentRepository.Delete(amizade);
+            await CurrentRepository.Delete(amizade);
         }
 
-        public Amizade? Get(int id)
+        public Task<Amizade?> Get(int id)
         {
             return CurrentRepository.Get(id);
         }
 
-        public List<Amizade> GetAllUsr(Guid idUsuario)
+        public Task<List<Amizade>> GetAllUsr(Guid idUsuario)
         {
             return CurrentRepository.GetAllUsr(idUsuario);
         }
 
-        public Amizade? GetLast()
+        public Task<Amizade?> GetLast()
         {
             return CurrentRepository.GetLast();
         }
 
-        public void Update(Amizade amizade)
+        public async Task Update(Amizade amizade)
         {
-            CurrentRepository.Update(amizade);
+            await CurrentRepository.Update(amizade);
         }
 
-        public Amizade? VerificarAmizade(Amizade amizade)
+        public Task<Amizade?> VerificarAmizade(Amizade amizade)
         {
             return CurrentRepository.VerificarAmizade(amizade);
         }

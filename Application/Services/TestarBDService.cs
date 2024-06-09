@@ -28,6 +28,22 @@ namespace WebAPI_Apollo.Application.Services
         {
             using var scope = _serviceProvider.CreateScope();
             var serviceProvider = scope.ServiceProvider;
+
+            ConfigService.DBFuncionando = ExecutarTeste();
+
+            if (ConfigService.DBFuncionando)
+            {
+                _configService.DBAtivado = true; // Mudar aqui pra forçar o uso da RAM no inicio
+            }
+            else 
+            {
+                Console.WriteLine("Erro nos Testes do Banco de Dados");
+                _configService.DBAtivado = false;
+            }
+        }
+
+        public static bool ExecutarTeste()
+        {
             bool read = true;
             bool write = true;
             bool delete = true;
@@ -35,7 +51,7 @@ namespace WebAPI_Apollo.Application.Services
             try
             {
                 using AppDbContext TesteBanco = new();
-                // A intenção aqui é gerar um erro caso não exista tabela correspondente,
+                // A intenção aqui é gerar um erro causo não exista tabela correspondente,
                 // ao mesmo tempo que verifica se existe um valor inicial já na tabela,
                 // não existindo ele insere
                 TestTable? tabelaExiste = TesteBanco.TestTable.FirstOrDefault();
@@ -94,18 +110,11 @@ namespace WebAPI_Apollo.Application.Services
                     }
                 }
 
-                if (read && write && delete)
-                {
-                    ConfigService.DBFuncionando = false; // Trocar aqui pra forçar uso da RAM no inicio
-                }
-
-                // Se todos os testes passarem ativa o banco
-                _configService.DBAtivado = ConfigService.DBFuncionando;
+                return read && write && delete;
             }
-            catch (Exception ex)
+            catch (Microsoft.Data.Sqlite.SqliteException)
             {
-                Console.WriteLine($"Erro nos Testes do Banco de Dados: {ex.Message}");
-                _configService.DBAtivado = false;
+                return false;
             }
         }
     }

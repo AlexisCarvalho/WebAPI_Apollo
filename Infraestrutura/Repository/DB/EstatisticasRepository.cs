@@ -1,4 +1,5 @@
-﻿using WebAPI_Apollo.Domain.Model;
+﻿using Microsoft.EntityFrameworkCore;
+using WebAPI_Apollo.Domain.Model;
 using WebAPI_Apollo.Domain.Model.Interfaces;
 
 namespace WebAPI_Apollo.Infraestrutura.Repository.DB
@@ -7,44 +8,44 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
     {
         private readonly AppDbContext _context = new();
 
-        public void Add(Estatisticas estatisticas)
+        public async Task Add(Estatisticas estatisticas)
         {
-            _context.Estatisticas.Add(estatisticas);
-            _context.SaveChanges();
+            await _context.Estatisticas.AddAsync(estatisticas);
+            await _context.SaveChangesAsync();
         }
 
-        public void DeletarReferencias(int idEstatisticas)
+        public async Task<Estatisticas?> Get(int id)
         {
-            var estatisticasDoUsuario = _context.Estatisticas
-                .Where(est => est.Id == idEstatisticas)
-                .ToList();
-
-            _context.Estatisticas.RemoveRange(estatisticasDoUsuario);
-            _context.SaveChanges();
+            return await _context.Estatisticas.FirstOrDefaultAsync(e => e.Id == id);
         }
 
-        public void Delete(Estatisticas estatisticas)
+        public async Task<Estatisticas?> GetLast()
         {
-            _context.Estatisticas.Remove(estatisticas);
-            _context.SaveChanges();
-        }
-
-        public Estatisticas? Get(int id)
-        {
-            return _context.Estatisticas.FirstOrDefault(e => e.Id == id);
-        }
-
-        public Estatisticas? GetLast()
-        {
-            return _context.Estatisticas
+            return await _context.Estatisticas
                 .OrderByDescending(e => e.Id)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
         }
 
-        public void Update(Estatisticas estatisticas)
+        public async Task Update(Estatisticas estatisticas)
         {
             _context.Estatisticas.Update(estatisticas);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task Delete(Estatisticas estatisticas)
+        {
+            _context.Estatisticas.Remove(estatisticas);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeletarReferencias(int idEstatisticas)
+        {
+            var estatisticasDoUsuario = await _context.Estatisticas
+                .Where(est => est.Id == idEstatisticas)
+                .ToListAsync();
+
+            _context.Estatisticas.RemoveRange(estatisticasDoUsuario);
+            await _context.SaveChangesAsync();
         }
     }
 }

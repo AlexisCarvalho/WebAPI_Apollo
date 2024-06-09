@@ -28,39 +28,39 @@ namespace WebAPI_Apollo.Infraestrutura.Proxy
 
         private IInformHomeRepository CurrentRepository => _currentRepository;
 
-        public void Add(InformHome informHome)
+        public async Task Add(InformHome informHome)
         {
-            CurrentRepository.Add(informHome);
+            await CurrentRepository.Add(informHome);
         }
 
-        public void Delete(InformHome informHome)
+        public async Task Delete(InformHome informHome)
         {
-            CurrentRepository.Delete(informHome);
+            await CurrentRepository.Delete(informHome);
         }
 
-        public InformHome? Get(int id)
+        public Task<InformHome?> Get(int id)
         {
             return CurrentRepository.Get(id);
         }
 
-        public InformHome? GetLast()
+        public Task<InformHome?> GetLast()
         {
             return CurrentRepository.GetLast();
         }
 
-        public InformHome? GetViaUsr(Guid idUsuario)
+        public Task<InformHome?> GetViaUsr(Guid idUsuario)
         {
             return CurrentRepository.GetViaUsr(idUsuario);
         }
 
-        public InformHome? JaExiste(InformHome informHome)
+        public Task<InformHome?> JaExiste(InformHome informHome)
         {
             return CurrentRepository.JaExiste(informHome);
         }
 
-        public void Update(InformHome informHome)
+        public async Task Update(InformHome informHome)
         {
-            CurrentRepository.Update(informHome);
+            await CurrentRepository.Update(informHome);
         }
     }
 }

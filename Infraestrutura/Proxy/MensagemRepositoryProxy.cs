@@ -29,49 +29,49 @@ namespace WebAPI_Apollo.Infraestrutura.Proxy
 
         private IMensagemRepository CurrentRepository => _currentRepository;
 
-        public void Add(Mensagem mensagem)
+        public async Task Add(Mensagem mensagem)
         {
-            CurrentRepository.Add(mensagem);
+            await CurrentRepository.Add(mensagem);
         }
 
-        public void Delete(Mensagem mensagem)
+        public async Task Delete(Mensagem mensagem)
         {
-            CurrentRepository.Delete(mensagem);
+            await CurrentRepository.Delete(mensagem);
         }
 
-        public List<ChatDto> EnviadasEntre(Guid remetente, Guid destinatario)
+        public Task<List<ChatDto>> EnviadasEntre(Guid remetente, Guid destinatario)
         {
             return CurrentRepository.EnviadasEntre(remetente, destinatario);
         }
 
-        public List<ChatDto> EnviadasPor(Guid id)
+        public Task<List<ChatDto>> EnviadasPor(Guid id)
         {
             return CurrentRepository.EnviadasPor(id);
         }
 
-        public Mensagem? Get(int id)
+        public Task<Mensagem?> Get(int id)
         {
             return CurrentRepository.Get(id);
         }
 
-        public List<ChatDto> GetAll()
+        public Task<List<ChatDto>> GetAll()
         {
             return CurrentRepository.GetAll();
         }
 
-        public Mensagem? GetLast()
+        public Task<Mensagem?> GetLast()
         {
             return CurrentRepository.GetLast();
         }
 
-        public List<ChatDto> RecebidasPor(Guid id)
+        public Task<List<ChatDto>> RecebidasPor(Guid id)
         {
             return CurrentRepository.RecebidasPor(id);
         }
 
-        public void Update(Mensagem mensagem)
+        public async Task Update(Mensagem mensagem)
         {
-            CurrentRepository.Update(mensagem);
+            await CurrentRepository.Update(mensagem);
         }
     }
 }
