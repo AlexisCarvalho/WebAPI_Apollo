@@ -752,6 +752,21 @@ namespace WebAPI_Apollo.Controllers
             return Ok(token);
         }
 
+        // Deslogar da Rede
+        [HttpPost]
+        [Route("Login/Deslogar")]
+        public IActionResult LoginOff()
+        {
+            if(ConfigUsuario.CurrentUser is null)
+            {
+                return BadRequest("Nenhum Usuario Logado");
+            }
+
+            ConfigUsuario.CurrentUser = null;
+
+            return Ok();
+        }
+
         // Rota para alterar as informações do Login
         [HttpPut]
         [Route("Login/{email}/{senha}")]
