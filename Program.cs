@@ -38,29 +38,12 @@ builder.Services.AddTransient<IPostRepository, PostRepositoryRAM>();
 // | Usuario Repository |
 builder.Services.AddTransient<IUsuarioRepository, UsuarioRepositoryRAM>();
 
-// Esse primeiro aqui limita por porta "endereço",
-// se descobrir como setar uma porta especifica no Electron
-// muda pra essa aqui, o que esta sendo usado é a de baixo
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: "RestringirAcesso",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:3000") // Muda isso aqui pro do Electron João
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-        });
-});
-
-// Essa aqui libera pra qualquer endereço ou porta,
-// independente de quem tentar,
-// se estiver rodando na mesma maquina vai executar
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("Liberado",
         builder =>
         {
-            builder.AllowAnyOrigin() // Permite acesso de qualquer origem
+            builder.AllowAnyOrigin()
                    .AllowAnyHeader()
                    .AllowAnyMethod();
         });
