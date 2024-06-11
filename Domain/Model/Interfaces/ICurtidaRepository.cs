@@ -4,11 +4,11 @@ namespace WebAPI_Apollo.Domain.Model.Interfaces
 {
     public interface ICurtidaRepository
     {
-        Task Add(Curtida curtida);
-        Task<Curtida?> Get(int id);
-        Task<Curtida?> GetLast();
-        Task Update(Curtida curtida);
-        Task Delete(Curtida curtida);
-        Task<Curtida?> JaCurtiu(Curtida curtida);
+        void Add(Curtida curtida);
+        void Delete(Curtida curtida);
+        Curtida? Get(int id);
+        Curtida? GetLast();
+        Curtida? JaCurtiu(Curtida curtida);
+        void Update(Curtida curtida);
     }
 }

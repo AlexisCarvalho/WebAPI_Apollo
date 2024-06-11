@@ -6,47 +6,40 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
 {
     public class NotificacaoRepositoryRAM : INotificacaoRepository
     {
-        public async Task Add(Notificacao notificacao)
+        public void Add(Notificacao notificacao)
         {
-            await Task.Run(() =>
+            // Código pra substituir o autoIncrement do Banco
+            var ultimaNotificacao = GetLast();
+
+            if (ultimaNotificacao != null)
             {
-                // Código pra substituir o autoIncrement do Banco
-                var ultimaNotificacao = GetLast().Result;
+                notificacao.Id = ultimaNotificacao.Id + 1;
+            }
+            else
+            {
+                notificacao.Id = 1;
+            }
+            // Visa manter o uso de id int ao invés de trocar pra Guid
 
-                if (ultimaNotificacao != null)
-                {
-                    notificacao.Id = ultimaNotificacao.Id + 1;
-                }
-                else
-                {
-                    notificacao.Id = 1;
-                }
-                // Visa manter o uso de id int ao invés de trocar pra Guid
-
-                VolatileContext.Notificacoes.Add(notificacao);
-            });
+            VolatileContext.Notificacoes.Add(notificacao);
         }
 
-        public Task<Notificacao?> JaFoiNotificado(Notificacao notificacao)
+        public Notificacao? JaFoiNotificado(Notificacao notificacao)
         {
-            var resultado = VolatileContext.Notificacoes
+            return VolatileContext.Notificacoes
                 .FirstOrDefault(notificacoesNoBanco =>
                 notificacoesNoBanco.Remetente == notificacao.Remetente &&
                 notificacoesNoBanco.Destinatario == notificacao.Destinatario &&
                 notificacoesNoBanco.TipoDeNotificacao == notificacao.TipoDeNotificacao);
-
-            return Task.FromResult(resultado);
         }
 
-        public Task<Notificacao?> Get(int id)
+        public Notificacao? Get(int id)
         {
-            var resultado = VolatileContext.Notificacoes
+            return VolatileContext.Notificacoes
                 .FirstOrDefault(e => e.Id == id);
-
-            return Task.FromResult(resultado);
         }
 
-        public Task<List<NotificacoesDaRedeDto>> GetAll()
+        public List<NotificacoesDaRedeDto> GetAll()
         {
             var notificacoesSaida = new List<NotificacoesDaRedeDto>();
             var notificacoes = VolatileContext.Notificacoes
@@ -80,10 +73,10 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                 notificacoesSaida.Add(notiSaida);
             }
 
-            return Task.FromResult(notificacoesSaida);
+            return notificacoesSaida;
         }
 
-        public Task<List<NotificacoesDaRedeDto>> GetAllUsr(Guid idUsuario)
+        public List<NotificacoesDaRedeDto> GetAllUsr(Guid idUsuario)
         {
             var notificacoesSaida = new List<NotificacoesDaRedeDto>();
             var notificacoes = VolatileContext.Notificacoes
@@ -118,10 +111,10 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                 notificacoesSaida.Add(notiSaida);
             }
 
-            return Task.FromResult(notificacoesSaida);
+            return notificacoesSaida;
         }
 
-        public Task<List<NotificacoesDaRedeDto>> GetAllNotiAmizadeUsr(Guid idUsuario)
+        public List<NotificacoesDaRedeDto> GetAllNotiAmizadeUsr(Guid idUsuario)
         {
             var notificacoesSaida = new List<NotificacoesDaRedeDto>();
             var notificacoes = VolatileContext.Notificacoes
@@ -156,10 +149,10 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                 notificacoesSaida.Add(notiSaida);
             }
 
-            return Task.FromResult(notificacoesSaida);
+            return notificacoesSaida;
         }
 
-        public Task<List<NotificacoesDaRedeDto>> GetAllEnviadasNotiAmizadeUsr(Guid idUsuario)
+        public List<NotificacoesDaRedeDto> GetAllEnviadasNotiAmizadeUsr(Guid idUsuario)
         {
             var notificacoesSaida = new List<NotificacoesDaRedeDto>();
             var notificacoes = VolatileContext.Notificacoes
@@ -194,62 +187,51 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                 notificacoesSaida.Add(notiSaida);
             }
 
-            return Task.FromResult(notificacoesSaida);
+            return notificacoesSaida;
         }
 
-        public Task<Notificacao?> GetLast()
+        public Notificacao? GetLast()
         {
-            var resultado = VolatileContext.Notificacoes
+            return VolatileContext.Notificacoes
                 .OrderByDescending(e => e.Id)
                 .FirstOrDefault();
-
-            return Task.FromResult(resultado);
         }
 
-        public async Task Update(Notificacao notificacao)
+        public void Update(Notificacao notificacao)
         {
-            await Task.Run(() =>
+            var index = VolatileContext.Notificacoes
+            .FindIndex(e => e.Id == notificacao.Id);
+            if (index != -1)
             {
-                var index = VolatileContext.Notificacoes
-                .FindIndex(e => e.Id == notificacao.Id);
-                if (index != -1)
-                {
-                    VolatileContext.Notificacoes[index] = notificacao;
-                }
-            });
+                VolatileContext.Notificacoes[index] = notificacao;
+            }
         }
 
-        public async Task Delete(Notificacao notificacao)
+        public void Delete(Notificacao notificacao)
         {
-            await Task.Run(() =>
-            {
-                VolatileContext.Notificacoes.Remove(notificacao);
-            });
+            VolatileContext.Notificacoes.Remove(notificacao);
         }
 
-        public async Task DeletarReferencias(Guid idUsuario)
+        public void DeletarReferencias(Guid idUsuario)
         {
-            await Task.Run(() =>
-            {
-                var notificacoesDoUsr = VolatileContext.Notificacoes
-                .Select(noti => new Notificacao
-                (
-                    noti.Id,
-                    noti.Remetente,
-                    noti.Destinatario,
-                    noti.TipoDeNotificacao,
-                    noti.TimeStamp,
-                    noti.MensagemDaNotificacao
-                ))
-                .Where(ntf => ntf.Destinatario == idUsuario
-                              || ntf.Remetente == idUsuario)
-                .ToList();
+            var notificacoesDoUsr = VolatileContext.Notificacoes
+            .Select(noti => new Notificacao
+            (
+                noti.Id,
+                noti.Remetente,
+                noti.Destinatario,
+                noti.TipoDeNotificacao,
+                noti.TimeStamp,
+                noti.MensagemDaNotificacao
+            ))
+            .Where(ntf => ntf.Destinatario == idUsuario
+                          || ntf.Remetente == idUsuario)
+            .ToList();
 
-                foreach (var notificacoes in notificacoesDoUsr)
-                {
-                    VolatileContext.Notificacoes.Remove(notificacoes);
-                }
-            });
+            foreach (var notificacoes in notificacoesDoUsr)
+            {
+                VolatileContext.Notificacoes.Remove(notificacoes);
+            }
         }
     }
 }

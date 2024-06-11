@@ -524,7 +524,7 @@ namespace WebAPI_Apollo.Controllers
 
             _crtRepository.Add(curtida);
             postCurtido.NumCurtidas++;
-            
+
             _pstRepository.Update(postCurtido);
 
             // ******* Area destinada aos ganhos de XP automatico da Rede ****** //
@@ -537,7 +537,7 @@ namespace WebAPI_Apollo.Controllers
 
             var usuarioDoPost = _usrRepository.Get(postCurtido.IdUsuario).Result;
 
-            if(usuarioDoPost is null)
+            if (usuarioDoPost is null)
             {
                 return Problem("Usuario Que Publicou Não Encontrado");
             }

@@ -2,11 +2,11 @@
 {
     public interface IEstatisticasRepository
     {
-        Task Add(Estatisticas estatisticas);
-        Task<Estatisticas?> Get(int id);
-        Task<Estatisticas?> GetLast();
-        Task Update(Estatisticas estatisticas);
-        Task Delete(Estatisticas est);
-        Task DeletarReferencias(int idEstatisticas);
+        void Add(Estatisticas estatisticas);
+        void DeletarReferencias(int idEstatisticas);
+        void Delete(Estatisticas est);
+        Estatisticas? Get(int id);
+        Estatisticas? GetLast();
+        void Update(Estatisticas estatisticas);
     }
 }

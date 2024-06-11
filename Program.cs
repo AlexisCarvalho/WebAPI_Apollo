@@ -2,11 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using WebAPI_Apollo.Application.Services;
 using WebAPI_Apollo.Domain.Model.Interfaces;
-using WebAPI_Apollo.Infraestrutura;
-using WebAPI_Apollo.Infraestrutura.Proxy;
-using WebAPI_Apollo.Infraestrutura.Repository.DB;
 using WebAPI_Apollo.Infraestrutura.Repository.RAM;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,98 +14,29 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<ConfigService>();
-
 // | Amizade Repository |
-builder.Services.AddTransient<AmizadeRepository>();
-builder.Services.AddTransient<AmizadeRepositoryRAM>();
-builder.Services.AddTransient<IAmizadeRepository>(provider =>
-{
-    var configService = provider.GetRequiredService<ConfigService>();
-    var dbRepository = provider.GetRequiredService<AmizadeRepository>();
-    var ramRepository = provider.GetRequiredService<AmizadeRepositoryRAM>();
-    return new AmizadeRepositoryProxy(configService, dbRepository, ramRepository);
-});
+builder.Services.AddTransient<IAmizadeRepository, AmizadeRepositoryRAM>();
 
 // | Curtida Repository |
-builder.Services.AddTransient<CurtidaRepository>();
-builder.Services.AddTransient<CurtidaRepositoryRAM>();
-builder.Services.AddTransient<ICurtidaRepository>(provider =>
-{
-    var configService = provider.GetRequiredService<ConfigService>();
-    var dbRepository = provider.GetRequiredService<CurtidaRepository>();
-    var ramRepository = provider.GetRequiredService<CurtidaRepositoryRAM>();
-    return new CurtidaRepositoryProxy(configService, dbRepository, ramRepository);
-});
+builder.Services.AddTransient<ICurtidaRepository, CurtidaRepositoryRAM>();
 
 // | Estatistica Repository |
-builder.Services.AddTransient<EstatisticasRepository>();
-builder.Services.AddTransient<EstatisticasRepositoryRAM>();
-builder.Services.AddTransient<IEstatisticasRepository>(provider =>
-{
-    var configService = provider.GetRequiredService<ConfigService>();
-    var dbRepository = provider.GetRequiredService<EstatisticasRepository>();
-    var ramRepository = provider.GetRequiredService<EstatisticasRepositoryRAM>();
-    return new EstatisticasRepositoryProxy(configService, dbRepository, ramRepository);
-});
+builder.Services.AddTransient<IEstatisticasRepository, EstatisticasRepositoryRAM>();
 
 // | InformHome Repository |
-builder.Services.AddTransient<InformHomeRepository>();
-builder.Services.AddTransient<InformHomeRepositoryRAM>();
-builder.Services.AddTransient<IInformHomeRepository>(provider =>
-{
-    var configService = provider.GetRequiredService<ConfigService>();
-    var dbRepository = provider.GetRequiredService<InformHomeRepository>();
-    var ramRepository = provider.GetRequiredService<InformHomeRepositoryRAM>();
-    return new InformHomeRepositoryProxy(configService, dbRepository, ramRepository);
-});
+builder.Services.AddTransient<IInformHomeRepository, InformHomeRepositoryRAM>();
 
 // | Mensagem Repository |
-builder.Services.AddTransient<MensagemRepository>();
-builder.Services.AddTransient<MensagemRepositoryRAM>();
-builder.Services.AddTransient<IMensagemRepository>(provider =>
-{
-    var configService = provider.GetRequiredService<ConfigService>();
-    var dbRepository = provider.GetRequiredService<MensagemRepository>();
-    var ramRepository = provider.GetRequiredService<MensagemRepositoryRAM>();
-    return new MensagemRepositoryProxy(configService, dbRepository, ramRepository);
-});
+builder.Services.AddTransient<IMensagemRepository, MensagemRepositoryRAM>();
 
 // | Notificacao Repository |
-builder.Services.AddTransient<NotificacaoRepository>();
-builder.Services.AddTransient<NotificacaoRepositoryRAM>();
-builder.Services.AddTransient<INotificacaoRepository>(provider =>
-{
-    var configService = provider.GetRequiredService<ConfigService>();
-    var dbRepository = provider.GetRequiredService<NotificacaoRepository>();
-    var ramRepository = provider.GetRequiredService<NotificacaoRepositoryRAM>();
-    return new NotificacaoRepositoryProxy(configService, dbRepository, ramRepository);
-});
+builder.Services.AddTransient<INotificacaoRepository, NotificacaoRepositoryRAM>();
 
 // | Post Repository |
-builder.Services.AddTransient<PostRepository>();
-builder.Services.AddTransient<PostRepositoryRAM>();
-builder.Services.AddTransient<IPostRepository>(provider =>
-{
-    var configService = provider.GetRequiredService<ConfigService>();
-    var dbRepository = provider.GetRequiredService<PostRepository>();
-    var ramRepository = provider.GetRequiredService<PostRepositoryRAM>();
-    return new PostRepositoryProxy(configService, dbRepository, ramRepository);
-});
+builder.Services.AddTransient<IPostRepository, PostRepositoryRAM>();
 
 // | Usuario Repository |
-builder.Services.AddTransient<UsuarioRepository>();
-builder.Services.AddTransient<UsuarioRepositoryRAM>();
-builder.Services.AddTransient<IUsuarioRepository>(provider =>
-{
-    var configService = provider.GetRequiredService<ConfigService>();
-    var dbRepository = provider.GetRequiredService<UsuarioRepository>();
-    var ramRepository = provider.GetRequiredService<UsuarioRepositoryRAM>();
-    return new UsuarioRepositoryProxy(configService, dbRepository, ramRepository);
-});
-
-// Adicionar testes automaticos do Banco
-builder.Services.AddHostedService<TestarBDService>();
+builder.Services.AddTransient<IUsuarioRepository, UsuarioRepositoryRAM>();
 
 // Esse primeiro aqui limita por porta "endereço",
 // se descobrir como setar uma porta especifica no Electron

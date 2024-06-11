@@ -8,37 +8,29 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
 {
     public class PostRepositoryRAM : IPostRepository
     {
-        public async Task Add(Post post)
+        public void Add(Post post)
         {
-            await Task.Run(() =>
-            {
-                VolatileContext.Posts.Add(post);
-            });
+            VolatileContext.Posts.Add(post);
         }
 
-        public Task<Post?> Get(Guid id)
+        public Post? Get(Guid id)
         {
-            var resultado = VolatileContext.Posts
+            return VolatileContext.Posts
                 .FirstOrDefault(post => post.Id == id);
-
-            return Task.FromResult(resultado);
         }
 
-        public async Task Update(Post post)
+        public void Update(Post post)
         {
-            await Task.Run(() =>
+            var index = VolatileContext.Posts.FindIndex(m => m.Id == post.Id);
+            if (index != -1)
             {
-                var index = VolatileContext.Posts.FindIndex(m => m.Id == post.Id);
-                if (index != -1)
-                {
-                    VolatileContext.Posts[index] = post;
-                }
-            });
+                VolatileContext.Posts[index] = post;
+            }
         }
 
-        public Task<List<PostCompletoDto>> GetAll()
+        public List<PostCompletoDto> GetAll()
         {
-            var resultado = VolatileContext.Posts
+            return VolatileContext.Posts
                 .OrderByDescending(post => post.TimeStamp)
                 .Select(post => new PostCompletoDto
                 (
@@ -52,13 +44,11 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                     post.TimeStamp
                 ))
                 .ToList();
-
-            return Task.FromResult(resultado);
         }
 
-        public Task<List<PostCompletoDto>> GetFeedUsr(Guid idUsuario)
+        public List<PostCompletoDto> GetFeedUsr(Guid idUsuario)
         {
-            var amizades = GetAllAmz(idUsuario).Result;
+            var amizades = GetAllAmz(idUsuario);
             List<Guid> idAmigos = new();
             List<PostCompletoDto> feed = new();
 
@@ -76,22 +66,22 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
 
             foreach (var id in idAmigos)
             {
-                feed.AddRange(PostadosPor(id).Result);
+                feed.AddRange(PostadosPor(id));
             }
 
             feed.Sort((postUm, postDois) =>
             postDois.timeStamp.CompareTo(postUm.timeStamp));
             // Ordem inversa para ser decrescente, trocar causo queira crescente
 
-            return Task.FromResult(feed);
+            return feed;
         }
 
-        public Task<List<PostCompletoDto>> GetPostsPesquisa(string pesquisa)
+        public List<PostCompletoDto> GetPostsPesquisa(string pesquisa)
         {
             var candidatos = VolatileContext.Posts
-                .Where(post => 
+                .Where(post =>
                     post.Titulo.Contains
-                        (pesquisa, StringComparison.CurrentCultureIgnoreCase) || 
+                        (pesquisa, StringComparison.CurrentCultureIgnoreCase) ||
                     post.Descricao.Contains
                         (pesquisa, StringComparison.CurrentCultureIgnoreCase))
                 .Select(post => new PostCompletoDto
@@ -111,28 +101,23 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                                || AlgoritmosDePesquisa.SimilaridadeDeJaccard(post.descricao, pesquisa) > 0.2)
                 .ToList();
 
-            return Task.FromResult(resultados);
+            return resultados;
         }
 
-        public async Task Delete(Post post)
+        public void Delete(Post post)
         {
-            await Task.Run(() =>
-            {
-                VolatileContext.Posts.Remove(post);
-            });
+            VolatileContext.Posts.Remove(post);
         }
 
-        public Task<Post?> GetLast()
+        public Post? GetLast()
         {
-            var resultado = VolatileContext.Posts
+            return VolatileContext.Posts
                 .OrderByDescending(e => e.Id).FirstOrDefault();
-
-            return Task.FromResult(resultado);
         }
 
-        public Task<List<PostCompletoDto>> PostadosPor(Guid idUsuario)
+        public List<PostCompletoDto> PostadosPor(Guid idUsuario)
         {
-            var resultado = VolatileContext.Posts
+            return VolatileContext.Posts
                 .Where(post => post.IdUsuario == idUsuario)
                 .Select(post => new PostCompletoDto
                 (
@@ -146,19 +131,15 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                     post.TimeStamp
                 ))
                 .ToList();
-
-            return Task.FromResult(resultado);
         }
 
-        public Task<List<Amizade>> GetAllAmz(Guid idUsuario)
+        public List<Amizade> GetAllAmz(Guid idUsuario)
         {
-            var resultado = VolatileContext.Amizades
+            return VolatileContext.Amizades
                 .OrderByDescending(amz => amz.Id)
                 .Select(amz => new Amizade(amz.Remetente, amz.Destinatario))
                 .Where(amz => amz.Destinatario == idUsuario || amz.Remetente == idUsuario)
                 .ToList();
-
-            return Task.FromResult(resultado);
         }
     }
 }
