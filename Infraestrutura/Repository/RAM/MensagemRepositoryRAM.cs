@@ -121,7 +121,9 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                     mensagem.TimeStamp
                 ))
                 .Where(mensagem => mensagem.Remetente == remetente
-                                   && mensagem.Destinatario == destinatario)
+                                   && mensagem.Destinatario == destinatario
+                                   || mensagem.Remetente == destinatario
+                                   && mensagem.Destinatario == remetente)
                 .ToList();
 
             return Task.FromResult(resultado);
