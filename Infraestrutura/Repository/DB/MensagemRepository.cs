@@ -77,8 +77,9 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
         {
             return await _context.Mensagens
                 .Where(m => m.Remetente == remetente
-                            && m.Destinatario == destinatario)
-                .OrderByDescending(m => m.Id)
+                                && m.Destinatario == destinatario
+                                || m.Remetente == destinatario
+                                && m.Destinatario == remetente)
                 .Select(m => new ChatDto
                 (
                     m.Id,
