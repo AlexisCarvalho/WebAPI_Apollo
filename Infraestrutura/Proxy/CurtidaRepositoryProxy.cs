@@ -1,4 +1,5 @@
-﻿using WebAPI_Apollo.Domain.Model.Interacoes;
+﻿using WebAPI_Apollo.Domain.Model;
+using WebAPI_Apollo.Domain.Model.Interacoes;
 using WebAPI_Apollo.Domain.Model.Interfaces;
 
 namespace WebAPI_Apollo.Infraestrutura.Proxy

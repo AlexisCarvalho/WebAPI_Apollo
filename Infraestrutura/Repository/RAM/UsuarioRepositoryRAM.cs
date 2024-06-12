@@ -132,7 +132,7 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                 ))
                 .ToList();
 
-            var resultados = candidatos
+            var resultados = candidatos    
                 .Where(usuario => AlgoritmosDePesquisa.SimilaridadeDeJaccard(usuario.nome, nome) > 0.6)
                 .ToList();
 

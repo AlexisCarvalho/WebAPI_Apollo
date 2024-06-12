@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata.Ecma335;
 using WebAPI_Apollo.Application.Services;
 using WebAPI_Apollo.Domain.DTOs;
 using WebAPI_Apollo.Domain.Model;
@@ -54,7 +55,7 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.DB
         public async Task<List<UsuarioDto>> GetUsuariosNome(string nome)
         {
             var candidatos = await _context.Usuarios
-                .Where(usuario =>
+                .Where(usuario => 
                     usuario.Nome.ToLower().Contains
                         (nome.ToLower()))
                 .Select(usuario => new UsuarioDto

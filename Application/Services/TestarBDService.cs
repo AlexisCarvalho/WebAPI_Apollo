@@ -35,7 +35,7 @@ namespace WebAPI_Apollo.Application.Services
             {
                 _configService.DBAtivado = true; // Mudar aqui pra forçar o uso da RAM no inicio
             }
-            else
+            else 
             {
                 Console.WriteLine("Erro nos Testes do Banco de Dados");
                 _configService.DBAtivado = false;

@@ -1,4 +1,5 @@
-﻿using WebAPI_Apollo.Domain.Model.Interacoes;
+﻿using WebAPI_Apollo.Domain.Model;
+using WebAPI_Apollo.Domain.Model.Interacoes;
 using WebAPI_Apollo.Domain.Model.Interfaces;
 
 namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
@@ -7,8 +8,8 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
     {
         public async Task Add(Curtida curtida)
         {
-            await Task.Run(() =>
-            {
+            await Task.Run(() => 
+            { 
                 // Código pra substituir o autoIncrement do Banco
                 var ultimaCurtida = GetLast().Result;
 
@@ -53,7 +54,7 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
 
         public async Task Update(Curtida curtida)
         {
-            await Task.Run(() =>
+            await Task.Run(() => 
             {
                 var index = VolatileContext.Curtidas
                     .FindIndex(e => e.Id == curtida.Id);
