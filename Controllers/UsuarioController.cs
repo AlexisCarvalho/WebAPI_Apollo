@@ -506,8 +506,8 @@ namespace WebAPI_Apollo.Controllers
             var pedidoExistente = _ntfRepository.JaFoiNotificado(
                 new Notificacao
                 (
-                    quemPediu.Id, 
-                    usuario.Id, 
+                    quemPediu.Id,
+                    usuario.Id,
                     1,
                     ""
                 )).Result;
@@ -595,8 +595,8 @@ namespace WebAPI_Apollo.Controllers
                 .JaFoiNotificado(new Notificacao
                 (
                     quemPediu.Id,
-                    usuario.Id, 
-                    1, 
+                    usuario.Id,
+                    1,
                     ""
                 )).Result;
 
@@ -757,7 +757,7 @@ namespace WebAPI_Apollo.Controllers
         [Route("Login/Deslogar")]
         public IActionResult LoginOff()
         {
-            if(ConfigUsuario.CurrentUser is null)
+            if (ConfigUsuario.CurrentUser is null)
             {
                 return BadRequest("Nenhum Usuario Logado");
             }

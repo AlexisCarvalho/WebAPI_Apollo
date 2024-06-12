@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WebAPI_Apollo.Domain.Model;
 using WebAPI_Apollo.Domain.Model.Interacoes;
 using WebAPI_Apollo.Domain.Model.Interfaces;
 

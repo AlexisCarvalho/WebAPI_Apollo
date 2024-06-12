@@ -111,7 +111,6 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
         public Task<List<ChatDto>> EnviadasEntre(Guid remetente, Guid destinatario)
         {
             var resultado = VolatileContext.Mensagens
-                .OrderByDescending(msg => msg.Id)
                 .Select(mensagem => new ChatDto
                 (
                     mensagem.Id,
@@ -121,7 +120,9 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
                     mensagem.TimeStamp
                 ))
                 .Where(mensagem => mensagem.Remetente == remetente
-                                   && mensagem.Destinatario == destinatario)
+                                   && mensagem.Destinatario == destinatario
+                                   || mensagem.Remetente == destinatario
+                                   && mensagem.Destinatario == remetente)
                 .ToList();
 
             return Task.FromResult(resultado);

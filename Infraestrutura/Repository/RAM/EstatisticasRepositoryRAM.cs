@@ -7,8 +7,8 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
     {
         public async Task Add(Estatisticas estatisticas)
         {
-            await Task.Run(() => 
-            { 
+            await Task.Run(() =>
+            {
                 // Código pra substituir o autoIncrement do Banco
                 var ultimaEstatistica = GetLast().Result;
 

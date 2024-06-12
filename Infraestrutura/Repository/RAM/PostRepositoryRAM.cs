@@ -89,9 +89,9 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
         public Task<List<PostCompletoDto>> GetPostsPesquisa(string pesquisa)
         {
             var candidatos = VolatileContext.Posts
-                .Where(post => 
+                .Where(post =>
                     post.Titulo.Contains
-                        (pesquisa, StringComparison.CurrentCultureIgnoreCase) || 
+                        (pesquisa, StringComparison.CurrentCultureIgnoreCase) ||
                     post.Descricao.Contains
                         (pesquisa, StringComparison.CurrentCultureIgnoreCase))
                 .Select(post => new PostCompletoDto

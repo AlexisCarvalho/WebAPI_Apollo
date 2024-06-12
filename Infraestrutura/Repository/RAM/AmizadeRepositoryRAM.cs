@@ -52,7 +52,7 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
 
         public Task<List<Amizade>> GetAllUsr(Guid idUsuario)
         {
-            var resultado = 
+            var resultado =
                 VolatileContext.Amizades
                         .OrderByDescending(amz => amz.Id)
                         .Select(amz => new Amizade
@@ -99,8 +99,8 @@ namespace WebAPI_Apollo.Infraestrutura.Repository.RAM
 
         public async Task DeletarReferencias(Guid idUsuario)
         {
-            await Task.Run(() => 
-            { 
+            await Task.Run(() =>
+            {
                 var amizadesDoUsr = VolatileContext.Amizades
                     .Select(amz => new Amizade
                     (
